@@ -3,13 +3,10 @@
 
 #include <iostream>
 
+#include "application.hpp"
+
 
 const char *VERSION = "0.0.0";
 
-
-class Engine {
-public:
-    void Start();
-};
 
 #endif
