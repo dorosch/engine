@@ -15,8 +15,6 @@ $(TARGET): $(OBJECTS)
 	@make --dir $(LIB) -f $(LIB)/Makefile
 	@mkdir -p $(TARGET_DIR)
 	$(CXX) $(OBJECTS) $(CXXFLAGS) -o $(TARGET)
-
-run: $(TARGET)
 	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/bin ./$(TARGET)
 
 clean:
