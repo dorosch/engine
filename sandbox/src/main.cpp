@@ -1,20 +1,23 @@
-#include "engine.hpp"
+#include "core.hpp"
+
+
+class Sandbox : public Engine::Application {};
 
 
 int main() {
-    Engine *engine = new Engine();
+    Sandbox *application = new Sandbox();
 
     try {
-        engine->Start();
-    } catch (const std::exception& e) {
-        delete engine;
+        application->Run();
+    } catch (const std::exception& error) {
+        delete application;
 
-        std::cerr << e.what() << std::endl;
+        std::cerr << error.what() << std::endl;
 
         return EXIT_FAILURE;
     }
 
-    delete engine;
+    delete application;
 
     return EXIT_SUCCESS;
 }
