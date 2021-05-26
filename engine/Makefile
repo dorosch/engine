@@ -1,10 +1,11 @@
 CXX = g++
-CXXFLAGS = -fPIC -std=c++17 -O2 -Wall -pedantic -I include $(LDFLAGS)
+CXXFLAGS = -fPIC -std=c++17 -O2 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
+INCLUDE = -I include
 LDFLAGS =
 
 TARGET_DIR = bin
-TARGET = $(TARGET_DIR)/engine.so
-SOURCES = $(shell find src/ -name *.cpp)
+TARGET = $(TARGET_DIR)/libengine.so
+SOURCES = $(shell find ./src/ -name *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
 
 
@@ -14,4 +15,4 @@ $(TARGET): $(OBJECTS)
 
 clean:
 	@rm -rf $(TARGET_DIR)
-	@rm -f $(shell find src/ -name *.o)
+	@rm -f $(OBJECTS)
