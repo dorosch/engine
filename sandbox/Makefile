@@ -1,9 +1,9 @@
 LIB = $(shell dirname $(shell pwd))/engine
 
 CXX = g++
-CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
+CXXFLAGS = -std=c++20 -O2 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
 INCLUDE = -I $(LIB)/include -L $(LIB)/bin
-LDFLAGS = -lengine
+LDFLAGS = -lengine -lfmt
 
 TARGET_DIR = bin
 TARGET = $(TARGET_DIR)/application

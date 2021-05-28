@@ -1,12 +1,11 @@
 #ifndef __ENGINE_HPP__
 #define __ENGINE_HPP__
 
-#include <iostream>
-
 #include "application.hpp"
+#include "logger.hpp"
 
 
-const char *VERSION = "0.0.0";
+const char *ENGINE_VERSION = "0.0.0";
 
 
 #endif

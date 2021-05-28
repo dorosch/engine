@@ -1,9 +1,11 @@
-#include "core.hpp"
+#include "application.hpp"
 
 
 namespace Engine {
     void Application::Run() {
-        std::cout << "Engine version: " << VERSION << std::endl;
+        logger->debug("run");
+
+        logger->info(fmt::format("Engine version: {}", ENGINE_VERSION));
 
         while (true);
     }

@@ -1,7 +1,27 @@
-#include "core.hpp"
+#include <iostream>
+
+#include <core.hpp>
 
 
-class Sandbox : public Engine::Application {};
+class Sandbox : public Engine::Application {
+private:
+    Engine::Logger::Logger *logger;
+
+public:
+    Sandbox() {
+        logger = new Engine::Logger::Logger("sandbox");
+
+        logger->SetLevel(Engine::Logger::Level::trace);
+
+        logger->debug("init");
+    }
+
+    ~Sandbox() {
+        logger->debug("finish");
+
+        delete logger;
+    }
+};
 
 
 int main() {
@@ -10,9 +30,9 @@ int main() {
     try {
         application->Run();
     } catch (const std::exception& error) {
-        delete application;
-
         std::cerr << error.what() << std::endl;
+
+        delete application;
 
         return EXIT_FAILURE;
     }
