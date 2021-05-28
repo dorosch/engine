@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include <core.hpp>
+#include "application.hpp"
+#include "logger.hpp"
 
 
 class Sandbox : public Engine::Application {
@@ -10,8 +11,6 @@ private:
 public:
     Sandbox() {
         logger = new Engine::Logger::Logger("sandbox");
-
-        logger->SetLevel(Engine::Logger::Level::trace);
 
         logger->debug("init");
     }

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fmt/format.h>
 
-#include "core.hpp"
+#include "meta.hpp"
 #include "logger.hpp"
 
 
@@ -16,8 +16,6 @@ namespace Engine {
     public:
         Application() {
             logger = new Logger::Logger("engine");
-
-            logger->SetLevel(Logger::Level::trace);
 
             logger->debug("init");
         }
