@@ -19,64 +19,70 @@ namespace Engine {
 
         class Logger {
         private:
+            Level _level;
             std::shared_ptr<spdlog::logger> _logger;
 
         public:
             Logger(const char *name) {
+                this->_level = Level::info;
                 this->_logger = spdlog::stdout_logger_mt(name);
             }
 
             void SetLevel(Level level) {
                 switch (level) {
                     case Level::trace:
+                        this->_level = Level::trace;
                         this->_logger->set_level(spdlog::level::trace);
                         break;
                     case Level::debug:
+                        this->_level = Level::debug;
                         this->_logger->set_level(spdlog::level::debug);
                         break;
                     case Level::info:
+                        this->_level = Level::info;
                         this->_logger->set_level(spdlog::level::info);
                         break;
                     case Level::warning:
+                        this->_level = Level::warning;
                         this->_logger->set_level(spdlog::level::warn);
                         break;
                     case Level::error:
+                        this->_level = Level::error;
                         this->_logger->set_level(spdlog::level::err);
                         break;
                     case Level::critical:
+                        this->_level = Level::critical;
                         this->_logger->set_level(spdlog::level::critical);
                         break;
                 }
             }
 
-            template<typename ...Args>
-            void trace(Args&&... args) {
-                this->_logger->trace(args...);
+            Level GetLevel() {
+                return this->_level;
             }
 
-            template<typename ...Args>
-            void debug(Args&&... args) {
-                this->_logger->debug(args...);
+            void trace(const char *message) {
+                this->_logger->trace(message);
             }
 
-            template<typename ...Args>
-            void info(Args&&... args) {
-                this->_logger->info(args...);
+            void debug(const char *message) {
+                this->_logger->debug(message);
             }
 
-            template<typename ...Args>
-            void warning(Args&&... args) {
-                this->_logger->warn(args...);
+            void info(const char *message) {
+                this->_logger->info(message);
             }
 
-            template<typename ...Args>
-            void error(Args&&... args) {
-                this->_logger->error(args...);
+            void warning(const char *message) {
+                this->_logger->warn(message);
             }
 
-            template<typename ...Args>
-            void critical(Args&&... args) {
-                this->_logger->critical(args...);
+            void error(const char *message) {
+                this->_logger->error(message);
+            }
+
+            void critical(const char *message) {
+                this->_logger->critical(message);
             }
         };
     }
