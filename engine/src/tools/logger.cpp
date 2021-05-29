@@ -5,7 +5,7 @@ namespace Engine {
     namespace Logger {
         Logger::Logger(const char *name) {
             this->_level = Level::info;
-            this->_logger = spdlog::stdout_logger_mt(name);
+            this->_logger = spdlog::stdout_color_mt(name);
         }
 
 
