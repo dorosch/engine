@@ -2,12 +2,19 @@
 #define __ENGINE_HPP__
 
 #include "tools/logger.hpp"
+#include "core/manager/window.hpp"
 
 
 namespace Engine{
     class EngineApplication {
     public:
-        virtual void Run() = 0;
+        EngineApplication();
+
+        ~EngineApplication();
+
+        Manager::WindowManager *window;
+
+        virtual void Init() = 0;
 
         virtual void Update() = 0;
 

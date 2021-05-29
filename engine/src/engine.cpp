@@ -5,6 +5,16 @@
 
 
 namespace Engine {
+    EngineApplication::EngineApplication() {
+        this->window = nullptr;
+    }
+
+
+    EngineApplication::~EngineApplication() {
+        delete this->window;
+    }
+
+
     Engine::Engine(EngineApplication *application) {
         this->application = application;
 
@@ -22,12 +32,26 @@ namespace Engine {
 
 
     void Engine::Run() {
-        logger->info("engine starting");
+        /**
+         * The main method of starting the engine.
+         * 
+         * The method initializes the user application and checks 
+         * the correctness of the initialization. If one of the managers 
+         * is not initialized, then the execution of the main loop 
+         * will not start. 
+         */
+
         logger->info(fmt::format("engine version: {}", ENGINE_VERSION).c_str());
 
-        this->application->Run();
+        this->application->Init();
 
-        while (true) {
+        if (!this->application->window) {
+            return logger->critical(
+                "The application must initialize WindowManager"
+            );
+        }
+
+        while (this->application->window->IsOpen) {
             this->application->Update();
         }
     }

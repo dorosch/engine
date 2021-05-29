@@ -1,6 +1,5 @@
-#include <iostream>
-
 #include "engine.hpp"
+#include "core/manager/window.hpp"
 #include "tools/logger.hpp"
 
 
@@ -9,10 +8,12 @@ private:
     Engine::Logger::Logger *logger;
 
 public:
-    void Run() {
+    void Init() {
         logger = new Engine::Logger::Logger("app");
 
-        logger->info("application starting");
+        logger->info("application init");
+
+        window = new Engine::Manager::WindowManager();
     }
 
     void Update() {
@@ -34,8 +35,6 @@ int main() {
     try {
         engine.Run();
     } catch (const std::exception& error) {
-        std::cerr << error.what() << std::endl;
-
         return EXIT_FAILURE;
     }
 
