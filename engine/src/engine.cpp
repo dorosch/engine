@@ -18,7 +18,7 @@ namespace Engine {
     Engine::Engine(EngineApplication *application) {
         this->application = application;
 
-        this->logger = new Logger::Logger("engine");
+        this->logger = new Tool::Logger::Logger("engine");
     }
 
 

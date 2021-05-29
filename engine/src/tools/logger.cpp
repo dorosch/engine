@@ -1,7 +1,7 @@
 #include "tools/logger.hpp"
 
 
-namespace Engine {
+namespace Tool {
     namespace Logger {
         Logger::Logger(const char *name) {
             this->_level = Level::info;

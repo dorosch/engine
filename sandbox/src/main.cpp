@@ -5,11 +5,11 @@
 
 class Application : public Engine::EngineApplication {
 private:
-    Engine::Logger::Logger *logger;
+    Tool::Logger::Logger *logger;
 
 public:
     void Init() {
-        logger = new Engine::Logger::Logger("app");
+        logger = new Tool::Logger::Logger("app");
 
         logger->info("application init");
 

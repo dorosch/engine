@@ -25,7 +25,7 @@ namespace Engine{
     class Engine {
     private:
         EngineApplication *application;
-        Logger::Logger *logger;
+        Tool::Logger::Logger *logger;
 
     public:
         Engine(EngineApplication *);
