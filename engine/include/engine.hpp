@@ -10,7 +10,9 @@ namespace Engine{
     public:
         EngineApplication();
 
-        ~EngineApplication();
+        virtual ~EngineApplication();
+
+        Tool::Logger::Logger *logger;
 
         Manager::WindowManager *window;
 
@@ -25,12 +27,13 @@ namespace Engine{
     class Engine {
     private:
         EngineApplication *application;
-        Tool::Logger::Logger *logger;
 
     public:
         Engine(EngineApplication *);
 
         ~Engine();
+
+        Tool::Logger::Logger *logger;
 
         void Run();
     };
