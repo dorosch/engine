@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "engine.hpp"
-#include "logger.hpp"
+#include "tools/logger.hpp"
 
 
 class Application : public Engine::EngineApplication {
@@ -28,7 +28,7 @@ public:
 
 
 int main() {
-    Application *application = new Application();;
+    Application *application = new Application();
     Engine::Engine engine(application);
 
     try {
