@@ -20,3 +20,4 @@ $(TARGET): $(OBJECTS)
 clean:
 	@rm -f $(OBJECTS)
 	@rm -rf $(TARGET_DIR)
+	@make --dir $(LIB) -f $(LIB)/Makefile clean
