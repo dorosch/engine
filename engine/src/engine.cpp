@@ -7,26 +7,38 @@
 namespace Engine {
     EngineApplication::EngineApplication() {
         this->window = nullptr;
+
+        logger = new Tool::Logger::Logger("app");
+
+        logger->trace("constructor");
     }
 
 
     EngineApplication::~EngineApplication() {
+        logger->trace("destructor");
+
+        this->window->Shutdown();
+
         delete this->window;
+        delete this->logger;
     }
 
 
     Engine::Engine(EngineApplication *application) {
         this->application = application;
 
-        this->logger = new Tool::Logger::Logger("engine");
+        logger = new Tool::Logger::Logger("engine");
+
+        logger->trace("constructor");
     }
 
 
     Engine::~Engine() {
-        logger->info("engine shutdown");
+        logger->trace("destructor");
 
         this->application->Shutdown();
 
+        delete this->application;
         delete this->logger;
     }
 
@@ -49,6 +61,8 @@ namespace Engine {
             return logger->critical(
                 "The application must initialize WindowManager"
             );
+        } else {
+            this->application->window->Init();
         }
 
         while (this->application->window->IsOpen) {

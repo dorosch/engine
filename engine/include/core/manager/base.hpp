@@ -5,7 +5,7 @@
 namespace Engine {
     namespace Manager {
         class EngineManager {
-        
+
         };
     }
 }

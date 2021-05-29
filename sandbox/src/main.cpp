@@ -4,26 +4,17 @@
 
 
 class Application : public Engine::EngineApplication {
-private:
-    Tool::Logger::Logger *logger;
-
 public:
     void Init() {
-        logger = new Tool::Logger::Logger("app");
-
-        logger->info("application init");
+        logger->debug("init");
 
         window = new Engine::Manager::WindowManager();
     }
 
-    void Update() {
-        // TODO: Implement me
-    }
+    void Update() {}
 
     void Shutdown() {
-        logger->info("application shutdown");
-
-        delete logger;
+        logger->debug("shutdown");
     }
 };
 
