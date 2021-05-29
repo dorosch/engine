@@ -1,22 +1,26 @@
 #include <iostream>
 
-#include "application.hpp"
+#include "engine.hpp"
 #include "logger.hpp"
 
 
-class Sandbox : public Engine::Application {
+class Application : public Engine::EngineApplication {
 private:
     Engine::Logger::Logger *logger;
 
 public:
-    Sandbox() {
-        logger = new Engine::Logger::Logger("sandbox");
+    void Run() {
+        logger = new Engine::Logger::Logger("app");
 
-        logger->debug("init");
+        logger->info("application starting");
     }
 
-    ~Sandbox() {
-        logger->debug("finish");
+    void Update() {
+        // TODO: Implement me
+    }
+
+    void Shutdown() {
+        logger->info("application shutdown");
 
         delete logger;
     }
@@ -24,19 +28,16 @@ public:
 
 
 int main() {
-    Sandbox *application = new Sandbox();
+    Application *application = new Application();;
+    Engine::Engine engine(application);
 
     try {
-        application->Run();
+        engine.Run();
     } catch (const std::exception& error) {
         std::cerr << error.what() << std::endl;
 
-        delete application;
-
         return EXIT_FAILURE;
     }
-
-    delete application;
 
     return EXIT_SUCCESS;
 }
