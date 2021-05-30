@@ -3,20 +3,6 @@
 
 namespace Engine {
     namespace Manager {
-        WindowManager::WindowManager() {
-            logger = new Tool::Logger::Logger("windowm");
-
-            logger->trace("constructor");
-        }
-
-
-        WindowManager::~WindowManager() {
-            logger->trace("destructor");
-
-            delete this->logger;
-        }
-
-
         void WindowManager::Init() {
             if (!this->provider) {
                 this->provider = Window::Provider::GLFW;

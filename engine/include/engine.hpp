@@ -1,8 +1,12 @@
 #ifndef __ENGINE_HPP__
 #define __ENGINE_HPP__
 
+#include <memory>
+
 #include "tools/logger.hpp"
 #include "core/window/manager.hpp"
+
+using namespace Tool::Logger;
 
 
 namespace Engine{
@@ -22,8 +26,9 @@ namespace Engine{
          */
 
     public:
-        Tool::Logger::Logger *logger;
-        Manager::WindowManager *windowManager;
+        std::unique_ptr<Logger> logger = std::make_unique<Logger>("app");
+
+        Manager::WindowManager *windowManager = nullptr;
 
         EngineApplication();
         virtual ~EngineApplication();
@@ -46,7 +51,7 @@ namespace Engine{
         EngineApplication *app;
 
     public:
-        Tool::Logger::Logger *logger;
+        std::unique_ptr<Logger> logger = std::make_unique<Logger>("engine");
 
         Engine(EngineApplication *);
         ~Engine();

@@ -5,11 +5,15 @@
 #define GLEW_STATIC
 #endif
 
+#include <memory>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "tools/logger.hpp"
 #include "core/window/provider.hpp"
+
+using namespace Tool::Logger;
 
 
 namespace Engine {
@@ -17,13 +21,10 @@ namespace Engine {
         class GLFWProvider : public WindowProvider {
         private:
             GLFWmonitor* primaryMonitor = nullptr;
-            Tool::Logger::Logger *logger;
+            std::unique_ptr<Logger> logger = std::make_unique<Logger>("glfw");
 
         public:
             GLFWwindow  *object = nullptr;
-
-            GLFWProvider();
-            ~GLFWProvider();
 
             void Init();
             void Create();

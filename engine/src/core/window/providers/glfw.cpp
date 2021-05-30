@@ -3,20 +3,6 @@
 
 namespace Engine {
     namespace Window {
-        GLFWProvider::GLFWProvider() {
-            this->logger = new Tool::Logger::Logger("glfw");
-
-            logger->trace("constructor");
-        }
-
-
-        GLFWProvider::~GLFWProvider() {
-            logger->trace("destructor");
-
-            delete logger;
-        }
-
-
         void GLFWProvider::Init() {
             logger->debug("init");
 

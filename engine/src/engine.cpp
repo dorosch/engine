@@ -7,39 +7,25 @@
 namespace Engine {
     EngineApplication::EngineApplication() {
         this->windowManager = new Manager::WindowManager();
-
-        logger = new Tool::Logger::Logger("app");
-
-        logger->trace("constructor");
     }
 
 
     EngineApplication::~EngineApplication() {
-        logger->trace("destructor");
-
         this->windowManager->Shutdown();
 
         delete this->windowManager;
-        delete this->logger;
     }
 
 
     Engine::Engine(EngineApplication *application) {
         this->app = application;
-
-        logger = new Tool::Logger::Logger("engine");
-
-        logger->trace("constructor");
     }
 
 
     Engine::~Engine() {
-        logger->trace("destructor");
-
         this->app->Shutdown();
 
         delete this->app;
-        delete this->logger;
     }
 
 
