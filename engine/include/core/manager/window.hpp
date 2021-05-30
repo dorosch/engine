@@ -27,15 +27,10 @@ namespace Engine {
             bool canResize;
 
             WindowManager();
-
             ~WindowManager();
-
             void Init();
-
             void Update();
-
             void Shutdown();
-
             bool IsOpen();
         };
     }
