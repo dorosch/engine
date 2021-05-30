@@ -6,7 +6,7 @@
 
 namespace Engine {
     EngineApplication::EngineApplication() {
-        this->window = new Manager::WindowManager();
+        this->windowManager = new Manager::WindowManager();
 
         logger = new Tool::Logger::Logger("app");
 
@@ -17,9 +17,9 @@ namespace Engine {
     EngineApplication::~EngineApplication() {
         logger->trace("destructor");
 
-        this->window->Shutdown();
+        this->windowManager->Shutdown();
 
-        delete this->window;
+        delete this->windowManager;
         delete this->logger;
     }
 
@@ -54,8 +54,10 @@ namespace Engine {
 
         logger->info(fmt::format("engine version: {}", ENGINE_VERSION).c_str());
 
+        // Initialize all managers and then initialize the application
+        // since the application can change the settings of managers.
+        this->app->windowManager->Init();
         this->app->Init();
-        this->app->window->Init();
     }
 
 
@@ -67,9 +69,11 @@ namespace Engine {
          * continues updating user application and all managers. 
          */
 
-        while (this->app->window->IsOpen()) {
+        this->app->windowManager->window->Create();
+
+        while (this->app->windowManager->window->IsOpen()) {
             this->app->Update();
-            this->app->window->Update();
+            this->app->windowManager->Update();
         }
     }
 }

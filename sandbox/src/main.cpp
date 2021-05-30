@@ -6,6 +6,9 @@ class Application : public Engine::EngineApplication {
 public:
     void Init() {
         logger->debug("init");
+
+        windowManager->window->settings.canResize = true;
+        windowManager->window->settings.title = "Application";
     }
 
     void Update() {}

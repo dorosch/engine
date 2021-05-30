@@ -9,6 +9,8 @@
 #include <GLFW/glfw3.h>
 
 #include "core/manager.hpp"
+#include "core/window/provider.hpp"
+#include "core/window/providers/glfw.hpp"
 #include "tools/logger.hpp"
 
 
@@ -19,19 +21,14 @@ namespace Engine {
             Tool::Logger::Logger *logger;
 
         public:
-            GLFWwindow* id;
-            int width;
-            int height;
-            const char *title;
-            bool fullScreen;
-            bool canResize;
+            Window::Provider provider;
+            Window::WindowProvider *window;
 
             WindowManager();
-            ~WindowManager();
+            virtual ~WindowManager();
             void Init();
             void Update();
             void Shutdown();
-            bool IsOpen();
         };
     }
 }

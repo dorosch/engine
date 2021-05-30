@@ -17,6 +17,7 @@ namespace Tool {
             critical
         };
 
+
         class Logger {
         private:
             Level _level;

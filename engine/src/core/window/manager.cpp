@@ -7,12 +7,6 @@ namespace Engine {
             logger = new Tool::Logger::Logger("windowm");
 
             logger->trace("constructor");
-
-            width = 800;
-            height = 600;
-            title = "Application";
-            fullScreen = false;
-            canResize = false;
         }
 
 
@@ -24,46 +18,27 @@ namespace Engine {
 
 
         void WindowManager::Init() {
-            GLFWmonitor* primaryMonitor = nullptr;
-
-            logger->debug("init");
-
-            glfwInit();
-
-            glfwWindowHint(GLFW_SAMPLES, 4);
-
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-            if (!this->canResize) {
-                glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+            if (!this->provider) {
+                this->provider = Window::Provider::GLFW;
             }
 
-            if (this->fullScreen) {
-                primaryMonitor = glfwGetPrimaryMonitor();
+            switch (this->provider) {
+                case Window::Provider::GLFW:
+                    this->window = new Window::GLFWProvider();
+                    break;
+                default:
+                    throw std::logic_error("Undefined WindowProvider");
             }
 
-            id = glfwCreateWindow(
-                this->width, this->height, this->title, primaryMonitor, nullptr
-            );
-            
-            glfwMakeContextCurrent(this->id);
+            this->window->Init();
         }
 
         void WindowManager::Update() {
-            glfwPollEvents();
-
-            glfwSwapBuffers(this->id);
+            this->window->Update();
         }
 
         void WindowManager::Shutdown() {
-            logger->debug("shutdown");
-
-            glfwDestroyWindow(this->id);
-        }
-
-        bool WindowManager::IsOpen() {
-            return !glfwWindowShouldClose(this->id);
+            this->window->Shutdown();
         }
     }
 }

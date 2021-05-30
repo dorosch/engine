@@ -23,7 +23,7 @@ namespace Engine{
 
     public:
         Tool::Logger::Logger *logger;
-        Manager::WindowManager *window;
+        Manager::WindowManager *windowManager;
 
         EngineApplication();
         virtual ~EngineApplication();
