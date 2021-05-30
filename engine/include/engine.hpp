@@ -8,13 +8,12 @@
 namespace Engine{
     class EngineApplication {
     public:
+        Tool::Logger::Logger *logger;
+        Manager::WindowManager *window;
+
         EngineApplication();
 
         virtual ~EngineApplication();
-
-        Tool::Logger::Logger *logger;
-
-        Manager::WindowManager *window;
 
         virtual void Init() = 0;
 
