@@ -1,5 +1,5 @@
-#ifndef __WINDOW_HPP__
-#define __WINDOW_HPP__
+#ifndef __WINDOW_MANAGER_HPP__
+#define __WINDOW_MANAGER_HPP__
 
 #ifndef GLEW_STATIC
 #define GLEW_STATIC
@@ -8,7 +8,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "core/manager/base.hpp"
+#include "core/manager.hpp"
 #include "tools/logger.hpp"
 
 

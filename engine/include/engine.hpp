@@ -2,7 +2,7 @@
 #define __ENGINE_HPP__
 
 #include "tools/logger.hpp"
-#include "core/manager/window.hpp"
+#include "core/window/manager.hpp"
 
 
 namespace Engine{
