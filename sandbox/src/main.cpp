@@ -21,6 +21,8 @@ int main() {
     Application *application = new Application();
     Engine::Engine engine(application);
 
+    engine.Init();
+
     try {
         engine.Run();
     } catch (const std::exception& error) {
