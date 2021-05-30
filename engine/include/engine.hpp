@@ -26,14 +26,14 @@ namespace Engine{
 
     class Engine {
     private:
-        EngineApplication *application;
+        EngineApplication *app;
 
     public:
+        Tool::Logger::Logger *logger;
+
         Engine(EngineApplication *);
 
         ~Engine();
-
-        Tool::Logger::Logger *logger;
 
         void Run();
     };

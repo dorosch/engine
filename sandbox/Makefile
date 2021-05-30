@@ -17,6 +17,9 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(OBJECTS) $(CXXFLAGS) -o $(TARGET)
 	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/bin ./$(TARGET)
 
+run: $(TARGET)
+	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/bin ./$(TARGET)
+
 clean:
 	@rm -f $(OBJECTS)
 	@rm -rf $(TARGET_DIR)

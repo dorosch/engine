@@ -7,8 +7,6 @@ class Application : public Engine::EngineApplication {
 public:
     void Init() {
         logger->debug("init");
-
-        window = new Engine::Manager::WindowManager();
     }
 
     void Update() {}

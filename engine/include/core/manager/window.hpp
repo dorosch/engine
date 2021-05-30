@@ -1,6 +1,13 @@
 #ifndef __WINDOW_HPP__
 #define __WINDOW_HPP__
 
+#ifndef GLEW_STATIC
+#define GLEW_STATIC
+#endif
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "core/manager/base.hpp"
 #include "tools/logger.hpp"
 
@@ -12,7 +19,12 @@ namespace Engine {
             Tool::Logger::Logger *logger;
 
         public:
-            bool IsOpen = false;
+            GLFWwindow* id;
+            int width;
+            int height;
+            const char *title;
+            bool fullScreen;
+            bool canResize;
 
             WindowManager();
 
@@ -23,6 +35,8 @@ namespace Engine {
             void Update();
 
             void Shutdown();
+
+            bool IsOpen();
         };
     }
 }
