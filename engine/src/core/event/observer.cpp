@@ -18,12 +18,12 @@ namespace Engine {
         }
 
 
-        EventObserver *EventObserver::GetInstance() {
-            if(_singleton == nullptr){
-                _singleton = new EventObserver();
-            }
+        // EventObserver *EventObserver::GetInstance() {
+        //     if(_singleton == nullptr){
+        //         _singleton = new EventObserver();
+        //     }
 
-            return _singleton;
-        }
+        //     return _singleton;
+        // }
     }
 }

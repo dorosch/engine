@@ -5,6 +5,9 @@
 
 #include "core/manager.hpp"
 #include "core/window/provider.hpp"
+#include "core/window/providers/glfw.hpp"
+#include "core/event/provider.hpp"
+#include "core/event/providers/glfw.hpp"
 #include "tools/logger.hpp"
 
 using namespace Tool::Logger;
@@ -17,6 +20,7 @@ namespace Engine {
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("evtm");
 
             Window::WindowProvider *window = nullptr;
+            Event::EventProvider *provider = nullptr;
 
         public:
             void Init() {};

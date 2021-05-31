@@ -45,7 +45,6 @@ namespace Engine {
         // Initialize all managers and then initialize the application
         // since the application can change the settings of managers.
         this->app->windowManager->Init();
-        this->app->eventManager->Init(this->app->windowManager->window);
         this->app->Init();
     }
 
@@ -59,6 +58,7 @@ namespace Engine {
          */
 
         this->app->windowManager->window->Create();
+        this->app->eventManager->Init(this->app->windowManager->window);
 
         while (this->app->windowManager->window->IsOpen()) {
             this->app->Update();

@@ -16,14 +16,14 @@ namespace Engine {
 
 
         class EventObserver {
-        private:
-            static EventObserver *_singleton;
+        // private:
+        //     static EventObserver *_singleton;
 
         public:
             void Publish(Event *);
             void Subscribe();
             void Unsubscribe();
-            static EventObserver *GetInstance();
+            // static EventObserver *GetInstance();
         };
     }
 }

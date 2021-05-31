@@ -7,6 +7,31 @@ namespace Engine {
             logger->debug("init");
 
             this->window = window;
+
+            switch (this->window->provider) {
+                case Window::Provider::GLFW:
+                    this->provider = new Event::GLFWEventProvider();
+
+                    // I don't like this solution with change glfwSetWindowUserPointer
+                    glfwSetWindowUserPointer(
+                        static_cast<Window::GLFWProvider*>(this->window)->object,
+                        static_cast<Event::GLFWEventProvider*>(this->provider)
+                    );
+
+                    glfwSetKeyCallback(
+                        static_cast<Window::GLFWProvider*>(this->window)->object,
+                        static_cast<Event::GLFWEventProvider*>(this->provider)->KeyboardEventCallbackStatic
+                    );
+
+                    glfwSetMouseButtonCallback(
+                        static_cast<Window::GLFWProvider*>(this->window)->object,
+                        static_cast<Event::GLFWEventProvider*>(this->provider)->MouseEventCallbackStatic
+                    );
+
+                    break;
+                default:
+                    throw std::logic_error("Undefined EventProvider");
+            }
         }
 
         void EventManager::Update() {
