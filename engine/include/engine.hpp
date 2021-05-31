@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "tools/logger.hpp"
+#include "core/event/manager.hpp"
 #include "core/window/manager.hpp"
 
 using namespace Tool::Logger;
@@ -29,6 +30,7 @@ namespace Engine{
         std::unique_ptr<Logger> logger = std::make_unique<Logger>("app");
 
         Manager::WindowManager *windowManager = nullptr;
+        Manager::EventManager *eventManager = nullptr;
 
         EngineApplication();
         virtual ~EngineApplication();

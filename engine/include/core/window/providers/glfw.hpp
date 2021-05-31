@@ -25,6 +25,7 @@ namespace Engine {
 
         public:
             GLFWwindow  *object = nullptr;
+            Provider provider = Provider::GLFW;
 
             void Init();
             void Create();

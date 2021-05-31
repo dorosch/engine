@@ -7,10 +7,12 @@
 namespace Engine {
     EngineApplication::EngineApplication() {
         this->windowManager = new Manager::WindowManager();
+        this->eventManager = new Manager::EventManager();
     }
 
 
     EngineApplication::~EngineApplication() {
+        this->eventManager->Shutdown();
         this->windowManager->Shutdown();
 
         delete this->windowManager;
@@ -43,6 +45,7 @@ namespace Engine {
         // Initialize all managers and then initialize the application
         // since the application can change the settings of managers.
         this->app->windowManager->Init();
+        this->app->eventManager->Init(this->app->windowManager->window);
         this->app->Init();
     }
 
@@ -60,6 +63,7 @@ namespace Engine {
         while (this->app->windowManager->window->IsOpen()) {
             this->app->Update();
             this->app->windowManager->Update();
+            this->app->eventManager->Update();
         }
     }
 }

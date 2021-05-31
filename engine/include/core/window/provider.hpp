@@ -19,9 +19,10 @@ namespace Engine {
 
         class WindowProvider {
         public:
+            Provider provider;
             Settings settings = {
                 800, 600, false, false, "Application"
-                };
+            };
 
             virtual void Init() = 0;
             virtual void Create() = 0;
