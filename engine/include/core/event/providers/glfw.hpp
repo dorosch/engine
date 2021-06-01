@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 
 #include "core/event/provider.hpp"
+#include "core/event/observer.hpp"
 #include "tools/logger.hpp"
 
 using namespace Tool::Logger;
