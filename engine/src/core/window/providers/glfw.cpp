@@ -26,7 +26,6 @@ namespace Engine {
                 primaryMonitor = glfwGetPrimaryMonitor();
             }
 
-            // TODO: check if window was create
             this->object = glfwCreateWindow(
                 this->settings.width,
                 this->settings.height,
@@ -44,9 +43,6 @@ namespace Engine {
 
 
         void GLFWWindowProvider::Update() {
-            // TODO: Move to the EventManager provider
-            glfwPollEvents();
-
             glfwSwapBuffers(this->object);
         }
 

@@ -34,7 +34,7 @@ namespace Engine {
         }
 
         void EventManager::Update() {
-
+            glfwPollEvents();
         }
 
         void EventManager::Shutdown() {
