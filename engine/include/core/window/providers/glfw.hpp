@@ -18,7 +18,7 @@ using namespace Tool::Logger;
 
 namespace Engine {
     namespace Window {
-        class GLFWProvider : public WindowProvider {
+        class GLFWWindowProvider : public WindowProvider {
         private:
             GLFWmonitor* primaryMonitor = nullptr;
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("glfw");

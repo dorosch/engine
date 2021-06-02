@@ -3,7 +3,7 @@
 
 namespace Engine {
     namespace Window {
-        void GLFWProvider::Init() {
+        void GLFWWindowProvider::Init() {
             logger->debug("init");
 
             glfwInit();
@@ -15,7 +15,7 @@ namespace Engine {
         }
 
 
-        void GLFWProvider::Create() {
+        void GLFWWindowProvider::Create() {
             logger->debug("create");
 
             if (!this->settings.canResize) {
@@ -43,7 +43,7 @@ namespace Engine {
         }
 
 
-        void GLFWProvider::Update() {
+        void GLFWWindowProvider::Update() {
             // TODO: Move to the EventManager provider
             glfwPollEvents();
 
@@ -51,14 +51,14 @@ namespace Engine {
         }
 
 
-        void GLFWProvider::Shutdown() {
+        void GLFWWindowProvider::Shutdown() {
             logger->debug("shutdown");
 
             glfwDestroyWindow(this->object);
         }
 
 
-        bool GLFWProvider::IsOpen() {
+        bool GLFWWindowProvider::IsOpen() {
             return !glfwWindowShouldClose(this->object);
         }
     }

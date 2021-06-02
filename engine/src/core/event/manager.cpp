@@ -13,17 +13,17 @@ namespace Engine {
                     this->provider = new Event::GLFWEventProvider();
 
                     glfwSetWindowUserPointer(
-                        static_cast<Window::GLFWProvider*>(this->window)->object,
+                        static_cast<Window::GLFWWindowProvider*>(this->window)->object,
                         static_cast<Event::GLFWEventProvider*>(this->provider)
                     );
 
                     glfwSetKeyCallback(
-                        static_cast<Window::GLFWProvider*>(this->window)->object,
+                        static_cast<Window::GLFWWindowProvider*>(this->window)->object,
                         static_cast<Event::GLFWEventProvider*>(this->provider)->KeyboardEventCallbackStatic
                     );
 
                     glfwSetMouseButtonCallback(
-                        static_cast<Window::GLFWProvider*>(this->window)->object,
+                        static_cast<Window::GLFWWindowProvider*>(this->window)->object,
                         static_cast<Event::GLFWEventProvider*>(this->provider)->MouseEventCallbackStatic
                     );
 

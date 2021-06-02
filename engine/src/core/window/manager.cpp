@@ -10,7 +10,7 @@ namespace Engine {
 
             switch (this->provider) {
                 case Window::Provider::GLFW:
-                    this->window = new Window::GLFWProvider();
+                    this->window = new Window::GLFWWindowProvider();
                     break;
                 default:
                     throw std::logic_error("Undefined WindowProvider");
