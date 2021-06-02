@@ -6,7 +6,7 @@
 Tool::Logger::Logger logger("test");
 
 
-TEST_CASE("Logger", "[tool][logger]" ) {
+TEST_CASE("Logger", "[tool][logger]") {
     SECTION("default log level") {
         REQUIRE(logger.GetLevel() == Tool::Logger::Level::info);
     }
