@@ -3,5 +3,5 @@
 ### Dependencies
 
 ```bash
-$ sudo apt-get install libfmt-dev libspdlog-dev
+$ sudo apt-get install libfmt-dev libspdlog-dev catch2
 ```
