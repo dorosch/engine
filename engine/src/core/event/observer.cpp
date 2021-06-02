@@ -9,17 +9,29 @@ namespace Engine {
 
 
         void EventObserver::Publish(Event *event) {
-            logger->info("Need to publish new event!!1");
+            for(
+                auto subscriber = this->_subscribers.begin();
+                subscriber < this->_subscribers.end();
+                subscriber++
+            ) {
+                (*subscriber)(event);
+            }
         }
 
 
-        void EventObserver::Subscribe() {
-
+        void EventObserver::Subscribe(EventCallback subscriber) {
+            this->_subscribers.push_back(subscriber);
         }
 
 
-        void EventObserver::Unsubscribe() {
-
+        void EventObserver::Unsubscribe(EventCallback subscriber) {
+            this->_subscribers.erase(
+                std::remove(
+                    this->_subscribers.begin(),
+                    this->_subscribers.end(),
+                    subscriber
+                ), this->_subscribers.end()
+            );
         }
 
 

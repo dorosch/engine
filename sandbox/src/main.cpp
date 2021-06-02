@@ -1,5 +1,12 @@
+#include <iostream>
+
 #include "engine.hpp"
 #include "tools/logger.hpp"
+
+
+void event_callback(Engine::Event::Event *event) {
+    std::cout << "New event in application" << std::endl;
+}
 
 
 class Application : public Engine::EngineApplication {
@@ -9,6 +16,8 @@ public:
 
         windowManager->window->settings.canResize = true;
         windowManager->window->settings.title = "Application";
+
+        Engine::Event::EventObserver::GetInstance()->Subscribe(event_callback);
     }
 
     void Update() {}
