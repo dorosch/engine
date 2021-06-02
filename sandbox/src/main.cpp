@@ -37,8 +37,12 @@ int main() {
     try {
         engine.Run();
     } catch (const std::exception& error) {
+        delete application;
+
         return EXIT_FAILURE;
     }
+
+    delete application;
 
     return EXIT_SUCCESS;
 }
