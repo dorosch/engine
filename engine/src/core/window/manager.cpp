@@ -4,6 +4,8 @@
 namespace Engine {
     namespace Manager {
         void WindowManager::Init() {
+            logger->trace("Init");
+
             if (!this->provider) {
                 this->provider = Window::Provider::GLFW;
             }
@@ -24,6 +26,8 @@ namespace Engine {
         }
 
         void WindowManager::Shutdown() {
+            logger->trace("Shutdown");
+
             this->window->Shutdown();
         }
     }

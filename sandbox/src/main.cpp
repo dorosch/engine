@@ -12,7 +12,7 @@ void event_callback(Engine::Event::Event *event) {
 class Application : public Engine::EngineApplication {
 public:
     void Init() {
-        logger->debug("init");
+        logger->trace("Init");
 
         windowManager->window->settings.canResize = true;
         windowManager->window->settings.title = "Application";
@@ -23,7 +23,7 @@ public:
     void Update() {}
 
     void Shutdown() {
-        logger->debug("shutdown");
+        logger->trace("Shutdown");
     }
 };
 

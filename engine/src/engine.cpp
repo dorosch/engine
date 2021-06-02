@@ -6,12 +6,16 @@
 
 namespace Engine {
     EngineApplication::EngineApplication() {
+        logger->trace("constructor");
+
         this->windowManager = new Manager::WindowManager();
         this->eventManager = new Manager::EventManager();
     }
 
 
     EngineApplication::~EngineApplication() {
+        logger->trace("destructor");
+
         this->eventManager->Shutdown();
         this->windowManager->Shutdown();
 
@@ -21,14 +25,9 @@ namespace Engine {
 
 
     Engine::Engine(EngineApplication *application) {
+        logger->trace("constructor");
+
         this->app = application;
-    }
-
-
-    Engine::~Engine() {
-        this->app->Shutdown();
-
-        delete this->app;
     }
 
 
@@ -58,6 +57,8 @@ namespace Engine {
          * continues updating user application and all managers. 
          */
 
+        logger->trace("run");
+
         this->app->windowManager->window->Create();
         this->app->eventManager->Init(this->app->windowManager->window);
 
@@ -66,5 +67,7 @@ namespace Engine {
             this->app->windowManager->Update();
             this->app->eventManager->Update();
         }
+
+        this->app->Shutdown();
     }
 }

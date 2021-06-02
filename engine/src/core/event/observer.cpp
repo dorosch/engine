@@ -9,6 +9,8 @@ namespace Engine {
 
 
         void EventObserver::Publish(Event *event) {
+            logger->trace("Publish");
+
             for(
                 auto subscriber = this->_subscribers.begin();
                 subscriber < this->_subscribers.end();
@@ -20,11 +22,15 @@ namespace Engine {
 
 
         void EventObserver::Subscribe(EventCallback subscriber) {
+            logger->trace("Subscribe");
+
             this->_subscribers.push_back(subscriber);
         }
 
 
         void EventObserver::Unsubscribe(EventCallback subscriber) {
+            logger->trace("Unsubscribe");
+
             this->_subscribers.erase(
                 std::remove(
                     this->_subscribers.begin(),

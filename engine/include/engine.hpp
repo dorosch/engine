@@ -56,7 +56,6 @@ namespace Engine{
         std::unique_ptr<Logger> logger = std::make_unique<Logger>("engine");
 
         Engine(EngineApplication *);
-        ~Engine();
         void Init();
         void Run();
     };

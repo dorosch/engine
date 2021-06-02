@@ -4,7 +4,7 @@
 namespace Engine {
     namespace Window {
         void GLFWWindowProvider::Init() {
-            logger->debug("init");
+            logger->trace("Init");
 
             glfwInit();
 
@@ -16,7 +16,7 @@ namespace Engine {
 
 
         void GLFWWindowProvider::Create() {
-            logger->debug("create");
+            logger->trace("Create");
 
             if (!this->settings.canResize) {
                 glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
@@ -48,7 +48,7 @@ namespace Engine {
 
 
         void GLFWWindowProvider::Shutdown() {
-            logger->debug("shutdown");
+            logger->trace("Shutdown");
 
             glfwDestroyWindow(this->object);
         }

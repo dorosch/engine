@@ -4,7 +4,7 @@
 namespace Engine {
     namespace Manager {
         void EventManager::Init(Window::WindowProvider *window) {
-            logger->debug("init");
+            logger->trace("Init");
 
             this->window = window;
 
@@ -38,7 +38,7 @@ namespace Engine {
         }
 
         void EventManager::Shutdown() {
-            logger->debug("shutdown");
+            logger->trace("Shutdown");
         }
     }
 }
