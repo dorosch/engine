@@ -16,6 +16,7 @@ namespace Engine {
         this->windowManager->Shutdown();
 
         delete this->windowManager;
+        delete this->eventManager;
     }
 
 
