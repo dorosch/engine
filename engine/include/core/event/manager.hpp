@@ -16,6 +16,11 @@ using namespace Tool::Logger;
 namespace Engine {
     namespace Manager {
         class EventManager: public EngineManager {
+            /**
+             * The event manager is responsible for choosing an event 
+             * provider and then calling the event provider update. 
+             */
+
         private:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("evtm");
 

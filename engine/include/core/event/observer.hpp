@@ -28,6 +28,12 @@ namespace Engine {
 
 
         class EventObserver {
+            /**
+             * Class implements singleton pattern for managing incoming events.
+             * The class also implements the observer pattern for the ability 
+             * to register subscriptions and unsubscribe from receiving events.
+             */
+
         private:
             static EventObserver *_singleton;
             std::vector<EventCallback> _subscribers;
