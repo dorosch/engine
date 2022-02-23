@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -fPIC -std=c++17 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
 INCLUDE = -I include
-LDFLAGS = -lglfw -lGLEW -lfmt
+LDFLAGS = -lglfw -lGLEW -lfmt -lGL
 
 TARGET_DIR = target/lib
 TARGET = $(TARGET_DIR)/libengine.so
