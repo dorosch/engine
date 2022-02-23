@@ -14,6 +14,8 @@ public:
     void Init() {
         logger->trace("Init");
 
+        windowManager->window->settings.width = 1680;
+        windowManager->window->settings.height = 1050;
         windowManager->window->settings.canResize = true;
         windowManager->window->settings.title = "Application";
 
