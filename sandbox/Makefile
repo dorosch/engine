@@ -1,7 +1,7 @@
 LIB = $(shell dirname $(shell pwd))/engine
 
 CXX = g++
-CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
 INCLUDE = -I $(LIB)/include -L $(LIB)/bin
 LDFLAGS = -lengine -lfmt
 
