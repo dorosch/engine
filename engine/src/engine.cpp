@@ -2,6 +2,7 @@
 
 #include "meta.hpp"
 #include "engine.hpp"
+#include "editor/editor.hpp"
 
 
 namespace Engine {
@@ -10,6 +11,7 @@ namespace Engine {
 
         this->windowManager = new Manager::WindowManager();
         this->eventManager = new Manager::EventManager();
+        this->editor = new Editor::EngineEditor();
     }
 
 
@@ -21,6 +23,7 @@ namespace Engine {
 
         delete this->windowManager;
         delete this->eventManager;
+        delete this->editor;
     }
 
 
@@ -46,6 +49,7 @@ namespace Engine {
         // since the application can change the settings of managers.
         this->app->windowManager->Init();
         this->app->Init();
+        this->app->editor->Init(this->app);
     }
 
 
@@ -66,8 +70,10 @@ namespace Engine {
             this->app->Update();
             this->app->windowManager->Update();
             this->app->eventManager->Update();
+            this->app->editor->Update();
         }
 
+        this->app->editor->Shutdown();
         this->app->Shutdown();
     }
 }

@@ -4,13 +4,17 @@
 #include <memory>
 
 #include "tools/logger.hpp"
+#include "editor/editor.hpp"
 #include "core/event/manager.hpp"
 #include "core/window/manager.hpp"
 
 using namespace Tool::Logger;
 
 
-namespace Engine{
+namespace Engine {
+    class EngineEditor;
+
+
     class EngineApplication {
         /**
          * Custom engine application class.
@@ -31,6 +35,8 @@ namespace Engine{
 
         Manager::WindowManager *windowManager = nullptr;
         Manager::EventManager *eventManager = nullptr;
+        Editor::EngineEditor *editor = nullptr;
+
 
         EngineApplication();
         virtual ~EngineApplication();
