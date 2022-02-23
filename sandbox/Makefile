@@ -2,7 +2,7 @@ LIB = $(shell dirname $(shell pwd))/engine
 
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
-INCLUDE = -I $(LIB)/include -L $(LIB)/bin
+INCLUDE = -I $(LIB)/include -L $(LIB)/target/lib
 LDFLAGS = -lengine -lfmt
 
 TARGET_DIR = bin
@@ -12,15 +12,14 @@ OBJECTS = $(SOURCES:.cpp=.o)
 
 
 $(TARGET): $(OBJECTS)
-	@make --dir $(LIB) -f $(LIB)/Makefile
+	$(MAKE) -C $(LIB)
 	@mkdir -p $(TARGET_DIR)
 	$(CXX) $(OBJECTS) $(CXXFLAGS) -o $(TARGET)
-	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/bin ./$(TARGET)
+	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/target/lib ./$(TARGET)
 
 run: $(TARGET)
-	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/bin ./$(TARGET)
+	@LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(LIB)/target/lib ./$(TARGET)
 
 clean:
 	@rm -f $(OBJECTS)
 	@rm -rf $(TARGET_DIR)
-	@make --dir $(LIB) -f $(LIB)/Makefile clean
