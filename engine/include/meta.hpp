@@ -3,7 +3,7 @@
 
 
 // Current engine version
-const char *ENGINE_VERSION = "0.0.1";
+const char *ENGINE_VERSION = "0.0.2";
 
 
 #endif
