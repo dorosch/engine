@@ -11,7 +11,7 @@ namespace Engine {
 
         this->windowManager = new Manager::WindowManager();
         this->eventManager = new Manager::EventManager();
-        this->editor = new Editor::EngineEditor();
+        this->editor = new Editor::EngineEditor(this);
     }
 
 
@@ -49,7 +49,6 @@ namespace Engine {
         // since the application can change the settings of managers.
         this->app->windowManager->Init();
         this->app->Init();
-        this->app->editor->Init(this->app);
     }
 
 
@@ -65,12 +64,13 @@ namespace Engine {
 
         this->app->windowManager->window->Create();
         this->app->eventManager->Init(this->app->windowManager->window);
+        this->app->editor->Init();
 
         while (this->app->windowManager->window->IsOpen()) {
             this->app->Update();
-            this->app->windowManager->Update();
-            this->app->eventManager->Update();
             this->app->editor->Update();
+            this->app->eventManager->Update();
+            this->app->windowManager->Update();
         }
 
         this->app->editor->Shutdown();

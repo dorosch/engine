@@ -21,8 +21,8 @@ namespace Engine {
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");
 
-            EngineEditor();
-            void Init(EngineApplication *);
+            EngineEditor(EngineApplication *);
+            void Init();
             void Update();
             void Shutdown();
         };
