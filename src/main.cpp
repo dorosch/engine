@@ -5,8 +5,13 @@
 #include <fmt/format.h>
 
 #define GLEW_STATIC
+#define GLM_FORCE_RADIANS
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SOIL/SOIL.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -21,9 +26,10 @@ const GLchar* vertexShaderSource = "\n    #version 330 core\n"
     "    layout (location = 2) in vec2 texCoord;\n"
     "    out vec3 ourColor;\n"
     "    out vec2 TexCoord;\n"
-    "    uniform vec3 ourPosition;"
+    "    uniform vec3 ourPosition;\n"
+    "    uniform mat4 rotation;\n"
     "    void main() {\n"
-    "        gl_Position = vec4(position.x + ourPosition.x, position.y + ourPosition.y, position.z + ourPosition.z, 1.0);\n"
+    "        gl_Position = rotation * vec4(position + ourPosition, 1.0);\n"
     "        ourColor = color;\n"
     "        TexCoord = texCoord;\n"
     "    }\n\0";
@@ -328,6 +334,11 @@ namespace Engine {
                  GLint position = glGetUniformLocation(this->object, attribute);
                 glUniform3f(position, x, y, z);
             }
+
+            void uniformRotation(const char *attribure, glm::mat4 rotation) {
+                GLuint rotationAttribute = glGetUniformLocation(this->object, attribure);
+                glUniformMatrix4fv(rotationAttribute, 1, GL_FALSE, glm::value_ptr(rotation));
+            }
         };
     }
 
@@ -596,7 +607,7 @@ public:
         );
 
         this->texture = new Engine::Render::OpenglTexture(
-            "container.jpg"
+            "/home/a-kletsko/Projects/engine/container.jpg"
         );
 
         float vertices[] = {
@@ -637,9 +648,19 @@ public:
     }
 
     void Update() {
+        glm::mat4 rotation(1.0f);
+        // rotation = glm::rotate(rotation, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+        // rotation = glm::scale(rotation, glm::vec3(0.5, 0.5, 0.5));
+
+        // rotation = glm::translate(rotation, glm::vec3(0.5f, -0.5f, 0.0f));
+        rotation = glm::rotate(rotation,(GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // std::cout << glm::to_string(rotation) << std::endl;
+
         this->shader->use();
         this->shader->uniformColor("testColor", color[0], color[1], color[2], 0.0);
         this->shader->uniformPosition("ourPosition", position[0], position[1], position[2]);
+        this->shader->uniformRotation("rotation", rotation);
 
         this->texture->bind();
 
