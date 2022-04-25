@@ -22,25 +22,28 @@
 
 const GLchar* vertexShaderSource = "\n    #version 330 core\n"
     "    layout (location = 0) in vec3 position;\n"
-    "    layout (location = 1) in vec3 color;\n"
-    "    layout (location = 2) in vec2 texCoord;\n"
-    "    out vec3 ourColor;\n"
+    // "    layout (location = 1) in vec3 color;\n"
+    "    layout (location = 1) in vec2 texCoord;\n"
+    // "    out vec3 ourColor;\n"
     "    out vec2 TexCoord;\n"
     "    uniform vec3 ourPosition;\n"
     "    uniform mat4 rotation;\n"
+    "    uniform mat4 model;\n"
+    "    uniform mat4 view;\n"
+    "    uniform mat4 projection;\n"
     "    void main() {\n"
-    "        gl_Position = rotation * vec4(position + ourPosition, 1.0);\n"
-    "        ourColor = color;\n"
+    "        gl_Position =  projection * view * model * vec4(position + ourPosition, 1.0);\n"
+    // "        ourColor = color;\n"
     "        TexCoord = texCoord;\n"
     "    }\n\0";
 const GLchar* fragmentShaderSource = "\n    #version 330 core\n"
-    "    in vec3 ourColor;\n"
+    // "    in vec3 ourColor;\n"
     "    in vec2 TexCoord;\n"
     "    out vec4 color;\n"
     "    uniform sampler2D ourTexture;\n"
-    "    uniform vec3 testColor;\n"
+    // "    uniform vec3 testColor;\n"
     "    void main() {\n"
-    "        color = texture(ourTexture, TexCoord) * vec4(ourColor * testColor, 1.0f);\n"
+    "        color = texture(ourTexture, TexCoord);\n"
     "    }\n\0";
 
 
@@ -335,9 +338,9 @@ namespace Engine {
                 glUniform3f(position, x, y, z);
             }
 
-            void uniformRotation(const char *attribure, glm::mat4 rotation) {
-                GLuint rotationAttribute = glGetUniformLocation(this->object, attribure);
-                glUniformMatrix4fv(rotationAttribute, 1, GL_FALSE, glm::value_ptr(rotation));
+            void uniformMatrix(const char *attribure, glm::mat4 matrix) {
+                GLuint targetAttribute = glGetUniformLocation(this->object, attribure);
+                glUniformMatrix4fv(targetAttribute, 1, GL_FALSE, glm::value_ptr(matrix));
             }
         };
     }
@@ -552,8 +555,11 @@ namespace Engine {
                 static_cast<Window::GLFWWindowProvider*>(this->app->window)->object
             );
 
+            // TODO: Move all gl* functions to the render backend
             glewExperimental = GL_TRUE;
             glewInit();
+
+            glEnable(GL_DEPTH_TEST);
 
             this->app->Run();
 
@@ -561,7 +567,7 @@ namespace Engine {
                 glfwPollEvents();
 
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 this->app->Update();
                 this->app->editor->Update();
@@ -589,7 +595,7 @@ class UserApplication : public Engine::Application {
 public:
     GLuint VAO;
     Engine::Render::OpenglVertexBuffer *VBO = nullptr;
-    Engine::Render::OpenglIndexBuffer *EBO = nullptr;
+    // Engine::Render::OpenglIndexBuffer *EBO = nullptr;
     Engine::Render::OpenglTexture *texture = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
 
@@ -610,13 +616,56 @@ public:
             "/home/a-kletsko/Projects/engine/container.jpg"
         );
 
+        // float vertices[] = {
+        //     // Position          // Texture
+        //     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
+        //     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+        //     -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,
+        //     -0.5f,  0.5f, 0.0f,  0.0f, 1.0f
+        // };
         float vertices[] = {
-            // Position          // Color           // Texture
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
-            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f
-        };
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
         uint32_t indices[] = {
             0, 1, 3,
             1, 2, 3
@@ -624,23 +673,23 @@ public:
 
         glGenVertexArrays(1, &this->VAO);
         this->VBO = new Engine::Render::OpenglVertexBuffer();
-        this->EBO = new Engine::Render::OpenglIndexBuffer();
+        // this->EBO = new Engine::Render::OpenglIndexBuffer();
 
         glBindVertexArray(VAO);
         this->VBO->bind(vertices, sizeof(vertices));
-        this->EBO->bind(indices, sizeof(indices) / sizeof(uint32_t));
+        // this->EBO->bind(indices, sizeof(indices) / sizeof(uint32_t));
         
         // Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
     
         // Color attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
+        // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        // glEnableVertexAttribArray(1);
     
         // TexCoord attribute
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
 
         this->VBO->unbind();
 
@@ -648,6 +697,16 @@ public:
     }
 
     void Update() {
+        glm::mat4 model(1.0f);
+        // model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.5f, 1.0f, 0.0f));
+
+        glm::mat4 view(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+        glm::mat4 projection(1.0f);
+        projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
+
         glm::mat4 rotation(1.0f);
         // rotation = glm::rotate(rotation, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
         // rotation = glm::scale(rotation, glm::vec3(0.5, 0.5, 0.5));
@@ -660,12 +719,17 @@ public:
         this->shader->use();
         this->shader->uniformColor("testColor", color[0], color[1], color[2], 0.0);
         this->shader->uniformPosition("ourPosition", position[0], position[1], position[2]);
-        this->shader->uniformRotation("rotation", rotation);
+        this->shader->uniformMatrix("rotation", rotation);
+
+        this->shader->uniformMatrix("model", model);
+        this->shader->uniformMatrix("view", view);
+        this->shader->uniformMatrix("projection", projection);
 
         this->texture->bind();
 
         glBindVertexArray(this->VAO);
-        glDrawElements(GL_TRIANGLES, this->EBO->count, GL_UNSIGNED_INT, 0);
+        // glDrawElements(GL_TRIANGLES, this->EBO->count, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
     }
 
@@ -676,7 +740,7 @@ public:
 
         delete shader;
         delete VBO;
-        delete EBO;
+        // delete EBO;
     }
 };
 
@@ -690,6 +754,8 @@ int main() {
     try {
         engine.Run();
     } catch (const std::exception& error) {
+        std::cerr << error.what() << std::endl;
+
         delete application;
 
         return EXIT_FAILURE;
