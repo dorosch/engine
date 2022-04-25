@@ -9,7 +9,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 
 CXX = g++
 INCLUDE = -I include -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends
-LDFLAGS = -lGL -lGLU -lGLEW -lglfw -lglut -lfmt -lm -ldl
+LDFLAGS = -lSOIL -lGL -lGLU -lGLEW -lglfw -lglut -lfmt -lm -ldl
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
 
 

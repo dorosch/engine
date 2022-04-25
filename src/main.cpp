@@ -7,6 +7,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <SOIL/SOIL.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -16,15 +17,24 @@
 
 const GLchar* vertexShaderSource = "\n    #version 330 core\n"
     "    layout (location = 0) in vec3 position;\n"
+    "    layout (location = 1) in vec3 color;\n"
+    "    layout (location = 2) in vec2 texCoord;\n"
+    "    out vec3 ourColor;\n"
+    "    out vec2 TexCoord;\n"
     "    uniform vec3 ourPosition;"
     "    void main() {\n"
     "        gl_Position = vec4(position.x + ourPosition.x, position.y + ourPosition.y, position.z + ourPosition.z, 1.0);\n"
+    "        ourColor = color;\n"
+    "        TexCoord = texCoord;\n"
     "    }\n\0";
 const GLchar* fragmentShaderSource = "\n    #version 330 core\n"
+    "    in vec3 ourColor;\n"
+    "    in vec2 TexCoord;\n"
     "    out vec4 color;\n"
-    "    uniform vec4 ourColor;\n"
+    "    uniform sampler2D ourTexture;\n"
+    "    uniform vec3 testColor;\n"
     "    void main() {\n"
-    "        color = ourColor;\n"
+    "        color = texture(ourTexture, TexCoord) * vec4(ourColor * testColor, 1.0f);\n"
     "    }\n\0";
 
 
@@ -176,6 +186,37 @@ namespace Engine {
         };
 
 
+        class Texture {
+        public:
+            uint32_t object;
+        };
+
+
+        class OpenglTexture : public Texture {
+        public:
+            OpenglTexture(const char *imagePath) {
+                glGenTextures(1, &this->object);
+
+                int width, height;
+
+                glBindTexture(GL_TEXTURE_2D, this->object);
+
+                unsigned char* image = SOIL_load_image(imagePath, &width, &height, 0, SOIL_LOAD_RGB);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+                glGenerateMipmap(GL_TEXTURE_2D);
+                SOIL_free_image_data(image);
+                glBindTexture(GL_TEXTURE_2D, 0); 
+            }
+
+            virtual ~OpenglTexture() {
+                glDeleteTextures(1, &this->object);
+            }
+
+            void bind() {
+                glBindTexture(GL_TEXTURE_2D, this->object);
+            }
+        };
+
         class ShaderProgram {
         private:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("shader");
@@ -280,7 +321,7 @@ namespace Engine {
 
             void uniformColor(const char *attribute, float r, float g, float b, float a) {
                 GLint color = glGetUniformLocation(this->object, attribute);
-                glUniform4f(color, r, g, b, a);
+                glUniform3f(color, r, g, b);
             }
 
             void uniformPosition(const char *attribute, float x, float y, float z) {
@@ -538,6 +579,7 @@ public:
     GLuint VAO;
     Engine::Render::OpenglVertexBuffer *VBO = nullptr;
     Engine::Render::OpenglIndexBuffer *EBO = nullptr;
+    Engine::Render::OpenglTexture *texture = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
 
     void Startup() {
@@ -553,18 +595,20 @@ public:
             vertexShaderSource, fragmentShaderSource
         );
 
+        this->texture = new Engine::Render::OpenglTexture(
+            "container.jpg"
+        );
+
         float vertices[] = {
-            0.5f,  0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-            0.6f, 0.75f, 0.0f
+            // Position          // Color           // Texture
+            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f
         };
         uint32_t indices[] = {
             0, 1, 3,
-            1, 2, 3,
-            0, 1, 2,
-            4, 1, 2
+            1, 2, 3
         };
 
         glGenVertexArrays(1, &this->VAO);
@@ -574,9 +618,18 @@ public:
         glBindVertexArray(VAO);
         this->VBO->bind(vertices, sizeof(vertices));
         this->EBO->bind(indices, sizeof(indices) / sizeof(uint32_t));
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+        
+        // Position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
+    
+        // Color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+    
+        // TexCoord attribute
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(2);
 
         this->VBO->unbind();
 
@@ -585,8 +638,10 @@ public:
 
     void Update() {
         this->shader->use();
-        this->shader->uniformColor("ourColor", color[0], color[1], color[2], color[3]);
+        this->shader->uniformColor("testColor", color[0], color[1], color[2], 0.0);
         this->shader->uniformPosition("ourPosition", position[0], position[1], position[2]);
+
+        this->texture->bind();
 
         glBindVertexArray(this->VAO);
         glDrawElements(GL_TRIANGLES, this->EBO->count, GL_UNSIGNED_INT, 0);
