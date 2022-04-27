@@ -23,26 +23,20 @@
 
 const GLchar* vertexShaderSource = "\n    #version 330 core\n"
     "    layout (location = 0) in vec3 position;\n"
-    // "    layout (location = 1) in vec3 color;\n"
     "    layout (location = 1) in vec2 texCoord;\n"
-    // "    out vec3 ourColor;\n"
     "    out vec2 TexCoord;\n"
     "    uniform vec3 ourPosition;\n"
-    "    uniform mat4 rotation;\n"
     "    uniform mat4 model;\n"
     "    uniform mat4 view;\n"
     "    uniform mat4 projection;\n"
     "    void main() {\n"
-    "        gl_Position =  projection * view * model * vec4(position + ourPosition, 1.0);\n"
-    // "        ourColor = color;\n"
+    "        gl_Position =  projection * view * model * vec4(position, 1.0);\n"
     "        TexCoord = texCoord;\n"
     "    }\n\0";
 const GLchar* fragmentShaderSource = "\n    #version 330 core\n"
-    // "    in vec3 ourColor;\n"
     "    in vec2 TexCoord;\n"
     "    out vec4 color;\n"
     "    uniform sampler2D ourTexture;\n"
-    // "    uniform vec3 testColor;\n"
     "    void main() {\n"
     "        color = texture(ourTexture, TexCoord);\n"
     "    }\n\0";
@@ -154,6 +148,115 @@ namespace Tool {
 
 namespace Engine {
     using namespace Tool::Logger;
+
+
+    namespace Scene {
+        enum CameraDirection {
+            FORWARD,
+            BACKWARD,
+            LEFT,
+            RIGHT
+        };
+
+
+        class Camera {
+
+        };
+
+
+        class OpenglCamera : public Camera {
+        public:
+            glm::vec3 Position;
+            glm::vec3 Front;
+            glm::vec3 Up;
+            glm::vec3 Right;
+            glm::vec3 WorldUp;
+    
+            // Eular Angles
+            GLfloat Yaw;
+            GLfloat Pitch;
+    
+            // Camera options
+            GLfloat MovementSpeed;
+            GLfloat MouseSensitivity;
+            GLfloat Zoom;
+
+            OpenglCamera() {
+                this->Position = glm::vec3(0.0f, 0.0f, 0.0f);
+                this->WorldUp = glm::vec3(0.0f, 5.0f, 0.0f);
+                this->Yaw = -90.0f;
+                this->Pitch = 0.0f;
+                this->MovementSpeed = 3.0f;
+                this->MouseSensitivity = 0.25f;
+                this->Zoom = 90.0f;
+
+                this->updateCameraVectors();
+            }
+
+            virtual ~OpenglCamera() {
+
+            }
+
+            glm::mat4 GetViewMatrix() {
+                return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
+            }
+
+            void ProcessKeyboard(CameraDirection direction, GLfloat deltaTime) {
+                GLfloat velocity = this->MovementSpeed * deltaTime;
+        
+                if (direction == FORWARD)
+                    this->Position += this->Front * velocity;
+                if (direction == BACKWARD)
+                    this->Position -= this->Front * velocity;
+                if (direction == LEFT)
+                    this->Position -= this->Right * velocity;
+                if (direction == RIGHT)
+                    this->Position += this->Right * velocity;
+            }
+
+            void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true) {
+                xoffset *= this->MouseSensitivity;
+                yoffset *= this->MouseSensitivity;
+
+                this->Yaw   += xoffset;
+                this->Pitch += yoffset;
+
+                // Make sure that when pitch is out of bounds, screen doesn't get flipped
+                if (constrainPitch) {
+                    if (this->Pitch > 89.0f)
+                        this->Pitch = 89.0f;
+                    if (this->Pitch < -89.0f)
+                        this->Pitch = -89.0f;
+                }
+
+                // Update Front, Right and Up Vectors using the updated Eular angles
+                this->updateCameraVectors();
+            }
+
+            // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
+            void ProcessMouseScroll(GLfloat yoffset) {
+                if (this->Zoom >= 1.0f && this->Zoom <= 45.0f)
+                    this->Zoom -= yoffset;
+                if (this->Zoom <= 1.0f)
+                    this->Zoom = 1.0f;
+                if (this->Zoom >= 45.0f)
+                    this->Zoom = 45.0f;
+            }
+
+            void updateCameraVectors() {
+                // Calculate the new Front vector
+                glm::vec3 front;
+                front.x = cos(glm::radians(this->Yaw)) * cos(glm::radians(this->Pitch));
+                front.y = sin(glm::radians(this->Pitch));
+                front.z = sin(glm::radians(this->Yaw)) * cos(glm::radians(this->Pitch));
+                this->Front = glm::normalize(front);
+
+                // Also re-calculate the Right and Up vector
+                this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));
+                this->Up = glm::normalize(glm::cross(this->Right, this->Front));
+            }
+        };
+    }
 
 
     namespace Render {
@@ -692,6 +795,69 @@ extern float position[];
 extern float color[];
 
 
+Engine::Scene::OpenglCamera camera;
+bool keys[1024];
+GLfloat lastX = 400, lastY = 300;
+bool firstMouse = true;
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
+GLuint screenWidth = 1920, screenHeight = 1080;
+
+
+// Moves/alters the camera positions based on user input
+void Do_Movement()
+{
+    // Camera controls
+    if(keys[GLFW_KEY_W])
+        camera.ProcessKeyboard(Engine::Scene::CameraDirection::FORWARD, deltaTime);
+    if(keys[GLFW_KEY_S])
+        camera.ProcessKeyboard(Engine::Scene::CameraDirection::BACKWARD, deltaTime);
+    if(keys[GLFW_KEY_A])
+        camera.ProcessKeyboard(Engine::Scene::CameraDirection::LEFT, deltaTime);
+    if(keys[GLFW_KEY_D])
+        camera.ProcessKeyboard(Engine::Scene::CameraDirection::RIGHT, deltaTime);
+}
+
+// Is called whenever a key is pressed/released via GLFW
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key >= 0 && key < 1024)
+    {
+        if(action == GLFW_PRESS)
+            keys[key] = true;
+        else if(action == GLFW_RELEASE)
+            keys[key] = false;	
+    }
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos;
+    
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}	
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    camera.ProcessMouseScroll(yoffset);
+}
+
+
 class UserApplication : public Engine::Application {
 public:
     GLuint VAO;
@@ -706,11 +872,15 @@ public:
         logger->trace("Startup");
 
         this->window->settings = {
-            800, 600, false, true, "Application"
+            screenWidth, screenHeight, false, true, "Application"
         };
     }
 
     void Run() {
+        glfwSetKeyCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, key_callback);
+        glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_callback);
+        glfwSetScrollCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, scroll_callback);
+
         this->shader = new Engine::Render::ShaderProgram(
             vertexShaderSource, fragmentShaderSource
         );
@@ -801,29 +971,39 @@ public:
         // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
         // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
         // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-        GLfloat radius = 10.0f;
-        GLfloat camX = sin(glfwGetTime()) * radius;
-        GLfloat camZ = cos(glfwGetTime()) * radius;
+        // GLfloat radius = 10.0f;
+        // GLfloat camX = sin(glfwGetTime()) * radius;
+        // GLfloat camZ = cos(glfwGetTime()) * radius;
 
-        glm::mat4 view(1.0f);
-        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
+        // glm::mat4 view(1.0f);
+        // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
 
-        glm::mat4 projection(1.0f);
-        projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
+        // glm::mat4 projection(1.0f);
+        // projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
 
-        glm::mat4 rotation(1.0f);
+        // glm::mat4 rotation(1.0f);
         // rotation = glm::rotate(rotation, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
         // rotation = glm::scale(rotation, glm::vec3(0.5, 0.5, 0.5));
 
         // rotation = glm::translate(rotation, glm::vec3(0.5f, -0.5f, 0.0f));
-        rotation = glm::rotate(rotation,(GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 1.0f, 1.0f));
+        // rotation = glm::rotate(rotation,(GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 1.0f, 1.0f));
 
         // std::cout << glm::to_string(rotation) << std::endl;
+
+        GLfloat currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        Do_Movement();
+
+        glm::mat4 view;
+        view = camera.GetViewMatrix();
+        glm::mat4 projection;	
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
 
         this->shader->use();
         this->shader->uniformColor("testColor", color[0], color[1], color[2]);
         this->shader->uniformPosition("ourPosition", position[0], position[1], position[2]);
-        this->shader->uniformMatrix("rotation", rotation);
 
         this->shader->uniformMatrix("view", view);
         this->shader->uniformMatrix("projection", projection);
@@ -857,7 +1037,7 @@ public:
 
         // TODO: Move to the editor as debug flag
         glm::mat4 mvp(1.0f);
-        this->debugAxes->SetMVP(mvp);
+        this->debugAxes->SetMVP(view);
         this->debugAxes->Enable();
     }
 
