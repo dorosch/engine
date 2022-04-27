@@ -4,6 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <fmt/format.h>
+#include <string>
+#include <fstream>
+#include <streambuf>
+#include <filesystem>
+#include <iostream>
 
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
@@ -20,46 +25,8 @@
 #include "meta.hpp"
 #include "editor.hpp"
 
-
-const GLchar* vertexShaderSource = "\n    #version 330 core\n"
-    "    layout (location = 0) in vec3 position;\n"
-    "    layout (location = 1) in vec2 texCoord;\n"
-    "    out vec2 TexCoord;\n"
-    "    uniform vec3 ourPosition;\n"
-    "    uniform mat4 model;\n"
-    "    uniform mat4 view;\n"
-    "    uniform mat4 projection;\n"
-    "    void main() {\n"
-    "        gl_Position =  projection * view * model * vec4(position, 1.0);\n"
-    "        TexCoord = texCoord;\n"
-    "    }\n\0";
-const GLchar* fragmentShaderSource = "\n    #version 330 core\n"
-    "    in vec2 TexCoord;\n"
-    "    out vec4 color;\n"
-    "    uniform sampler2D ourTexture;\n"
-    "    void main() {\n"
-    "        color = texture(ourTexture, TexCoord);\n"
-    "    }\n\0";
-
-
-// Debug lines
-const char *debugVertexShader = "\n"
-    "    #version 330 core\n"
-    "    layout (location = 0) in vec3 position;\n"
-    "    layout (location = 1) in vec3 color;\n"
-    "    out vec3 ourColor;\n"
-    "    uniform mat4 MVP;\n"
-    "    void main() {\n"
-    "        gl_Position = MVP * vec4(position.x, position.y, position.z, 1.0f);\n"
-    "        ourColor = color;\n"
-    "    }\0";        
-const char *debugFragmentShader = "\n"
-    "    #version 330 core\n"
-    "    in vec3 ourColor;\n"
-    "    out vec4 color;\n"
-    "    void main() {\n"
-    "        color = vec4(ourColor, 1.0f);\n"
-    "    }\n\0";
+#include "core/render/shader.hpp"
+#include "core/render/shader/opengl.hpp"
 
 
 namespace Tool {
@@ -260,10 +227,10 @@ namespace Engine {
 
 
     namespace Render {
-        enum Shader {
-            VERTEX,
-            FRAGMENT
-        };
+        // enum Shader {
+        //     VERTEX,
+        //     FRAGMENT
+        // };
 
 
         enum Backend {
@@ -349,129 +316,6 @@ namespace Engine {
                 glBindTexture(GL_TEXTURE_2D, this->object);
             }
         };
-
-        class ShaderProgram {
-        private:
-            // std::unique_ptr<Logger> logger = std::make_unique<Logger>("shader");
-
-        public:
-            GLuint object;
-
-            ShaderProgram(const char *vertexSource, const char *fragmentSource) {
-                std::optional<GLuint> vertex = this->compile(
-                    Shader::VERTEX, vertexSource
-                );
-                std::optional<GLuint> fragment = this->compile(
-                    Shader::FRAGMENT, fragmentSource
-                );
-
-                this->object = glCreateProgram();
-
-                if (vertex) {
-                    glAttachShader(this->object, vertex.value());
-                }
-                else {
-                    std::cout << "Shader compilation result not received" << std::endl;
-                    // this->logger->warning("Shader compilation result not received");
-                }
-
-                if (fragment) {
-                    glAttachShader(this->object, fragment.value());
-                }
-                else {
-                    std::cout << "Shader compilation result not received" << std::endl;
-                    // this->logger->warning("Shader compilation result not received");
-                }
-
-                this->linking();
-
-                if (vertex) {
-                    glDeleteShader(vertex.value());
-                }
-
-                if (fragment) {
-                    glDeleteShader(fragment.value());
-                }
-            }
-
-            ~ShaderProgram() {
-                glDeleteProgram(this->object);
-            }
-
-            std::optional<GLuint> compile(Shader type, const char *file) {
-                GLint compileStatus;
-                GLuint shader;
-
-                switch (type) {
-                    case Shader::VERTEX:
-                        shader = glCreateShader(GL_VERTEX_SHADER);
-                        break;
-                    case Shader::FRAGMENT:
-                        shader = glCreateShader(GL_FRAGMENT_SHADER);
-                        break;
-                    default:
-                        throw std::logic_error("Shader type is not implement");
-                }
-
-                glShaderSource(shader, 1, &file, NULL);
-                glCompileShader(shader);
-                glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
-
-                if (compileStatus) {
-                    return shader;
-                }
-                else {
-                    GLchar errorMessage[512];
-
-                    glGetShaderInfoLog(shader, 512, NULL, errorMessage);
-
-                    std::cout << fmt::format("Shader compile error {}\n{}", errorMessage, file).c_str() << std::endl;
-                    // this->logger->error(
-                        // fmt::format("Shader compile error {}\n{}", errorMessage, file).c_str()
-                    // );
-
-                    return std::nullopt;
-                }
-            }
-
-            void linking() {
-                GLint linkingStatus;
-
-                glLinkProgram(this->object);
-                glGetProgramiv(this->object, GL_LINK_STATUS, &linkingStatus);
-
-                if (!linkingStatus) {
-                    GLchar errorMessage[512];
-
-                    glGetProgramInfoLog(this->object, 512, NULL, errorMessage);
-
-                    std::cout << fmt::format("Shader program linking: {}", errorMessage).c_str() << std::endl;
-
-                    // this->logger->error(
-                        // fmt::format("Shader program linking: {}", errorMessage).c_str()
-                    // );
-                }
-            }
-
-            void use() {
-                glUseProgram(this->object);
-            }
-
-            void uniformColor(const char *attribute, float r, float g, float b) {
-                GLint color = glGetUniformLocation(this->object, attribute);
-                glUniform3f(color, r, g, b);
-            }
-
-            void uniformPosition(const char *attribute, float x, float y, float z) {
-                 GLint position = glGetUniformLocation(this->object, attribute);
-                glUniform3f(position, x, y, z);
-            }
-
-            void uniformMatrix(const char *attribure, glm::mat4 matrix) {
-                GLuint targetAttribute = glGetUniformLocation(this->object, attribure);
-                glUniformMatrix4fv(targetAttribute, 1, GL_FALSE, glm::value_ptr(matrix));
-            }
-        };
     }
 
 
@@ -494,8 +338,12 @@ namespace Engine {
             ShaderProgram *shader = nullptr;
 
             OpenglDebugAxes() {
-                this->shader = new Render::ShaderProgram(
-                    debugVertexShader, debugFragmentShader
+                std::filesystem::path cwd = std::filesystem::current_path();
+
+                this->shader = Engine::Render::ShaderProgram::GetInstance();
+                this->shader->Build(
+                    cwd / "resources" / "shaders" / "position-color.vert",
+                    cwd / "resources" / "shaders" / "position-color.frag"
                 );
 
                 GLfloat vertices[] = {
@@ -538,8 +386,8 @@ namespace Engine {
             }
 
             void Enable() {
-                this->shader->use();
-                this->shader->uniformMatrix("MVP", this->MVP);
+                this->shader->Use();
+                this->shader->UniformMatrix("MVP", this->MVP);
 
                 glBindVertexArray(this->VAO);
                 // 6 is a count vertex
@@ -863,8 +711,9 @@ public:
     GLuint VAO;
     Engine::Render::OpenglVertexBuffer *VBO = nullptr;
     // Engine::Render::OpenglIndexBuffer *EBO = nullptr;
-    Engine::Render::OpenglTexture *texture = nullptr;
+    // Engine::Render::OpenglShaderProgram *shader = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
+    Engine::Render::OpenglTexture *texture = nullptr;
 
     Engine::Debug::OpenglDebugAxes *debugAxes = nullptr;
 
@@ -881,8 +730,12 @@ public:
         glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_callback);
         glfwSetScrollCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, scroll_callback);
 
-        this->shader = new Engine::Render::ShaderProgram(
-            vertexShaderSource, fragmentShaderSource
+        std::filesystem::path cwd = std::filesystem::current_path();
+
+        this->shader = Engine::Render::ShaderProgram::GetInstance();
+        this->shader->Build(
+            cwd / "resources" / "shaders" / "position-texture.vert",
+            cwd / "resources" / "shaders" / "position-texture.frag"
         );
         this->debugAxes = new Engine::Debug::OpenglDebugAxes();
 
@@ -1001,12 +854,12 @@ public:
         glm::mat4 projection;	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
 
-        this->shader->use();
-        this->shader->uniformColor("testColor", color[0], color[1], color[2]);
-        this->shader->uniformPosition("ourPosition", position[0], position[1], position[2]);
+        this->shader->Use();
+        this->shader->UniformColor("testColor", color[0], color[1], color[2]);
+        this->shader->UniformPosition("ourPosition", position[0], position[1], position[2]);
 
-        this->shader->uniformMatrix("view", view);
-        this->shader->uniformMatrix("projection", projection);
+        this->shader->UniformMatrix("view", view);
+        this->shader->UniformMatrix("projection", projection);
 
         this->texture->bind(); 
 
@@ -1029,14 +882,13 @@ public:
             model = glm::translate(model, cubePositions[i]);
 
             model = glm::rotate(model, (GLfloat)(1.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
-            this->shader->uniformMatrix("model", model);
+            this->shader->UniformMatrix("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
 
         // TODO: Move to the editor as debug flag
-        glm::mat4 mvp(1.0f);
         this->debugAxes->SetMVP(view);
         this->debugAxes->Enable();
     }
@@ -1046,7 +898,7 @@ public:
 
         glDeleteVertexArrays(1, &this->VAO);
 
-        delete shader;
+        // delete shader;
         delete VBO;
         delete this->debugAxes;
         // delete EBO;
