@@ -1,7 +1,7 @@
 #ifndef __META_HPP__
 #define __META_HPP__
 
-#define ENGINE_VERSION "0.0.6"
+#define ENGINE_VERSION "0.0.7"
 #define GLSL_VERSION "#version 330"
 
 #endif

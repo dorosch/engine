@@ -1,6 +1,7 @@
 #include <optional>
 #include <functional>
 #include <memory>
+#include <vector>
 #include <iostream>
 #include <fmt/format.h>
 
@@ -44,6 +45,26 @@ const GLchar* fragmentShaderSource = "\n    #version 330 core\n"
     // "    uniform vec3 testColor;\n"
     "    void main() {\n"
     "        color = texture(ourTexture, TexCoord);\n"
+    "    }\n\0";
+
+
+// Debug lines
+const char *debugVertexShader = "\n"
+    "    #version 330 core\n"
+    "    layout (location = 0) in vec3 position;\n"
+    "    layout (location = 1) in vec3 color;\n"
+    "    out vec3 ourColor;\n"
+    "    uniform mat4 MVP;\n"
+    "    void main() {\n"
+    "        gl_Position = MVP * vec4(position.x, position.y, position.z, 1.0f);\n"
+    "        ourColor = color;\n"
+    "    }\0";        
+const char *debugFragmentShader = "\n"
+    "    #version 330 core\n"
+    "    in vec3 ourColor;\n"
+    "    out vec4 color;\n"
+    "    void main() {\n"
+    "        color = vec4(ourColor, 1.0f);\n"
     "    }\n\0";
 
 
@@ -228,7 +249,7 @@ namespace Engine {
 
         class ShaderProgram {
         private:
-            std::unique_ptr<Logger> logger = std::make_unique<Logger>("shader");
+            // std::unique_ptr<Logger> logger = std::make_unique<Logger>("shader");
 
         public:
             GLuint object;
@@ -247,14 +268,16 @@ namespace Engine {
                     glAttachShader(this->object, vertex.value());
                 }
                 else {
-                    this->logger->warning("Shader compilation result not received");
+                    std::cout << "Shader compilation result not received" << std::endl;
+                    // this->logger->warning("Shader compilation result not received");
                 }
 
                 if (fragment) {
                     glAttachShader(this->object, fragment.value());
                 }
                 else {
-                    this->logger->warning("Shader compilation result not received");
+                    std::cout << "Shader compilation result not received" << std::endl;
+                    // this->logger->warning("Shader compilation result not received");
                 }
 
                 this->linking();
@@ -299,9 +322,10 @@ namespace Engine {
 
                     glGetShaderInfoLog(shader, 512, NULL, errorMessage);
 
-                    this->logger->error(
-                        fmt::format("Shader compile error {}\n{}", errorMessage, file).c_str()
-                    );
+                    std::cout << fmt::format("Shader compile error {}\n{}", errorMessage, file).c_str() << std::endl;
+                    // this->logger->error(
+                        // fmt::format("Shader compile error {}\n{}", errorMessage, file).c_str()
+                    // );
 
                     return std::nullopt;
                 }
@@ -318,9 +342,11 @@ namespace Engine {
 
                     glGetProgramInfoLog(this->object, 512, NULL, errorMessage);
 
-                    this->logger->error(
-                        fmt::format("Shader program linking: {}", errorMessage).c_str()
-                    );
+                    std::cout << fmt::format("Shader program linking: {}", errorMessage).c_str() << std::endl;
+
+                    // this->logger->error(
+                        // fmt::format("Shader program linking: {}", errorMessage).c_str()
+                    // );
                 }
             }
 
@@ -328,7 +354,7 @@ namespace Engine {
                 glUseProgram(this->object);
             }
 
-            void uniformColor(const char *attribute, float r, float g, float b, float a) {
+            void uniformColor(const char *attribute, float r, float g, float b) {
                 GLint color = glGetUniformLocation(this->object, attribute);
                 glUniform3f(color, r, g, b);
             }
@@ -341,6 +367,81 @@ namespace Engine {
             void uniformMatrix(const char *attribure, glm::mat4 matrix) {
                 GLuint targetAttribute = glGetUniformLocation(this->object, attribure);
                 glUniformMatrix4fv(targetAttribute, 1, GL_FALSE, glm::value_ptr(matrix));
+            }
+        };
+    }
+
+
+    namespace Debug {
+        using namespace Engine::Render;
+
+
+        class Debug {
+            virtual void Enable() = 0;
+        };
+
+        class DebugAxes : public Debug {};
+
+
+        class OpenglDebugAxes : public DebugAxes {
+        public:
+            GLuint VAO;
+            glm::mat4 MVP;
+            OpenglVertexBuffer *VBO = nullptr;
+            ShaderProgram *shader = nullptr;
+
+            OpenglDebugAxes() {
+                this->shader = new Render::ShaderProgram(
+                    debugVertexShader, debugFragmentShader
+                );
+
+                GLfloat vertices[] = {
+                    0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                    1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                    0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
+                };
+
+                glGenVertexArrays(1, &this->VAO);
+                this->VBO = new OpenglVertexBuffer();
+
+                glBindVertexArray(this->VAO);
+                this->VBO->bind(vertices, sizeof(vertices));
+
+                // Position
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+                glEnableVertexAttribArray(0);
+                
+                // Color attribute
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+                glEnableVertexAttribArray(1);
+
+                this->VBO->unbind();
+
+                glBindVertexArray(0);
+            }
+
+            virtual ~OpenglDebugAxes() {
+                glDeleteVertexArrays(1, &this->VAO);
+
+                delete this->VBO;
+                delete this->shader;
+            }
+
+            void SetMVP(glm::mat4 mvp) {
+                this->MVP = mvp;
+            }
+
+            void Enable() {
+                this->shader->use();
+                this->shader->uniformMatrix("MVP", this->MVP);
+
+                glBindVertexArray(this->VAO);
+                // 6 is a count vertex
+                glDrawArrays(GL_LINES, 0, 6);
+                glBindVertexArray(0);
             }
         };
     }
@@ -599,6 +700,8 @@ public:
     Engine::Render::OpenglTexture *texture = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
 
+    Engine::Debug::OpenglDebugAxes *debugAxes = nullptr;
+
     void Startup() {
         logger->trace("Startup");
 
@@ -611,65 +714,60 @@ public:
         this->shader = new Engine::Render::ShaderProgram(
             vertexShaderSource, fragmentShaderSource
         );
+        this->debugAxes = new Engine::Debug::OpenglDebugAxes();
 
         this->texture = new Engine::Render::OpenglTexture(
             "/home/a-kletsko/Projects/engine/container.jpg"
         );
 
-        // float vertices[] = {
-        //     // Position          // Texture
-        //     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
-        //     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
-        //     -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,
-        //     -0.5f,  0.5f, 0.0f,  0.0f, 1.0f
-        // };
         float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-        uint32_t indices[] = {
-            0, 1, 3,
-            1, 2, 3
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
+
+        // uint32_t indices[] = {
+        //     0, 1, 3,
+        //     1, 2, 3
+        // };
 
         glGenVertexArrays(1, &this->VAO);
         this->VBO = new Engine::Render::OpenglVertexBuffer();
@@ -697,12 +795,18 @@ public:
     }
 
     void Update() {
-        glm::mat4 model(1.0f);
-        // model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.5f, 1.0f, 0.0f));
+        // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+        // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+        // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+        // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
+        // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+        // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+        GLfloat radius = 10.0f;
+        GLfloat camX = sin(glfwGetTime()) * radius;
+        GLfloat camZ = cos(glfwGetTime()) * radius;
 
         glm::mat4 view(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
 
         glm::mat4 projection(1.0f);
         projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
@@ -712,25 +816,49 @@ public:
         // rotation = glm::scale(rotation, glm::vec3(0.5, 0.5, 0.5));
 
         // rotation = glm::translate(rotation, glm::vec3(0.5f, -0.5f, 0.0f));
-        rotation = glm::rotate(rotation,(GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+        rotation = glm::rotate(rotation,(GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 1.0f, 1.0f));
 
         // std::cout << glm::to_string(rotation) << std::endl;
 
         this->shader->use();
-        this->shader->uniformColor("testColor", color[0], color[1], color[2], 0.0);
+        this->shader->uniformColor("testColor", color[0], color[1], color[2]);
         this->shader->uniformPosition("ourPosition", position[0], position[1], position[2]);
         this->shader->uniformMatrix("rotation", rotation);
 
-        this->shader->uniformMatrix("model", model);
         this->shader->uniformMatrix("view", view);
         this->shader->uniformMatrix("projection", projection);
 
-        this->texture->bind();
+        this->texture->bind(); 
+
+        glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,  0.0f,  0.0f), 
+            glm::vec3( 2.0f,  5.0f, -15.0f), 
+            glm::vec3(-1.5f, -2.2f, -2.5f),  
+            glm::vec3(-3.8f, -2.0f, -12.3f),  
+            glm::vec3( 2.4f, -0.4f, -3.5f),  
+            glm::vec3(-1.7f,  3.0f, -7.5f),  
+            glm::vec3( 1.3f, -2.0f, -2.5f),  
+            glm::vec3( 1.5f,  2.0f, -2.5f), 
+            glm::vec3( 1.5f,  0.2f, -1.5f), 
+            glm::vec3(-1.3f,  1.0f, -1.5f)  
+        };
 
         glBindVertexArray(this->VAO);
-        // glDrawElements(GL_TRIANGLES, this->EBO->count, GL_UNSIGNED_INT, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(GLuint i = 0; i < 10; i++) {
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+
+            model = glm::rotate(model, (GLfloat)(1.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
+            this->shader->uniformMatrix("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
         glBindVertexArray(0);
+
+        // TODO: Move to the editor as debug flag
+        glm::mat4 mvp(1.0f);
+        this->debugAxes->SetMVP(mvp);
+        this->debugAxes->Enable();
     }
 
     void Shutdown() {
@@ -740,6 +868,7 @@ public:
 
         delete shader;
         delete VBO;
+        delete this->debugAxes;
         // delete EBO;
     }
 };
