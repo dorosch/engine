@@ -155,7 +155,7 @@ namespace Engine {
                 this->Pitch = 0.0f;
                 this->MovementSpeed = 3.0f;
                 this->MouseSensitivity = 0.25f;
-                this->Zoom = 50.0f;
+                this->Zoom = 60.0f;
 
                 this->updateCameraVectors();
             }
@@ -706,12 +706,15 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class UserApplication : public Engine::Application {
 public:
-    GLuint VAO;
+    GLuint VAO, modelVAO;
     Engine::Render::OpenglVertexBuffer *VBO = nullptr;
+    Engine::Render::OpenglVertexBuffer *modelVBO = nullptr;
     // Engine::Render::OpenglIndexBuffer *EBO = nullptr;
-    // Engine::Render::OpenglShaderProgram *shader = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
+    Engine::Render::ShaderProgram *shaderModel = nullptr;
     Engine::Render::OpenglTexture *texture = nullptr;
+
+    Tool::ObjModel *model = nullptr;
 
     Engine::Debug::OpenglDebugAxes *debugAxes = nullptr;
 
@@ -729,6 +732,17 @@ public:
         glfwSetScrollCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, scroll_callback);
 
         std::filesystem::path cwd = std::filesystem::current_path();
+
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "IS4.obj");
+        model->Load();
+        // TODO: Fix model deletion
+        // delete model;
+
+        this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
+        this->shaderModel->Build(
+            cwd / "resources" / "shaders" / "model.vert",
+            cwd / "resources" / "shaders" / "model.frag"
+        );
 
         this->shader = Engine::Render::ShaderProgram::GetInstance();
         this->shader->Build(
@@ -790,6 +804,23 @@ public:
         //     1, 2, 3
         // };
 
+        // Draw model
+        glGenVertexArrays(1, &this->modelVAO);
+        this->modelVBO = new Engine::Render::OpenglVertexBuffer();
+
+        glBindVertexArray(modelVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
+        glBufferData(GL_ARRAY_BUFFER, model->vertices.size() * sizeof(glm::vec4), model->vertices.data(), GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        this->modelVBO->unbind();
+
+        glBindVertexArray(0);
+
+        // End draw model
+
         glGenVertexArrays(1, &this->VAO);
         this->VBO = new Engine::Render::OpenglVertexBuffer();
         // this->EBO = new Engine::Render::OpenglIndexBuffer();
@@ -847,10 +878,23 @@ public:
 
         Do_Movement();
 
-        glm::mat4 view;
+        glm::mat4 view(1.0f);
         view = camera.GetViewMatrix();
-        glm::mat4 projection;	
+        glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
+
+        // Draw model
+        glm::mat4 model(1.0f);
+        this->shaderModel->Use();
+        this->shaderModel->UniformMatrix("model", model);
+        this->shaderModel->UniformMatrix("view", view);
+        this->shaderModel->UniformMatrix("projection", projection);
+        
+        glBindVertexArray(this->modelVAO);
+
+        glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
+        glBindVertexArray(0);
+        // End draw model
 
         this->shader->Use();
         this->shader->UniformColor("testColor", color[0], color[1], color[2]);
@@ -887,7 +931,7 @@ public:
         glBindVertexArray(0);
 
         // TODO: Move to the editor as debug flag
-        this->debugAxes->SetMVP(view);
+        this->debugAxes->SetMVP(projection * view * model);
         this->debugAxes->Enable();
     }
 
@@ -897,6 +941,7 @@ public:
         glDeleteVertexArrays(1, &this->VAO);
 
         // delete shader;
+        // delete shaderModel;
         delete VBO;
         delete this->debugAxes;
         // delete EBO;
@@ -905,12 +950,6 @@ public:
 
 
 int main() {
-    std::filesystem::path cwd = std::filesystem::current_path();
-
-    Tool::ObjModel *model = new Tool::ObjModel(cwd / "resources" / "models" / "IS4.obj");
-    model->Load();
-    // delete model;
-
     UserApplication *application = new UserApplication();
     Engine::Engine engine(application);
 
