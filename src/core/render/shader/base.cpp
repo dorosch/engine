@@ -22,5 +22,5 @@ std::string ShaderProgram::ReadShaderFile(std::filesystem::path path) {
 
 ShaderProgram *ShaderProgram::GetInstance() {
     // TODO: Add switch for select target shader implementation
-    return new OpenglShaderProgram;
+    return new OpenglShaderProgram();
 }

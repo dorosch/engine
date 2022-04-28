@@ -25,8 +25,8 @@
 #include "meta.hpp"
 #include "editor.hpp"
 
-#include "core/render/shader.hpp"
-#include "core/render/shader/opengl.hpp"
+#include "tools/model.hpp"
+#include "core/render/shader/base.hpp"
 
 
 namespace Tool {
@@ -155,14 +155,12 @@ namespace Engine {
                 this->Pitch = 0.0f;
                 this->MovementSpeed = 3.0f;
                 this->MouseSensitivity = 0.25f;
-                this->Zoom = 90.0f;
+                this->Zoom = 50.0f;
 
                 this->updateCameraVectors();
             }
 
-            virtual ~OpenglCamera() {
-
-            }
+            virtual ~OpenglCamera() {}
 
             glm::mat4 GetViewMatrix() {
                 return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
@@ -907,6 +905,12 @@ public:
 
 
 int main() {
+    std::filesystem::path cwd = std::filesystem::current_path();
+
+    Tool::ObjModel *model = new Tool::ObjModel(cwd / "resources" / "models" / "IS4.obj");
+    model->Load();
+    // delete model;
+
     UserApplication *application = new UserApplication();
     Engine::Engine engine(application);
 
