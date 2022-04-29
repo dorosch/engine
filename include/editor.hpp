@@ -18,7 +18,6 @@ using namespace Tool::Logger;
 namespace Engine {
     // class Application;
 
-
     namespace Editor {
         class Editor {
         private:

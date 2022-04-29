@@ -25,6 +25,7 @@
 
 #include "tools/model.hpp"
 #include "tools/logger.hpp"
+#include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 
 
@@ -145,54 +146,6 @@ namespace Engine {
         };
 
 
-        class Buffer {
-        public:
-            uint32_t object;
-
-            Buffer() {
-                glGenBuffers(1, &this->object);
-            }
-
-            virtual ~Buffer() {
-                glDeleteBuffers(1, &this->object);
-            }
-
-            void unbind() {
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-            }
-        };
-
-
-        // TODO: Add create method for buffer and overide with renderBackend
-        class VertexBuffer : public Buffer {};
-
-
-        class IndexBuffer : public Buffer {
-        public:
-            uint32_t count = 0;
-        };
-
-
-        class OpenglVertexBuffer : public VertexBuffer {
-        public:
-            void bind(float *vertices, uint32_t size) {
-                glBindBuffer(GL_ARRAY_BUFFER, this->object);
-                glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-            }
-        };
-
-
-        class OpenglIndexBuffer : public IndexBuffer {
-        public:
-            void bind(uint32_t *indices, uint32_t count) {
-                this->count = count;
-
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->object);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
-            }
-        };
-
-
         class Texture {
         public:
             uint32_t object;
@@ -241,7 +194,7 @@ namespace Engine {
         public:
             GLuint VAO;
             glm::mat4 MVP;
-            OpenglVertexBuffer *VBO = nullptr;
+            VertexBuffer *VBO = nullptr;
             ShaderProgram *shader = nullptr;
 
             OpenglDebugAxes() {
@@ -263,7 +216,7 @@ namespace Engine {
                 };
 
                 glGenVertexArrays(1, &this->VAO);
-                this->VBO = new OpenglVertexBuffer();
+                this->VBO = VertexBuffer::GetInstance();
 
                 glBindVertexArray(this->VAO);
                 this->VBO->bind(vertices, sizeof(vertices));
@@ -616,8 +569,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 class UserApplication : public Engine::Application {
 public:
     GLuint VAO, modelVAO;
-    Engine::Render::OpenglVertexBuffer *VBO = nullptr;
-    Engine::Render::OpenglVertexBuffer *modelVBO = nullptr;
+    Engine::Render::VertexBuffer *VBO = nullptr;
+    Engine::Render::VertexBuffer *modelVBO = nullptr;
     // Engine::Render::OpenglIndexBuffer *EBO = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
@@ -715,7 +668,7 @@ public:
 
         // Draw model
         glGenVertexArrays(1, &this->modelVAO);
-        this->modelVBO = new Engine::Render::OpenglVertexBuffer();
+        this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
         glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
@@ -731,7 +684,7 @@ public:
         // End draw model
 
         glGenVertexArrays(1, &this->VAO);
-        this->VBO = new Engine::Render::OpenglVertexBuffer();
+        this->VBO = Engine::Render::VertexBuffer::GetInstance();
         // this->EBO = new Engine::Render::OpenglIndexBuffer();
 
         glBindVertexArray(VAO);
