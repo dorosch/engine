@@ -26,6 +26,7 @@
 #include "tools/model.hpp"
 #include "tools/logger.hpp"
 #include "tools/debug/axes/base.hpp"
+#include "tools/debug/grid/base.hpp"
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 
@@ -500,6 +501,7 @@ public:
 
     Tool::ObjModel *model = nullptr;
     Tool::Debug::DebugAxes *debugAxes = nullptr;
+    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
     void Startup() {
         logger->trace(std::string("Startup"));
@@ -533,6 +535,7 @@ public:
             cwd / "resources" / "shaders" / "position-texture.frag"
         );
         this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
+        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
 
         this->texture = new Engine::Render::OpenglTexture(
             "/home/a-kletsko/Projects/engine/container.jpg"
@@ -718,6 +721,9 @@ public:
         // TODO: Move to the editor as debug flag
         this->debugAxes->SetMVP(projection * view * model);
         this->debugAxes->Enable();
+
+        this->debugFloorGrid->SetMVP(projection * view * model);
+        this->debugFloorGrid->Enable();
     }
 
     void Shutdown() {
