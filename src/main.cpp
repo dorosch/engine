@@ -25,6 +25,7 @@
 
 #include "tools/model.hpp"
 #include "tools/logger.hpp"
+#include "tools/debug/axes/base.hpp"
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 
@@ -174,85 +175,6 @@ namespace Engine {
 
             void bind() {
                 glBindTexture(GL_TEXTURE_2D, this->object);
-            }
-        };
-    }
-
-
-    namespace Debug {
-        using namespace Engine::Render;
-
-
-        class Debug {
-            virtual void Enable() = 0;
-        };
-
-        class DebugAxes : public Debug {};
-
-
-        class OpenglDebugAxes : public DebugAxes {
-        public:
-            GLuint VAO;
-            glm::mat4 MVP;
-            VertexBuffer *VBO = nullptr;
-            ShaderProgram *shader = nullptr;
-
-            OpenglDebugAxes() {
-                std::filesystem::path cwd = std::filesystem::current_path();
-
-                this->shader = Engine::Render::ShaderProgram::GetInstance();
-                this->shader->Build(
-                    cwd / "resources" / "shaders" / "position-color.vert",
-                    cwd / "resources" / "shaders" / "position-color.frag"
-                );
-
-                GLfloat vertices[] = {
-                    0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-                    1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-                    0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f
-                };
-
-                glGenVertexArrays(1, &this->VAO);
-                this->VBO = VertexBuffer::GetInstance();
-
-                glBindVertexArray(this->VAO);
-                this->VBO->bind(vertices, sizeof(vertices));
-
-                // Position
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-                glEnableVertexAttribArray(0);
-                
-                // Color attribute
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-                glEnableVertexAttribArray(1);
-
-                this->VBO->unbind();
-
-                glBindVertexArray(0);
-            }
-
-            virtual ~OpenglDebugAxes() {
-                glDeleteVertexArrays(1, &this->VAO);
-
-                delete this->VBO;
-                delete this->shader;
-            }
-
-            void SetMVP(glm::mat4 mvp) {
-                this->MVP = mvp;
-            }
-
-            void Enable() {
-                this->shader->Use();
-                this->shader->UniformMatrix("MVP", this->MVP);
-
-                glBindVertexArray(this->VAO);
-                // 6 is a count vertex
-                glDrawArrays(GL_LINES, 0, 6);
-                glBindVertexArray(0);
             }
         };
     }
@@ -577,8 +499,7 @@ public:
     Engine::Render::OpenglTexture *texture = nullptr;
 
     Tool::ObjModel *model = nullptr;
-
-    Engine::Debug::OpenglDebugAxes *debugAxes = nullptr;
+    Tool::Debug::DebugAxes *debugAxes = nullptr;
 
     void Startup() {
         logger->trace(std::string("Startup"));
@@ -611,7 +532,7 @@ public:
             cwd / "resources" / "shaders" / "position-texture.vert",
             cwd / "resources" / "shaders" / "position-texture.frag"
         );
-        this->debugAxes = new Engine::Debug::OpenglDebugAxes();
+        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
 
         this->texture = new Engine::Render::OpenglTexture(
             "/home/a-kletsko/Projects/engine/container.jpg"
