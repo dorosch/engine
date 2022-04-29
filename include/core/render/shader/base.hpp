@@ -11,6 +11,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "tools/logger.hpp"
+
 
 namespace Engine {
     namespace Render {
@@ -22,7 +24,8 @@ namespace Engine {
 
         class ShaderProgram {
         protected:
-            // std::unique_ptr<Logger> logger = std::make_unique<Logger>("shader");
+            std::unique_ptr<Tool::Logger::Logger> logger = 
+                std::make_unique<Tool::Logger::Logger>("shader");
 
             std::string ReadShaderFile(std::filesystem::path);
 

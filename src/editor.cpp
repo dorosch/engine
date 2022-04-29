@@ -12,7 +12,7 @@ namespace Engine {
         void Editor::Startup(GLFWwindow *window) {
             this->window = window;
 
-            // logger->trace("Init");
+            logger->trace(std::string("Init"));
 
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
@@ -30,7 +30,7 @@ namespace Engine {
             static bool closed = false;
             static bool wireframe = false;
 
-            // logger->trace("Update");
+            logger->trace(std::string("Update"));
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -67,7 +67,7 @@ namespace Engine {
 
 
         void Editor::Shutdown() {
-            // logger->trace("Shutdown");
+            logger->trace(std::string("Shutdown"));
 
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplGlfw_Shutdown();

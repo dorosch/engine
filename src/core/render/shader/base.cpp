@@ -4,19 +4,22 @@
 using namespace Engine::Render;
 
 
-std::string ShaderProgram::ReadShaderFile(std::filesystem::path path) {
-    if (!std::filesystem::exists(path)) {
-        // TODO: Change on logger
-        std::cout << "Error: file not exists" << std::endl;
+std::string ShaderProgram::ReadShaderFile(std::filesystem::path path) {    
+    std::ifstream file(path);
+    
+    if (file.is_open()) {
+        std::string content(
+            (std::istreambuf_iterator<char>(file)),
+            std::istreambuf_iterator<char>()
+        );
+        file.close();
+
+        return content;
     }
 
-    std::ifstream file(path);
-    std::string content(
-        (std::istreambuf_iterator<char>(file)),
-        std::istreambuf_iterator<char>()
+    throw std::runtime_error(
+        fmt::format("Cann't open file: {}", path.c_str())
     );
-
-    return content;
 }
 
 

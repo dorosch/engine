@@ -10,11 +10,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "tools/logger.hpp"
 
-// #include "engine.hpp"
-// #include "tools/logger.hpp"
-
-// using namespace Tool::Logger;
+using namespace Tool::Logger;
 
 
 namespace Engine {
@@ -27,7 +25,7 @@ namespace Engine {
             GLFWwindow *window = nullptr;
 
         public:
-            // std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");
+            std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");
 
             void Startup(GLFWwindow *);
             void Update();

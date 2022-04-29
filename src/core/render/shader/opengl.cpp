@@ -16,8 +16,22 @@ OpenglShaderProgram::~OpenglShaderProgram() {
 void OpenglShaderProgram::Build(
     std::filesystem::path vertexPath, std::filesystem::path fragmentPath
 ) {
-    std::string vertexSource = this->ReadShaderFile(vertexPath);
-    std::string fragmentSource = this->ReadShaderFile(fragmentPath);
+    std::string vertexSource;
+    std::string fragmentSource;
+
+    try {
+        vertexSource = this->ReadShaderFile(vertexPath);
+    }
+    catch (const std::exception& error) {
+        logger->error(error.what());
+    }
+
+    try {
+        fragmentSource = this->ReadShaderFile(fragmentPath);
+    }
+    catch (const std::exception& error) {
+        logger->error(error.what());
+    }
 
     std::optional<GLuint> vertex = this->Compile(
         Shader::VERTEX, vertexSource
@@ -30,16 +44,14 @@ void OpenglShaderProgram::Build(
         glAttachShader(this->object, vertex.value());
     }
     else {
-        std::cout << "Shader compilation result not received" << std::endl;
-        // this->logger->warning("Shader compilation result not received");
+        this->logger->warning(std::string("Shader compilation result not received"));
     }
 
     if (fragment) {
         glAttachShader(this->object, fragment.value());
     }
     else {
-        std::cout << "Shader compilation result not received" << std::endl;
-        // this->logger->warning("Shader compilation result not received");
+        this->logger->warning(std::string("Shader compilation result not received"));
     }
 
     this->Linking();
@@ -82,10 +94,9 @@ std::optional<uint32_t> OpenglShaderProgram::Compile(Shader type, std::string co
 
         glGetShaderInfoLog(shader, 512, NULL, errorMessage);
 
-        std::cout << fmt::format("Shader compile error {}\n{}", errorMessage, content).c_str() << std::endl;
-        // this->logger->error(
-            // fmt::format("Shader compile error {}\n{}", errorMessage, file).c_str()
-        // );
+        this->logger->error(
+            fmt::format("Shader compile error {}", errorMessage)
+        );
 
         return std::nullopt;
     }
@@ -103,11 +114,9 @@ void OpenglShaderProgram::Linking() {
 
         glGetProgramInfoLog(this->object, 512, NULL, errorMessage);
 
-        std::cout << fmt::format("Shader program linking: {}", errorMessage).c_str() << std::endl;
-
-        // this->logger->error(
-            // fmt::format("Shader program linking: {}", errorMessage).c_str()
-        // );
+        this->logger->error(
+            fmt::format("Shader program linking error {}", errorMessage)
+        );
     }
 }
 
