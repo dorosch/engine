@@ -72,7 +72,7 @@ namespace Engine {
                 this->WorldUp = glm::vec3(0.0f, 5.0f, 0.0f);
                 this->Yaw = -90.0f;
                 this->Pitch = 0.0f;
-                this->MovementSpeed = 3.0f;
+                this->MovementSpeed = 10.0f;
                 this->MouseSensitivity = 0.25f;
                 this->Zoom = 60.0f;
 
@@ -399,6 +399,7 @@ Engine::Scene::OpenglCamera camera;
 bool keys[1024];
 GLfloat lastX = 400, lastY = 300;
 bool firstMouse = true;
+bool mouseCamera = false;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -407,8 +408,7 @@ GLuint screenWidth = 1920, screenHeight = 1080;
 
 
 // Moves/alters the camera positions based on user input
-void Do_Movement()
-{
+void Do_Movement() {
     // Camera controls
     if(keys[GLFW_KEY_W])
         camera.ProcessKeyboard(Engine::Scene::CameraDirection::FORWARD, deltaTime);
@@ -421,8 +421,9 @@ void Do_Movement()
 }
 
 // Is called whenever a key is pressed/released via GLFW
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mode);
+
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
     if (key >= 0 && key < 1024)
@@ -438,8 +439,24 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureMouse) {
+
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            mouseCamera = true;
+        }
+        else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+            mouseCamera = false;
+        }
+    }
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+
     if(firstMouse)
     {
         lastX = xpos;
@@ -453,11 +470,15 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    if (mouseCamera) {
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
 }	
 
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+
     camera.ProcessMouseScroll(yoffset);
 }
 
@@ -485,6 +506,17 @@ public:
     }
 
     void Run() {
+        // TODO: Need custom event system because events need for application and editor
+        // bd->PrevUserCallbackWindowFocus = glfwSetWindowFocusCallback(window, ImGui_ImplGlfw_WindowFocusCallback);
+        // bd->PrevUserCallbackCursorEnter = glfwSetCursorEnterCallback(window, ImGui_ImplGlfw_CursorEnterCallback);
+        // bd->PrevUserCallbackCursorPos = glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
+        // bd->PrevUserCallbackMousebutton = glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
+        // bd->PrevUserCallbackScroll = glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
+        // bd->PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
+        // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+        // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
+
+        glfwSetMouseButtonCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_button_callback);
         glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, cursor_position_callback);
         glfwSetKeyCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, key_callback);
         glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_callback);
@@ -492,7 +524,7 @@ public:
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "Tiger_I.obj");
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "IS7.obj");
         model->Load();
         // TODO: Fix model deletion
         // delete model;
@@ -579,7 +611,6 @@ public:
         this->modelVBO->unbind();
 
         glBindVertexArray(0);
-
         // End draw model
 
         glGenVertexArrays(1, &this->VAO);
@@ -639,12 +670,12 @@ public:
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         glm::mat4 view(1.0f);
         view = camera.GetViewMatrix();
         glm::mat4 projection(1.0f);	
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
         // Draw model
         glm::mat4 model(1.0f);
