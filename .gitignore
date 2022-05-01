@@ -1,0 +1,5 @@
+*.o
+imgui*
+target/*
+resources/*
+.vscode
