@@ -18,7 +18,6 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <SOIL/SOIL.h>
 
 #include "meta.hpp"
 #include "editor.hpp"
@@ -27,8 +26,10 @@
 #include "tools/logger.hpp"
 #include "tools/debug/axes/base.hpp"
 #include "tools/debug/grid/base.hpp"
+#include "core/render/api.hpp"
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
+#include "core/render/texture/base.hpp"
 
 
 namespace Engine {
@@ -67,7 +68,7 @@ namespace Engine {
             GLfloat Zoom;
 
             OpenglCamera() {
-                this->Position = glm::vec3(0.0f, 0.0f, 0.0f);
+                this->Position = glm::vec3(5.0f, 5.0f, 5.0f);
                 this->WorldUp = glm::vec3(0.0f, 5.0f, 0.0f);
                 this->Yaw = -90.0f;
                 this->Pitch = 0.0f;
@@ -137,45 +138,6 @@ namespace Engine {
                 // Also re-calculate the Right and Up vector
                 this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));
                 this->Up = glm::normalize(glm::cross(this->Right, this->Front));
-            }
-        };
-    }
-
-
-    namespace Render {
-        enum Backend {
-            OPENGL,
-        };
-
-
-        class Texture {
-        public:
-            uint32_t object;
-        };
-
-
-        class OpenglTexture : public Texture {
-        public:
-            OpenglTexture(const char *imagePath) {
-                glGenTextures(1, &this->object);
-
-                int width, height;
-
-                glBindTexture(GL_TEXTURE_2D, this->object);
-
-                unsigned char* image = SOIL_load_image(imagePath, &width, &height, 0, SOIL_LOAD_RGB);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-                glGenerateMipmap(GL_TEXTURE_2D);
-                SOIL_free_image_data(image);
-                glBindTexture(GL_TEXTURE_2D, 0); 
-            }
-
-            virtual ~OpenglTexture() {
-                glDeleteTextures(1, &this->object);
-            }
-
-            void bind() {
-                glBindTexture(GL_TEXTURE_2D, this->object);
             }
         };
     }
@@ -299,7 +261,6 @@ namespace Engine {
         std::unique_ptr<Logger> logger = std::make_unique<Logger>("app");
 
         Window::Provider provider = Window::Provider::GLFW;
-        Render::Backend renderBackend = Render::Backend::OPENGL;
         Window::WindowProvider *window = nullptr;
         Editor::Editor *editor = nullptr;
 
@@ -366,13 +327,21 @@ namespace Engine {
              * for the initialization of managers. 
              */
 
-            logger->info(fmt::format("engine version: {}", ENGINE_VERSION));
-            logger->info(fmt::format("glsl version: {}", GLSL_VERSION));
-
             // Initialize all managers and then initialize the application
             // since the application can change the settings of managers.
             this->app->window->Startup();
             this->app->Startup();
+
+            logger->info(fmt::format("engine version: {}", ENGINE_VERSION));
+            logger->info(fmt::format("glsl version: {}", GLSL_VERSION));
+
+            switch (Render::BackendAPI) {
+                case Render::Backend::OPENGL:
+                    logger->info("backend API: OpenGL");
+                    break;
+                default:
+                    logger->critical("unknown render backend API");
+            }
         }
 
         void Run() {
@@ -465,6 +434,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
+
+}
+
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     if(firstMouse)
@@ -497,7 +470,7 @@ public:
     // Engine::Render::OpenglIndexBuffer *EBO = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
-    Engine::Render::OpenglTexture *texture = nullptr;
+    Engine::Render::Texture *texture = nullptr;
 
     Tool::ObjModel *model = nullptr;
     Tool::Debug::DebugAxes *debugAxes = nullptr;
@@ -512,13 +485,14 @@ public:
     }
 
     void Run() {
+        glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, cursor_position_callback);
         glfwSetKeyCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, key_callback);
         glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_callback);
         glfwSetScrollCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, scroll_callback);
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "IS7.obj");
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "Tiger_I.obj");
         model->Load();
         // TODO: Fix model deletion
         // delete model;
@@ -537,8 +511,9 @@ public:
         this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
         this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
 
-        this->texture = new Engine::Render::OpenglTexture(
-            "/home/a-kletsko/Projects/engine/container.jpg"
+        this->texture = Engine::Render::Texture::GetInstance();
+        this->texture->Build(
+            cwd / "resources" / "textures" / "container.jpg"
         );
 
         float vertices[] = {
@@ -658,11 +633,11 @@ public:
 
         // std::cout << glm::to_string(rotation) << std::endl;
 
+        Do_Movement();
+
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
-        Do_Movement();
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -691,7 +666,7 @@ public:
         this->shader->UniformMatrix("view", view);
         this->shader->UniformMatrix("projection", projection);
 
-        this->texture->bind(); 
+        this->texture->Bind(); 
 
         glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f), 

@@ -1,3 +1,4 @@
+#include "core/render/api.hpp"
 #include "core/render/shader/base.hpp"
 #include "core/render/shader/opengl.hpp"
 
@@ -24,6 +25,11 @@ std::string ShaderProgram::ReadShaderFile(std::filesystem::path path) {
 
 
 ShaderProgram *ShaderProgram::GetInstance() {
-    // TODO: Add switch for select target shader implementation
-    return new OpenglShaderProgram();
+    switch (GetBackendAPI()) {
+        case Backend::OPENGL:
+            return new OpenglShaderProgram();
+            break;
+        default:
+            throw std::logic_error("ShaderProgram - unsopported backend API");
+    }
 }

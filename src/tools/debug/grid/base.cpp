@@ -1,3 +1,4 @@
+#include "core/render/api.hpp"
 #include "tools/debug/grid/base.hpp"
 #include "tools/debug/grid/opengl.hpp"
 
@@ -5,6 +6,11 @@ using namespace Tool::Debug;
 
 
 DebugFloorGrid *DebugFloorGrid::GetInstance() {
-    // TODO: Add switch to select render backend
-    return new OpenglDebugFloorGrid();
+    switch (Engine::Render::GetBackendAPI()) {
+        case Engine::Render::Backend::OPENGL:
+            return new OpenglDebugFloorGrid();
+            break;
+        default:
+            throw std::logic_error("OpenglDebugFloorGrid - unsopported backend API");
+    }
 }

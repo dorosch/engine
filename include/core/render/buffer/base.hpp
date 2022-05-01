@@ -8,7 +8,7 @@ namespace Engine {
     namespace Render {
         class Buffer {
         public:
-            uint32_t object;
+            uint32_t object = 0;
         };
 
 
