@@ -30,6 +30,7 @@
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 #include "core/render/texture/base.hpp"
+#include "core/scene/scene.hpp"
 
 
 namespace Engine {
@@ -263,6 +264,7 @@ namespace Engine {
         Window::Provider provider = Window::Provider::GLFW;
         Window::WindowProvider *window = nullptr;
         Editor::Editor *editor = nullptr;
+        Scene::Scene *scene = nullptr;
 
         Application() {
             logger->trace(std::string("constructor"));
@@ -281,6 +283,7 @@ namespace Engine {
             }
 
             this->editor = new Editor::Editor();
+            this->scene = new Scene::Scene();
         }
 
         virtual ~Application() {
@@ -288,6 +291,7 @@ namespace Engine {
 
             delete this->editor;
             delete this->window;
+            delete this->scene;
         }
 
         virtual void Startup() = 0;
@@ -364,6 +368,7 @@ namespace Engine {
             glewInit();
 
             glEnable(GL_DEPTH_TEST);
+            glEnable(GL_MULTISAMPLE);
 
             this->app->Run();
 
@@ -443,7 +448,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (!io.WantCaptureMouse) {
+
+    // For keyboard io.WantCaptureKeyboard
+    if (io.WantCaptureMouse == false) {
 
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
             mouseCamera = true;
@@ -479,7 +486,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 
-    camera.ProcessMouseScroll(yoffset);
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (io.WantCaptureMouse == false) {
+        camera.ProcessMouseScroll(yoffset);
+    }
 }
 
 
