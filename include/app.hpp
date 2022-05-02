@@ -1,6 +1,8 @@
 #ifndef __APPLICATION__
 #define __APPLICATION__
 
+#include <memory>
+
 #include "editor.hpp"
 #include "tools/logger.hpp"
 #include "core/scene/scene.hpp"

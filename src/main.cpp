@@ -19,6 +19,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "engine.hpp"
 #include "app.hpp"
 #include "meta.hpp"
 #include "editor.hpp"
@@ -48,9 +49,7 @@ namespace Engine {
         };
 
 
-        class Camera {
-
-        };
+        class Camera {};
 
 
         class OpenglCamera : public Camera {
@@ -144,102 +143,6 @@ namespace Engine {
             }
         };
     }
-
-
-    class Engine {
-        /**
-         * Main engine class.
-         * 
-         * When used, the engine must have a custom user application. 
-         * Further work of the engine comes down to starting 
-         * main loop and updating managers and the user application.
-         */
-
-    private:
-        Application *app;
-
-    public:
-        std::unique_ptr<Logger> logger = std::make_unique<Logger>("engine");
-
-        Engine(Application *application) {
-            logger->trace(std::string("constructor"));
-
-            this->app = application;
-        }
-
-        void Startup() {
-            /**
-             * Engine initialization.
-             * 
-             * At this stage, the engine initializes the user application 
-             * and all managers. Also at this stage, it is possible to check 
-             * for the initialization of managers. 
-             */
-
-            // Initialize all managers and then initialize the application
-            // since the application can change the settings of managers.
-            this->app->window->Startup();
-            this->app->Startup();
-
-            logger->info(fmt::format("engine version: {}", ENGINE_VERSION));
-            logger->info(fmt::format("glsl version: {}", GLSL_VERSION));
-
-            switch (Render::BackendAPI) {
-                case Render::Backend::OPENGL:
-                    logger->info("backend API: OpenGL");
-                    break;
-                default:
-                    logger->critical("unknown render backend API");
-            }
-        }
-
-        void Run() {
-            /**
-             * Main engine loop.
-             * 
-             * As long as the application window is open, engine 
-             * continues updating user application and all managers. 
-             */
-
-            logger->trace(std::string("run"));
-
-            this->app->window->Create();
-
-            switch (this->app->provider) {
-                case Window::Provider::GLFW:
-                    this->app->editor->Startup(
-                        static_cast<Window::GLFWWindowProvider*>(this->app->window)->object
-                    );
-                    break;
-                default:
-                    throw std::logic_error("Undefined WindowProvider");
-            }
-
-            // TODO: Move all gl* functions to the render backend
-            glewExperimental = GL_TRUE;
-            glewInit();
-
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_MULTISAMPLE);
-
-            this->app->Run();
-
-            while (this->app->window->IsOpen()) {
-                glfwPollEvents();
-
-                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-                this->app->Update();
-                this->app->editor->Update();
-                this->app->window->Update();
-            }
-
-            this->app->editor->Shutdown();
-            this->app->window->Shutdown();
-            this->app->Shutdown();
-        }
-    };
 }
 
 
