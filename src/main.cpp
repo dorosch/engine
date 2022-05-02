@@ -13,7 +13,7 @@
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+// #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -31,6 +31,8 @@
 #include "core/render/shader/base.hpp"
 #include "core/render/texture/base.hpp"
 #include "core/scene/scene.hpp"
+#include "core/window/base.hpp"
+#include "core/window/glfw.hpp"
 
 
 namespace Engine {
@@ -144,105 +146,6 @@ namespace Engine {
     }
 
 
-    namespace Window {
-        enum Provider {
-            GLFW,
-        };
-
-
-        struct Settings {
-            int width;
-            int height;
-            bool fullScreen;
-            bool canResize;
-            const char *title;
-        };
-
-
-        class WindowProvider {
-        public:
-            Provider provider;
-            Settings settings = {
-                800, 600, false, false, "Application"
-            };
-
-            virtual ~WindowProvider() {};
-            virtual void Startup() = 0;
-            virtual void Create() = 0;
-            virtual void Update() = 0;
-            virtual void Shutdown() = 0;
-            virtual bool IsOpen() = 0;
-        };
-
-
-        class GLFWWindowProvider : public WindowProvider {
-        private:
-            GLFWmonitor *primaryMonitor = nullptr;
-            std::unique_ptr<Logger> logger = std::make_unique<Logger>("glfw");
-
-        public:
-            GLFWwindow *object = nullptr;
-            Provider provider = Provider::GLFW;
-
-            void Startup() {
-                logger->trace(std::string("Startup"));
-
-                glfwInit();
-
-                glfwWindowHint(GLFW_SAMPLES, 4);
-
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-            }
-
-            void Create() {
-                logger->trace(std::string("Create"));
-
-                if (!this->settings.canResize) {
-                    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-                }
-
-                if (this->settings.fullScreen) {
-                    this->primaryMonitor = glfwGetPrimaryMonitor();
-                }
-
-                this->object = glfwCreateWindow(
-                    this->settings.width,
-                    this->settings.height,
-                    this->settings.title,
-                    this->primaryMonitor,
-                    nullptr
-                );
-
-                if (!this->object) {
-                    throw std::runtime_error("Window creation error");
-                }
-
-                glfwMakeContextCurrent(this->object);
-                glfwSetFramebufferSizeCallback(this->object, framebufferChangeSizeCallback);
-            }
-
-            void Update() {
-                glfwSwapBuffers(this->object);
-            }
-
-            void Shutdown() {
-                logger->trace(std::string("Shutdown"));
-
-                glfwDestroyWindow(this->object);
-            }
-
-            bool IsOpen() {
-                return !glfwWindowShouldClose(this->object);
-            }
-
-            static void framebufferChangeSizeCallback(GLFWwindow* window, int width, int height) {
-                glViewport(0, 0, width, height);
-            }
-        };
-    }
-
-
     class Application {
         /**
          * Custom engine application class.
@@ -269,19 +172,7 @@ namespace Engine {
         Application() {
             logger->trace(std::string("constructor"));
 
-            // Initialize window provider
-            if (!this->provider) {
-                this->provider = Window::Provider::GLFW;
-            }
-
-            switch (this->provider) {
-                case Window::Provider::GLFW:
-                    this->window = new Window::GLFWWindowProvider();
-                    break;
-                default:
-                    throw std::logic_error("Undefined WindowProvider");
-            }
-
+            this->window = Window::WindowProvider::GetInstance();
             this->editor = new Editor::Editor();
             this->scene = new Scene::Scene();
         }
@@ -359,9 +250,16 @@ namespace Engine {
             logger->trace(std::string("run"));
 
             this->app->window->Create();
-            this->app->editor->Startup(
-                static_cast<Window::GLFWWindowProvider*>(this->app->window)->object
-            );
+
+            switch (this->app->provider) {
+                case Window::Provider::GLFW:
+                    this->app->editor->Startup(
+                        static_cast<Window::GLFWWindowProvider*>(this->app->window)->object
+                    );
+                    break;
+                default:
+                    throw std::logic_error("Undefined WindowProvider");
+            }
 
             // TODO: Move all gl* functions to the render backend
             glewExperimental = GL_TRUE;
@@ -527,11 +425,12 @@ public:
         // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
         // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
 
-        glfwSetMouseButtonCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_button_callback);
-        glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, cursor_position_callback);
-        glfwSetKeyCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, key_callback);
-        glfwSetCursorPosCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, mouse_callback);
-        glfwSetScrollCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, scroll_callback);
+        GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
+        glfwSetCursorPosCallback(window, cursor_position_callback);
+        glfwSetKeyCallback(window, key_callback);
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetScrollCallback(window, scroll_callback);
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
