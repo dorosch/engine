@@ -19,9 +19,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "app.hpp"
 #include "meta.hpp"
 #include "editor.hpp"
-
 #include "tools/model.hpp"
 #include "tools/logger.hpp"
 #include "tools/debug/axes/base.hpp"
@@ -144,52 +144,6 @@ namespace Engine {
             }
         };
     }
-
-
-    class Application {
-        /**
-         * Custom engine application class.
-         * 
-         * When creating an application using the engine, the entry 
-         * point is a class inherited from this one. Also, the custom 
-         * application needs to override three methods:
-         *     Startup()
-         *     Update()
-         *     Shutdown()
-         * 
-         * A user application should not override a constructor or 
-         * destructor without calling the parent construct or destructor. 
-         */
-
-    public:
-        std::unique_ptr<Logger> logger = std::make_unique<Logger>("app");
-
-        Window::Provider provider = Window::Provider::GLFW;
-        Window::WindowProvider *window = nullptr;
-        Editor::Editor *editor = nullptr;
-        Scene::Scene *scene = nullptr;
-
-        Application() {
-            logger->trace(std::string("constructor"));
-
-            this->window = Window::WindowProvider::GetInstance();
-            this->editor = new Editor::Editor();
-            this->scene = new Scene::Scene();
-        }
-
-        virtual ~Application() {
-            logger->trace(std::string("destructor"));
-
-            delete this->editor;
-            delete this->window;
-            delete this->scene;
-        }
-
-        virtual void Startup() = 0;
-        virtual void Run() = 0;
-        virtual void Update() = 0;
-        virtual void Shutdown() = 0;
-    };
 
 
     class Engine {
@@ -549,38 +503,11 @@ public:
     }
 
     void Update() {
-        // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-        // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-        // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-        // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
-        // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-        // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-        // GLfloat radius = 10.0f;
-        // GLfloat camX = sin(glfwGetTime()) * radius;
-        // GLfloat camZ = cos(glfwGetTime()) * radius;
-
-        // glm::mat4 view(1.0f);
-        // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, 1.0, 0.0));
-
-        // glm::mat4 projection(1.0f);
-        // projection = glm::perspective(45.0f, (GLfloat)800 / (GLfloat)600, 0.1f, 100.0f);
-
-        // glm::mat4 rotation(1.0f);
-        // rotation = glm::rotate(rotation, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-        // rotation = glm::scale(rotation, glm::vec3(0.5, 0.5, 0.5));
-
-        // rotation = glm::translate(rotation, glm::vec3(0.5f, -0.5f, 0.0f));
-        // rotation = glm::rotate(rotation,(GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.0f, 1.0f, 1.0f));
-
-        // std::cout << glm::to_string(rotation) << std::endl;
-
         Do_Movement();
 
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         glm::mat4 view(1.0f);
         view = camera.GetViewMatrix();
