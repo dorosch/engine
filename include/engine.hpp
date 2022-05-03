@@ -19,8 +19,6 @@ using namespace Tool::Logger;
 
 
 namespace Engine {
-    class Application;
-
     class Engine {
         /**
          * Main engine class.
@@ -31,12 +29,12 @@ namespace Engine {
          */
 
     private:
-        Application *app;
+        EngineApplication *app;
 
     public:
         std::unique_ptr<Logger> logger = std::make_unique<Logger>("engine");
 
-        Engine(Application *application) {
+        Engine(EngineApplication *application) {
             logger->trace(std::string("constructor"));
 
             this->app = application;
@@ -79,16 +77,7 @@ namespace Engine {
             logger->trace(std::string("run"));
 
             app->window->Create();
-
-            switch (app->provider) {
-                case Window::Provider::GLFW:
-                    app->editor->Startup(
-                        static_cast<Window::GLFWWindowProvider*>(app->window)->object
-                    );
-                    break;
-                default:
-                    throw std::logic_error("Undefined WindowProvider");
-            }
+            app->editor->Startup(app);
 
             // TODO: Move all gl* functions to the render backend
             glewExperimental = GL_TRUE;
@@ -109,7 +98,6 @@ namespace Engine {
                 app->editor->Update();
                 app->window->Update();
             }
-
 
             app->editor->Shutdown();
             app->window->Shutdown();

@@ -249,7 +249,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 
-class UserApplication : public Engine::Application {
+class UserApplication : public Engine::EngineApplication {
 public:
     GLuint VAO, modelVAO;
     Engine::Render::VertexBuffer *VBO = nullptr;

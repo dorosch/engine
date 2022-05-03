@@ -3,16 +3,17 @@
 using namespace Engine;
 
 
-Application::Application() {
+
+EngineApplication::EngineApplication() {
     logger->trace(std::string("constructor"));
 
     window = Window::WindowProvider::GetInstance();
-    editor = new Editor::Editor();
+    editor = new Editor::EngineEditor();
     scene = new Scene::Scene();
 }
 
 
-Application::~Application() {
+EngineApplication::~EngineApplication() {
     logger->trace(std::string("destructor"));
 
     delete editor;

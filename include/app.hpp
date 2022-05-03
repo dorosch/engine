@@ -12,7 +12,7 @@ using namespace Tool::Logger;
 
 
 namespace Engine {
-    class Application {
+    class EngineApplication {
         /**
          * Custom engine application class.
          * 
@@ -32,11 +32,11 @@ namespace Engine {
 
         Window::Provider provider = Window::Provider::GLFW;
         Window::WindowProvider *window = nullptr;
-        Editor::Editor *editor = nullptr;
+        Editor::EngineEditor *editor = nullptr;
         Scene::Scene *scene = nullptr;
 
-        Application();
-        virtual ~Application();
+        EngineApplication();
+        virtual ~EngineApplication();
         virtual void Startup() = 0;
         virtual void Run() = 0;
         virtual void Update() = 0;

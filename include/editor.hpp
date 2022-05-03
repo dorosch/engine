@@ -10,25 +10,33 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "app.hpp"
+#include "meta.hpp"
 #include "tools/logger.hpp"
+#include "core/window/base.hpp"
+#include "core/window/glfw.hpp"
+#include "core/render/api.hpp"
+#include "core/scene/entity.hpp"
 
 using namespace Tool::Logger;
 
 
 namespace Engine {
-    // class Application;
+    class EngineApplication;
+
 
     namespace Editor {
-        class Editor {
+        class EngineEditor {
         private:
-            GLFWwindow *window = nullptr;
+            EngineApplication *app = nullptr;
 
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");
 
-            void Startup(GLFWwindow *);
+            void Startup(EngineApplication *);
             void Update();
             void Shutdown();
+            void SelectEntity(Engine::Scene::Entity *);
         };
     }
 }
