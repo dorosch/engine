@@ -100,3 +100,21 @@ void ObjModel::Load() {
 		this->textures.push_back(b);
     }	
 }
+
+
+std::vector<float> ObjModel::Data() {
+    std::vector<float> data;
+
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        glm::vec4 vertice = vertices[i];
+        glm::vec2 texture = textures[i];
+
+        data.push_back(vertice.x);
+        data.push_back(vertice.y);
+        data.push_back(vertice.z);
+        data.push_back(texture.x);
+        data.push_back(texture.y);
+    }
+
+    return data;
+}

@@ -31,6 +31,7 @@ namespace Tool {
     public:
         ObjModel(std::filesystem::path path) : Model(path) {};
         void Load();
+        std::vector<float> Data();
     };
 }
 

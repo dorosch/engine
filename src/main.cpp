@@ -254,7 +254,7 @@ public:
     GLuint VAO, modelVAO;
     Engine::Render::VertexBuffer *VBO = nullptr;
     Engine::Render::VertexBuffer *modelVBO = nullptr;
-    Engine::Render::IndexBuffer *EBO = nullptr;
+    // Engine::Render::IndexBuffer *EBO = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
     Engine::Render::Texture *texture = nullptr;
@@ -292,7 +292,7 @@ public:
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "Old House" / "model.obj");
         model->Load();
         // TODO: Fix model deletion
         // delete model;
@@ -318,7 +318,7 @@ public:
 
         this->modelTexture = Engine::Render::Texture::GetInstance();
         this->modelTexture->Build(
-            cwd / "resources" / "models" / "T-90A" / "textures" / "3fea26f0.jpg"
+            cwd / "resources" / "models" / "Old House" / "textures" / "body.jpg"
         );
 
         float vertices[] = {
@@ -370,17 +370,22 @@ public:
         //     1, 2, 3
         // };
 
+        std::vector<float> data = this->model->Data();
+
         // Draw model
         glGenVertexArrays(1, &this->modelVAO);
         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
-        this->EBO = Engine::Render::IndexBuffer::GetInstance();
+        // this->EBO = Engine::Render::IndexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
         glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
-        glBufferData(GL_ARRAY_BUFFER, model->vertices.size() * sizeof(glm::vec4), model->vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
 
         this->modelVBO->unbind();
 
@@ -431,7 +436,7 @@ public:
         this->shaderModel->UniformMatrix("view", view);
         this->shaderModel->UniformMatrix("projection", projection);
 
-        // this->modelTexture->Bind();
+        this->modelTexture->Bind();
         
         glBindVertexArray(this->modelVAO);
 
