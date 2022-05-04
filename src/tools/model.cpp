@@ -13,20 +13,16 @@ void ObjModel::Load() {
 
     std::vector<uint32_t> vertexIndices;
     std::vector<glm::vec4> temp_vertices;
+    std::vector<uint32_t> textureIndices;
+    std::vector<glm::vec2> temp_textures;
 
     if (file.is_open()) {
         std::string line;
 
         while (std::getline(file, line)) {
             if (line.substr(0, 2) == "v ") {
-                // std::istringstream stream(line.substr(2));
-
                 float x, y, z;
                 glm::vec4 v;
-                // stream >> v.x;
-                // stream >> v.y;
-                // stream >> v.z;
-                // v.w = 1.0f;
 
                 sscanf (line.c_str(), "v %f %f %f", &x, &y, &z);
 
@@ -37,36 +33,46 @@ void ObjModel::Load() {
 
                 temp_vertices.push_back(v);
             }
+            else if (line.substr(0, 3) == "vt ") {
+                float x, y, z;
+                glm::vec2 v;
+
+                sscanf (line.c_str(), "vt %f %f %f", &x, &y, &z);
+
+                v.x = x;
+                v.y = y;
+
+                temp_textures.push_back(v);
+            }
             else if (line.substr(0, 2) == "f ") {
-                // f line can also have normals v/vn/n
+                std::istringstream stream(line.substr(2));
+                std::string token;
+                int vertice, texture, normal;
 
-                // std::istringstream stream(line.substr(2));
+                while (std::getline(stream, token, ' ')) {
+                    if (token.length() <= 1) {
+                        continue;
+                    }
 
-                int a,b,c; //to store mesh index
-                int A,B,C; //to store texture index
-                //std::istringstream v;
-                //v.str(line.substr(2));
-                sscanf (line.c_str(), "f %i/%i %i/%i %i/%i",&a,&A,&b,&B,&c,&C);
+                    if (token.find("//") != std::string::npos) {
+                        sscanf(token.c_str(), "%i//%i", &vertice, &normal);
+                    }
+                    else if (token.find('/') != std::string::npos) {
+                        if (std::count(token.begin(), token.end(), '/') == 1) {
+                            sscanf(token.c_str(), "%i/%i", &vertice, &texture);
+                            textureIndices.push_back(texture);
+                        }
+                        else {
+                            sscanf(token.c_str(), "%i/%i/%i", &vertice, &texture, &normal);
+                            textureIndices.push_back(texture);
+                        }
+                    }
+                    else {
+                        sscanf(token.c_str(), "%i", &vertice);
+                    }
 
-                //v>>a;v>>b;v>>c;
-                a--;b--;c--;
-                A--;B--;C--;
-                //std::cout<<a<<b<<c<<A<<B<<C;
-                vertexIndices.push_back(a); textures.push_back(A);
-                vertexIndices.push_back(b); textures.push_back(B);
-                vertexIndices.push_back(c); textures.push_back(C);
-
-                // uint32_t a, b, c;
-                // stream >> a;
-                // stream >> b;
-                // stream >> c;
-
-                // std::cout << line << std::endl;
-                // std::cout << a << " " << b << " " << c << std::endl;
-
-                // indices.push_back(--a);
-                // indices.push_back(--b);
-                // indices.push_back(--c);
+                    vertexIndices.push_back(vertice);
+                }
             }
         }
 
@@ -81,9 +87,16 @@ void ObjModel::Load() {
 
 		// Get the indices of its attributes
 		uint32_t vertexIndex = vertexIndices[i];
-        glm::vec4 a = temp_vertices[vertexIndex];
+        glm::vec4 a = temp_vertices[vertexIndex - 1];
 
 		// Put the attributes in buffers
 		this->vertices.push_back(a);
+    }
+
+    for (uint32_t i=0; i < textureIndices.size(); i++) {
+		uint32_t textureIndex = textureIndices[i];
+        glm::vec2 b = temp_textures[textureIndex - 1];
+
+		this->textures.push_back(b);
     }	
 }

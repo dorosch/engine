@@ -254,10 +254,11 @@ public:
     GLuint VAO, modelVAO;
     Engine::Render::VertexBuffer *VBO = nullptr;
     Engine::Render::VertexBuffer *modelVBO = nullptr;
-    // Engine::Render::OpenglIndexBuffer *EBO = nullptr;
+    Engine::Render::IndexBuffer *EBO = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
     Engine::Render::Texture *texture = nullptr;
+    Engine::Render::Texture *modelTexture = nullptr;
 
     Tool::ObjModel *model = nullptr;
     Tool::Debug::DebugAxes *debugAxes = nullptr;
@@ -291,7 +292,7 @@ public:
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "IS7.obj");
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
         model->Load();
         // TODO: Fix model deletion
         // delete model;
@@ -313,6 +314,11 @@ public:
         this->texture = Engine::Render::Texture::GetInstance();
         this->texture->Build(
             cwd / "resources" / "textures" / "container.jpg"
+        );
+
+        this->modelTexture = Engine::Render::Texture::GetInstance();
+        this->modelTexture->Build(
+            cwd / "resources" / "models" / "T-90A" / "textures" / "3fea26f0.jpg"
         );
 
         float vertices[] = {
@@ -367,6 +373,7 @@ public:
         // Draw model
         glGenVertexArrays(1, &this->modelVAO);
         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
+        this->EBO = Engine::Render::IndexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
         glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
@@ -380,9 +387,9 @@ public:
         glBindVertexArray(0);
         // End draw model
 
+
         glGenVertexArrays(1, &this->VAO);
         this->VBO = Engine::Render::VertexBuffer::GetInstance();
-        // this->EBO = new Engine::Render::OpenglIndexBuffer();
 
         glBindVertexArray(VAO);
         this->VBO->bind(vertices, sizeof(vertices));
@@ -423,6 +430,8 @@ public:
         this->shaderModel->UniformMatrix("model", model);
         this->shaderModel->UniformMatrix("view", view);
         this->shaderModel->UniformMatrix("projection", projection);
+
+        // this->modelTexture->Bind();
         
         glBindVertexArray(this->modelVAO);
 
