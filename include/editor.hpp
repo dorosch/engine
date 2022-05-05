@@ -2,6 +2,7 @@
 #define __EDITOR_HPP__
 
 #include <memory>
+#include <vector>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -30,13 +31,15 @@ namespace Engine {
         private:
             EngineApplication *app = nullptr;
 
+            void SelectEntity(Engine::Scene::Entity *);
+            void DrawSceneGraph(Engine::Scene::Entity *, std::vector<Engine::Scene::Entity*>);
+
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");
 
             void Startup(EngineApplication *);
             void Update();
             void Shutdown();
-            void SelectEntity(Engine::Scene::Entity *);
         };
     }
 }

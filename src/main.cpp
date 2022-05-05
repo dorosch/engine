@@ -292,7 +292,7 @@ public:
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "Old House" / "model.obj");
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "House" / "model.obj");
         model->Load();
         // TODO: Fix model deletion
         // delete model;
@@ -318,7 +318,7 @@ public:
 
         this->modelTexture = Engine::Render::Texture::GetInstance();
         this->modelTexture->Build(
-            cwd / "resources" / "models" / "Old House" / "textures" / "body.jpg"
+            cwd / "resources" / "models" / "House" / "textures" / "body.bmp"
         );
 
         float vertices[] = {
