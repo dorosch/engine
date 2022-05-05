@@ -37,7 +37,12 @@ void ObjModel::Load() {
                 float x, y, z;
                 glm::vec2 v;
 
-                sscanf (line.c_str(), "vt %f %f %f", &x, &y, &z);
+                if (std::count(line.begin(), line.end(), ' ') == 2) {
+                    sscanf (line.c_str(), "vt %f %f", &x, &y);
+                }
+                else {
+                    sscanf (line.c_str(), "vt %f %f %f", &x, &y, &z);
+                }
 
                 v.x = x;
                 v.y = y;
