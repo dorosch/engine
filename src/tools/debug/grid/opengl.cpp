@@ -8,8 +8,8 @@ OpenglDebugFloorGrid::OpenglDebugFloorGrid() {
 
     this->shader = Engine::Render::ShaderProgram::GetInstance();
     this->shader->Build(
-        cwd / "resources" / "shaders" / "debug-floor-grid.vert",
-        cwd / "resources" / "shaders" / "debug-floor-grid.frag"
+        cwd / "resources" / "shaders" / "debug" / "floor-grid" / "shader.vert",
+        cwd / "resources" / "shaders" / "debug" / "floor-grid" / "shader.frag"
     );
 
     for (uint32_t x = 0; x <= 50; ++x) {

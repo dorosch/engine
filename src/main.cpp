@@ -13,7 +13,6 @@
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
 #include <GL/glew.h>
-// #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -542,7 +541,6 @@ public:
 
     Tool::Debug::DebugAxes *debugAxes = nullptr;
     Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
-    // unsigned int cubemapTexture;
     Engine::Render::Cubemap *cubemap;
 
     void Startup() {
@@ -664,9 +662,6 @@ public:
     }
 
     void Update() {
-        // glDepthMask(GL_FALSE);
-        // skyboxShader->Use();
-
         Do_Movement();
 
         GLfloat currentFrame = glfwGetTime();
@@ -679,25 +674,23 @@ public:
         glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
 
-
+        // Draw skybox
         glDepthFunc(GL_LEQUAL);
         skyboxShader->Use();
         this->skyboxShader->UniformMatrix("view", view);
         this->skyboxShader->UniformMatrix("projection", projection);
         glBindVertexArray(skyboxVAO);
-        // glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->object);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
         glDepthFunc(GL_LESS);
-
-
+        // End skybox
 
         // TODO: Move to the editor as debug flag
-        this->debugAxes->SetMVP(projection * view * model);
+        this->debugAxes->SetMVP(projection * view);
         this->debugAxes->Enable();
 
-        this->debugFloorGrid->SetMVP(projection * view * model);
+        this->debugFloorGrid->SetMVP(projection * view);
         this->debugFloorGrid->Enable();
     }
 

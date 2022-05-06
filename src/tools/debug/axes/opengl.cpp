@@ -8,8 +8,8 @@ OpenglDebugAxes::OpenglDebugAxes() {
 
     this->shader = Engine::Render::ShaderProgram::GetInstance();
     this->shader->Build(
-        cwd / "resources" / "shaders" / "position-color.vert",
-        cwd / "resources" / "shaders" / "position-color.frag"
+        cwd / "resources" / "shaders" / "debug" / "axes" / "shader.vert",
+        cwd / "resources" / "shaders" / "debug" / "axes" / "shader.frag"
     );
 
     GLfloat vertices[] = {
@@ -59,7 +59,6 @@ void OpenglDebugAxes::Enable() {
     this->shader->UniformMatrix("MVP", this->MVP);
 
     glBindVertexArray(this->VAO);
-    // 6 is a count vertex
     glDrawArrays(GL_LINES, 0, 6);
     glBindVertexArray(0);
 }
