@@ -18,6 +18,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <SOIL/SOIL.h>
 
 #include "engine.hpp"
 #include "app.hpp"
@@ -143,6 +144,39 @@ namespace Engine {
             }
         };
     }
+}
+
+
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char *data = SOIL_load_image(faces[i].c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+            SOIL_free_image_data(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            SOIL_free_image_data(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 
@@ -534,14 +568,13 @@ class Tank : public Engine::Scene::Entity {
 
 class UserApplication : public Engine::EngineApplication {
 public:
-    // GLuint modelVAO;
-    // Engine::Render::VertexBuffer *modelVBO = nullptr;
-    // Engine::Render::ShaderProgram *shaderModel = nullptr;
-    // Engine::Render::Texture *modelTexture = nullptr;
+    GLuint skyboxVAO;
+    Engine::Render::VertexBuffer *skyboxVBO = nullptr;
+    Engine::Render::ShaderProgram *skyboxShader = nullptr;
 
-    // Tool::ObjModel *model = nullptr;
     Tool::Debug::DebugAxes *debugAxes = nullptr;
     Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
+    unsigned int cubemapTexture;
 
     void Startup() {
         logger->trace(std::string("Startup"));
@@ -562,6 +595,85 @@ public:
         // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
         // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
 
+        std::filesystem::path cwd = std::filesystem::current_path();
+
+        this->skyboxShader = Engine::Render::ShaderProgram::GetInstance();
+        this->skyboxShader->Build(
+            cwd / "resources" / "shaders" / "skybox" / "shader.vert",
+            cwd / "resources" / "shaders" / "skybox" / "shader.frag"
+        );
+        
+        float skyboxVertices[] = {
+            // positions          
+            -100.0f,  100.0f, -100.0f,
+            -100.0f, -100.0f, -100.0f,
+             100.0f, -100.0f, -100.0f,
+             100.0f, -100.0f, -100.0f,
+             100.0f,  100.0f, -100.0f,
+            -100.0f,  100.0f, -100.0f,
+
+            -100.0f, -100.0f,  100.0f,
+            -100.0f, -100.0f, -100.0f,
+            -100.0f,  100.0f, -100.0f,
+            -100.0f,  100.0f, -100.0f,
+            -100.0f,  100.0f,  100.0f,
+            -100.0f, -100.0f,  100.0f,
+
+             100.0f, -100.0f, -100.0f,
+             100.0f, -100.0f,  100.0f,
+             100.0f,  100.0f,  100.0f,
+             100.0f,  100.0f,  100.0f,
+             100.0f,  100.0f, -100.0f,
+             100.0f, -100.0f, -100.0f,
+
+            -100.0f, -100.0f,  100.0f,
+            -100.0f,  100.0f,  100.0f,
+             100.0f,  100.0f,  100.0f,
+             100.0f,  100.0f,  100.0f,
+             100.0f, -100.0f,  100.0f,
+            -100.0f, -100.0f,  100.0f,
+
+            -100.0f,  100.0f, -100.0f,
+             100.0f,  100.0f, -100.0f,
+             100.0f,  100.0f,  100.0f,
+             100.0f,  100.0f,  100.0f,
+            -100.0f,  100.0f,  100.0f,
+            -100.0f,  100.0f, -100.0f,
+
+            -100.0f, -100.0f, -100.0f,
+            -100.0f, -100.0f,  100.0f,
+             100.0f, -100.0f, -100.0f,
+             100.0f, -100.0f, -100.0f,
+            -100.0f, -100.0f,  100.0f,
+             100.0f, -100.0f,  100.0f
+        };
+        std::vector<std::string> faces = {
+            cwd / "resources" / "textures" / "skybox" / "default" / "right.jpg",
+            cwd / "resources" / "textures" / "skybox" / "default" / "left.jpg",
+            cwd / "resources" / "textures" / "skybox" / "default" / "top.jpg",
+            cwd / "resources" / "textures" / "skybox" / "default" / "bottom.jpg",
+            cwd / "resources" / "textures" / "skybox" / "default" / "front.jpg",
+            cwd / "resources" / "textures" / "skybox" / "default" / "back.jpg"
+        };
+        cubemapTexture = loadCubemap(faces);
+
+        // skybox VAO
+        // unsigned int skyboxVAO, skyboxVBO;
+        glGenVertexArrays(1, &skyboxVAO);
+        this->skyboxVBO = Engine::Render::VertexBuffer::GetInstance();
+        // glGenBuffers(1, &skyboxVBO);
+        glBindVertexArray(skyboxVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO->object);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+        skyboxVBO->unbind();
+
+        glBindVertexArray(0);
+
+
+
         Box *box = new Box("box");
         MP5 *mp5 = new MP5("mp5");
         Tank *tank = new Tank("tank");
@@ -581,6 +693,9 @@ public:
     }
 
     void Update() {
+        glDepthMask(GL_FALSE);
+        skyboxShader->Use();
+
         Do_Movement();
 
         GLfloat currentFrame = glfwGetTime();
@@ -592,6 +707,16 @@ public:
         view = camera.GetViewMatrix();
         glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+
+
+        this->skyboxShader->UniformMatrix("view", view);
+        this->skyboxShader->UniformMatrix("projection", projection);
+        glBindVertexArray(skyboxVAO);
+glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+glDrawArrays(GL_TRIANGLES, 0, 36);
+glDepthMask(GL_TRUE);
+
+
 
         // TODO: Move to the editor as debug flag
         this->debugAxes->SetMVP(projection * view * model);
