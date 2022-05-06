@@ -367,11 +367,7 @@ class MP5 : public Engine::Scene::Entity {
     GLuint modelVAO;
     Engine::Render::VertexBuffer *modelVBO = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
-    // Engine::Render::Texture *modelTexture = nullptr;
-
     Tool::ObjModel *model = nullptr;
-    Tool::Debug::DebugAxes *debugAxes = nullptr;
-    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
     MP5(std::string name) : Engine::Scene::Entity(name) {}
 
@@ -380,28 +376,19 @@ class MP5 : public Engine::Scene::Entity {
 
         this->model = new Tool::ObjModel(cwd / "resources" / "models" / "MP5SD" / "MP5SD.obj");
         model->Load();
-        // TODO: Fix model deletion
-        // delete model;
-
         this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
         this->shaderModel->Build(
             cwd / "resources" / "shaders" / "model.vert",
             cwd / "resources" / "shaders" / "model.frag"
         );
 
-        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
-        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
-
         std::vector<float> data = this->model->Data();
 
         // Draw model
         glGenVertexArrays(1, &this->modelVAO);
         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
-        // this->EBO = Engine::Render::IndexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
-        // glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
-        // glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
@@ -446,10 +433,7 @@ class Tank : public Engine::Scene::Entity {
     Engine::Render::VertexBuffer *modelVBO = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
     Engine::Render::Texture *modelTexture = nullptr;
-
     Tool::ObjModel *model = nullptr;
-    Tool::Debug::DebugAxes *debugAxes = nullptr;
-    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
     Tank(std::string name) : Engine::Scene::Entity(name) {}
 
@@ -458,17 +442,12 @@ class Tank : public Engine::Scene::Entity {
 
         this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
         model->Load();
-        // TODO: Fix model deletion
-        // delete model;
 
         this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
         this->shaderModel->Build(
             cwd / "resources" / "shaders" / "model.vert",
             cwd / "resources" / "shaders" / "model.frag"
         );
-
-        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
-        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
 
         this->modelTexture = Engine::Render::Texture::GetInstance();
         this->modelTexture->Build(
@@ -480,7 +459,6 @@ class Tank : public Engine::Scene::Entity {
         // Draw model
         glGenVertexArrays(1, &this->modelVAO);
         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
-        // this->EBO = Engine::Render::IndexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
@@ -511,7 +489,7 @@ class Tank : public Engine::Scene::Entity {
         this->shaderModel->UniformMatrix("projection", projection);
 
         this->modelTexture->Bind();
-        
+
         glBindVertexArray(this->modelVAO);
 
         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
