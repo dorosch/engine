@@ -343,7 +343,6 @@ class Box : public Engine::Scene::Entity {
         glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
-
         this->shader->Use();
         this->shader->UniformColor("testColor", color[0], color[1], color[2]);
         this->shader->UniformPosition("ourPosition", position[0], position[1], position[2]);
@@ -353,17 +352,11 @@ class Box : public Engine::Scene::Entity {
 
         this->texture->Bind(); 
 
-
+        glm::mat4 model(1.0f);
         glBindVertexArray(this->VAO);
-        // for(GLuint i = 0; i < 10; i++) {
-            glm::mat4 model(1.0f);
-            // model = glm::translate(model, cubePositions[i]);
+        this->shader->UniformMatrix("model", model);
 
-            // model = glm::rotate(model, (GLfloat)(1.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
-            this->shader->UniformMatrix("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        // }
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
     }
 };
@@ -399,11 +392,6 @@ class MP5 : public Engine::Scene::Entity {
         this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
         this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
 
-        // this->modelTexture = Engine::Render::Texture::GetInstance();
-        // this->modelTexture->Build(
-        //     cwd / "resources" / "models" / "Statue Female" / "textures" / "statue.jpg"
-        // );
-
         std::vector<float> data = this->model->Data();
 
         // Draw model
@@ -412,8 +400,9 @@ class MP5 : public Engine::Scene::Entity {
         // this->EBO = Engine::Render::IndexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
-        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+        // glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
+        // glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+        this->modelVBO->bind(data.data(), data.size() * sizeof(float));
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
@@ -494,8 +483,7 @@ class Tank : public Engine::Scene::Entity {
         // this->EBO = Engine::Render::IndexBuffer::GetInstance();
 
         glBindVertexArray(modelVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
-        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+        this->modelVBO->bind(data.data(), data.size() * sizeof(float));
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
@@ -622,26 +610,19 @@ public:
             cwd / "resources" / "textures" / "skybox" / "default" / "front.jpg",
             cwd / "resources" / "textures" / "skybox" / "default" / "back.jpg"
         };
-        // cubemapTexture = loadCubemap(faces);
         cubemap = Engine::Render::Cubemap::GetInstance();
         cubemap->Build(faces);
 
-        // skybox VAO
-        // unsigned int skyboxVAO, skyboxVBO;
+        // Bind skybox
         glGenVertexArrays(1, &skyboxVAO);
         this->skyboxVBO = Engine::Render::VertexBuffer::GetInstance();
-        // glGenBuffers(1, &skyboxVBO);
         glBindVertexArray(skyboxVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO->object);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+        this->skyboxVBO->bind(skyboxVertices, sizeof(skyboxVertices));
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
         skyboxVBO->unbind();
-
         glBindVertexArray(0);
-
-
+        // End skybox
 
         Box *box = new Box("box");
         MP5 *mp5 = new MP5("mp5");
