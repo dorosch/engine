@@ -20,6 +20,8 @@ namespace Engine {
 
             Entity(std::string);
             ~Entity();
+            virtual void Run() = 0;
+            virtual void Draw() = 0;
         };
     }
 }

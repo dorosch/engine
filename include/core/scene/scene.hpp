@@ -6,12 +6,22 @@
 
 namespace Engine {
     namespace Scene {
+        class RootEntity : public Entity {
+        public:
+            RootEntity(std::string name) : Entity(name) {}
+            void Run() {}
+            void Draw() {}
+        };
+
+
         class Scene {
         public:
-            Entity *root = nullptr;
+            RootEntity *root = nullptr;
 
             Scene();
             ~Scene();
+            void Startup();
+            void Update();
         };
     }
 }

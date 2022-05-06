@@ -249,76 +249,27 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 
-class UserApplication : public Engine::EngineApplication {
-public:
-    GLuint VAO, modelVAO;
+class Box : public Engine::Scene::Entity {
+    public:
+    GLuint VAO;
     Engine::Render::VertexBuffer *VBO = nullptr;
-    Engine::Render::VertexBuffer *modelVBO = nullptr;
-    // Engine::Render::IndexBuffer *EBO = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
-    Engine::Render::ShaderProgram *shaderModel = nullptr;
     Engine::Render::Texture *texture = nullptr;
-    Engine::Render::Texture *modelTexture = nullptr;
 
-    Tool::ObjModel *model = nullptr;
-    Tool::Debug::DebugAxes *debugAxes = nullptr;
-    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
-
-    void Startup() {
-        logger->trace(std::string("Startup"));
-
-        this->window->settings = {
-            screenWidth, screenHeight, false, true, "Application"
-        };
-    }
+    Box(std::string name) : Engine::Scene::Entity(name) {}
 
     void Run() {
-        // TODO: Need custom event system because events need for application and editor
-        // bd->PrevUserCallbackWindowFocus = glfwSetWindowFocusCallback(window, ImGui_ImplGlfw_WindowFocusCallback);
-        // bd->PrevUserCallbackCursorEnter = glfwSetCursorEnterCallback(window, ImGui_ImplGlfw_CursorEnterCallback);
-        // bd->PrevUserCallbackCursorPos = glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
-        // bd->PrevUserCallbackMousebutton = glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
-        // bd->PrevUserCallbackScroll = glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
-        // bd->PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
-        // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
-        // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
-
-        GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
-        glfwSetMouseButtonCallback(window, mouse_button_callback);
-        glfwSetCursorPosCallback(window, cursor_position_callback);
-        glfwSetKeyCallback(window, key_callback);
-        glfwSetCursorPosCallback(window, mouse_callback);
-        glfwSetScrollCallback(window, scroll_callback);
-
         std::filesystem::path cwd = std::filesystem::current_path();
-
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "House" / "model.obj");
-        model->Load();
-        // TODO: Fix model deletion
-        // delete model;
-
-        this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
-        this->shaderModel->Build(
-            cwd / "resources" / "shaders" / "model.vert",
-            cwd / "resources" / "shaders" / "model.frag"
-        );
 
         this->shader = Engine::Render::ShaderProgram::GetInstance();
         this->shader->Build(
             cwd / "resources" / "shaders" / "position-texture.vert",
             cwd / "resources" / "shaders" / "position-texture.frag"
         );
-        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
-        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
 
         this->texture = Engine::Render::Texture::GetInstance();
         this->texture->Build(
             cwd / "resources" / "textures" / "container.jpg"
-        );
-
-        this->modelTexture = Engine::Render::Texture::GetInstance();
-        this->modelTexture->Build(
-            cwd / "resources" / "models" / "House" / "textures" / "body.bmp"
         );
 
         float vertices[] = {
@@ -365,10 +316,92 @@ public:
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
 
-        // uint32_t indices[] = {
-        //     0, 1, 3,
-        //     1, 2, 3
-        // };
+
+        glGenVertexArrays(1, &this->VAO);
+        this->VBO = Engine::Render::VertexBuffer::GetInstance();
+
+        glBindVertexArray(VAO);
+        this->VBO->bind(vertices, sizeof(vertices));
+        
+        // Position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(0);
+
+        // TexCoord attribute
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+
+        this->VBO->unbind();
+
+        glBindVertexArray(0);
+    }
+
+    void Draw() {
+        glm::mat4 view(1.0f);
+        view = camera.GetViewMatrix();
+        glm::mat4 projection(1.0f);	
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+
+
+        this->shader->Use();
+        this->shader->UniformColor("testColor", color[0], color[1], color[2]);
+        this->shader->UniformPosition("ourPosition", position[0], position[1], position[2]);
+
+        this->shader->UniformMatrix("view", view);
+        this->shader->UniformMatrix("projection", projection);
+
+        this->texture->Bind(); 
+
+
+        glBindVertexArray(this->VAO);
+        // for(GLuint i = 0; i < 10; i++) {
+            glm::mat4 model(1.0f);
+            // model = glm::translate(model, cubePositions[i]);
+
+            // model = glm::rotate(model, (GLfloat)(1.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
+            this->shader->UniformMatrix("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        // }
+        glBindVertexArray(0);
+    }
+};
+
+
+class MP5 : public Engine::Scene::Entity {
+    public:
+    GLuint modelVAO;
+    Engine::Render::VertexBuffer *modelVBO = nullptr;
+    Engine::Render::ShaderProgram *shaderModel = nullptr;
+    // Engine::Render::Texture *modelTexture = nullptr;
+
+    Tool::ObjModel *model = nullptr;
+    Tool::Debug::DebugAxes *debugAxes = nullptr;
+    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
+
+    MP5(std::string name) : Engine::Scene::Entity(name) {}
+
+    void Run() {
+        std::filesystem::path cwd = std::filesystem::current_path();
+
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "MP5SD" / "MP5SD.obj");
+        model->Load();
+        // TODO: Fix model deletion
+        // delete model;
+
+        this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
+        this->shaderModel->Build(
+            cwd / "resources" / "shaders" / "model.vert",
+            cwd / "resources" / "shaders" / "model.frag"
+        );
+
+        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
+        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
+
+        // this->modelTexture = Engine::Render::Texture::GetInstance();
+        // this->modelTexture->Build(
+        //     cwd / "resources" / "models" / "Statue Female" / "textures" / "statue.jpg"
+        // );
 
         std::vector<float> data = this->model->Data();
 
@@ -391,39 +424,91 @@ public:
 
         glBindVertexArray(0);
         // End draw model
+    }
 
+    void Draw() {
+        glm::mat4 view(1.0f);
+        view = camera.GetViewMatrix();
+        glm::mat4 projection(1.0f);	
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
-        glGenVertexArrays(1, &this->VAO);
-        this->VBO = Engine::Render::VertexBuffer::GetInstance();
+        // Draw model
+        glm::mat4 model(1.0f);
+        this->shaderModel->Use();
+        this->shaderModel->UniformMatrix("model", model);
+        this->shaderModel->UniformMatrix("view", view);
+        this->shaderModel->UniformMatrix("projection", projection);
 
-        glBindVertexArray(VAO);
-        this->VBO->bind(vertices, sizeof(vertices));
-        // this->EBO->bind(indices, sizeof(indices) / sizeof(uint32_t));
+        // this->modelTexture->Bind();
         
-        // Position attribute
+        glBindVertexArray(this->modelVAO);
+
+        glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
+        glBindVertexArray(0);
+        // End draw model
+    }
+};
+
+
+class Tank : public Engine::Scene::Entity {
+    public:
+    GLuint modelVAO;
+    Engine::Render::VertexBuffer *modelVBO = nullptr;
+    Engine::Render::ShaderProgram *shaderModel = nullptr;
+    Engine::Render::Texture *modelTexture = nullptr;
+
+    Tool::ObjModel *model = nullptr;
+    Tool::Debug::DebugAxes *debugAxes = nullptr;
+    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
+
+    Tank(std::string name) : Engine::Scene::Entity(name) {}
+
+    void Run() {
+        std::filesystem::path cwd = std::filesystem::current_path();
+
+        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
+        model->Load();
+        // TODO: Fix model deletion
+        // delete model;
+
+        this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
+        this->shaderModel->Build(
+            cwd / "resources" / "shaders" / "model.vert",
+            cwd / "resources" / "shaders" / "model.frag"
+        );
+
+        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
+        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
+
+        this->modelTexture = Engine::Render::Texture::GetInstance();
+        this->modelTexture->Build(
+            cwd / "resources" / "models" / "T-90A" / "textures" / "8eca739b.jpg"
+        );
+
+        std::vector<float> data = this->model->Data();
+
+        // Draw model
+        glGenVertexArrays(1, &this->modelVAO);
+        this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
+        // this->EBO = Engine::Render::IndexBuffer::GetInstance();
+
+        glBindVertexArray(modelVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, this->modelVBO->object);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
-    
-        // Color attribute
-        // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        // glEnableVertexAttribArray(1);
-    
-        // TexCoord attribute
+
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
 
-        this->VBO->unbind();
+        this->modelVBO->unbind();
 
         glBindVertexArray(0);
+        // End draw model
     }
 
-    void Update() {
-        Do_Movement();
-
-        GLfloat currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
+    void Draw() {
         glm::mat4 view(1.0f);
         view = camera.GetViewMatrix();
         glm::mat4 projection(1.0f);	
@@ -443,40 +528,70 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
         glBindVertexArray(0);
         // End draw model
+    }
+};
 
-        this->shader->Use();
-        this->shader->UniformColor("testColor", color[0], color[1], color[2]);
-        this->shader->UniformPosition("ourPosition", position[0], position[1], position[2]);
 
-        this->shader->UniformMatrix("view", view);
-        this->shader->UniformMatrix("projection", projection);
+class UserApplication : public Engine::EngineApplication {
+public:
+    // GLuint modelVAO;
+    // Engine::Render::VertexBuffer *modelVBO = nullptr;
+    // Engine::Render::ShaderProgram *shaderModel = nullptr;
+    // Engine::Render::Texture *modelTexture = nullptr;
 
-        this->texture->Bind(); 
+    // Tool::ObjModel *model = nullptr;
+    Tool::Debug::DebugAxes *debugAxes = nullptr;
+    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
-        glm::vec3 cubePositions[] = {
-            glm::vec3( 0.0f,  0.0f,  0.0f), 
-            glm::vec3( 2.0f,  5.0f, -15.0f), 
-            glm::vec3(-1.5f, -2.2f, -2.5f),  
-            glm::vec3(-3.8f, -2.0f, -12.3f),  
-            glm::vec3( 2.4f, -0.4f, -3.5f),  
-            glm::vec3(-1.7f,  3.0f, -7.5f),  
-            glm::vec3( 1.3f, -2.0f, -2.5f),  
-            glm::vec3( 1.5f,  2.0f, -2.5f), 
-            glm::vec3( 1.5f,  0.2f, -1.5f), 
-            glm::vec3(-1.3f,  1.0f, -1.5f)  
+    void Startup() {
+        logger->trace(std::string("Startup"));
+
+        this->window->settings = {
+            screenWidth, screenHeight, false, true, "Application"
         };
+    }
 
-        glBindVertexArray(this->VAO);
-        for(GLuint i = 0; i < 10; i++) {
-            glm::mat4 model(1.0f);
-            model = glm::translate(model, cubePositions[i]);
+    void Run() {
+        // TODO: Need custom event system because events need for application and editor
+        // bd->PrevUserCallbackWindowFocus = glfwSetWindowFocusCallback(window, ImGui_ImplGlfw_WindowFocusCallback);
+        // bd->PrevUserCallbackCursorEnter = glfwSetCursorEnterCallback(window, ImGui_ImplGlfw_CursorEnterCallback);
+        // bd->PrevUserCallbackCursorPos = glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
+        // bd->PrevUserCallbackMousebutton = glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
+        // bd->PrevUserCallbackScroll = glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
+        // bd->PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
+        // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+        // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
 
-            model = glm::rotate(model, (GLfloat)(1.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
-            this->shader->UniformMatrix("model", model);
+        Box *box = new Box("box");
+        MP5 *mp5 = new MP5("mp5");
+        Tank *tank = new Tank("tank");
+        this->scene->root->children.push_back(box);
+        this->scene->root->children.push_back(mp5);
+        this->scene->root->children.push_back(tank);
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        glBindVertexArray(0);
+        GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
+        glfwSetCursorPosCallback(window, cursor_position_callback);
+        glfwSetKeyCallback(window, key_callback);
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetScrollCallback(window, scroll_callback);
+
+        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
+        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
+    }
+
+    void Update() {
+        Do_Movement();
+
+        GLfloat currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        glm::mat4 model(1.0f);
+        glm::mat4 view(1.0f);
+        view = camera.GetViewMatrix();
+        glm::mat4 projection(1.0f);	
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
         // TODO: Move to the editor as debug flag
         this->debugAxes->SetMVP(projection * view * model);
@@ -489,13 +604,7 @@ public:
     void Shutdown() {
         logger->trace(std::string("Shutdown"));
 
-        glDeleteVertexArrays(1, &this->VAO);
-
-        // delete shader;
-        // delete shaderModel;
-        delete VBO;
         delete this->debugAxes;
-        // delete EBO;
     }
 };
 

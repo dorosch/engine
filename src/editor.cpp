@@ -66,11 +66,10 @@ namespace Engine {
 
             ImGui::Begin("Scene graph", &closed);
                 if (ImGui::TreeNode(app->scene->root->name.c_str())) {
-                    if (!app->scene->root->children.empty()) {
-                        for (Engine::Scene::Entity *node : app->scene->root->children) {
-                            DrawSceneGraph(node, node->children);
-                        }
+                    for (Engine::Scene::Entity *node : app->scene->root->children) {
+                        DrawSceneGraph(node, node->children);
                     }
+
                     ImGui::TreePop();
                 }
             ImGui::End();
@@ -115,7 +114,7 @@ namespace Engine {
                     for (Engine::Scene::Entity *node : children) {
                         DrawSceneGraph(node, node->children);
                     }
-            
+
                     ImGui::TreePop();
                 }
             }

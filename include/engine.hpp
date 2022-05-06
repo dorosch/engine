@@ -87,6 +87,7 @@ namespace Engine {
             glEnable(GL_MULTISAMPLE);
 
             app->Run();
+            app->scene->Startup();
 
             while (app->window->IsOpen()) {
                 glfwPollEvents();
@@ -95,6 +96,7 @@ namespace Engine {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 app->Update();
+                app->scene->Update();
                 app->editor->Update();
                 app->window->Update();
             }
