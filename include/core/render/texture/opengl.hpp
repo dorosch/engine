@@ -1,3 +1,6 @@
+#ifndef __OPENGL_TEXTURE__
+#define __OPENGL_TEXTURE__
+
 #include <SOIL/SOIL.h>
 
 #include "core/render/texture/base.hpp"
@@ -14,3 +17,5 @@ namespace Engine {
         };
     }
 }
+
+#endif

@@ -95,8 +95,9 @@ namespace Engine {
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                app->Update();
+                // TODO: Update app before scene after move skybox to the entity
                 app->scene->Update();
+                app->Update();
                 app->editor->Update();
                 app->window->Update();
             }
