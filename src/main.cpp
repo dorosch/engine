@@ -35,6 +35,7 @@
 #include "core/scene/scene.hpp"
 #include "core/window/base.hpp"
 #include "core/window/glfw.hpp"
+#include "core/event/observer.hpp"
 
 
 namespace Engine {
@@ -497,6 +498,11 @@ class Tank : public Engine::Scene::Entity {
         // End draw model
     }
 };
+
+
+void callback() {
+    std::cout << "Callback event" << std::endl;
+}
 
 
 class UserApplication : public Engine::EngineApplication {
