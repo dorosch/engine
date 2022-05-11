@@ -24,6 +24,17 @@ namespace Engine {
             void bind(uint32_t *, uint32_t);
             void unbind();
         };
+
+
+        class OpenglVertexArray : public VertexArray {
+        public:
+            OpenglVertexArray();
+            virtual ~OpenglVertexArray();
+
+            void bind();
+            void unbind();
+            void layout(uint32_t, uint32_t, uint32_t);
+        };
     }
 }
 

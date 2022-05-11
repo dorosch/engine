@@ -252,8 +252,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 
 class Box : public Engine::Scene::Entity {
-    public:
-    GLuint VAO;
+public:
+    Engine::Render::VertexArray *VAO = nullptr;
     Engine::Render::VertexBuffer *VBO = nullptr;
     Engine::Render::ShaderProgram *shader = nullptr;
     Engine::Render::Texture *texture = nullptr;
@@ -319,29 +319,25 @@ class Box : public Engine::Scene::Entity {
         };
 
 
-        glGenVertexArrays(1, &this->VAO);
+        this->VAO = Engine::Render::VertexArray::GetInstance();
         this->VBO = Engine::Render::VertexBuffer::GetInstance();
 
-        glBindVertexArray(VAO);
+        this->VAO->bind();
         this->VBO->bind(vertices, sizeof(vertices));
-        
-        // Position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(0);
 
-        // TexCoord attribute
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
+        this->VAO->layout(3, 5 * sizeof(GLfloat), 0);
+        this->VAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
 
         this->VBO->unbind();
-
-        glBindVertexArray(0);
+        this->VAO->unbind();
     }
 
     void Draw() {
+        glm::mat4 model(1.0f);
         glm::mat4 view(1.0f);
+        glm::mat4 projection(1.0f);
+
         view = camera.GetViewMatrix();
-        glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
         this->shader->Use();
@@ -350,22 +346,22 @@ class Box : public Engine::Scene::Entity {
 
         this->shader->UniformMatrix("view", view);
         this->shader->UniformMatrix("projection", projection);
+        this->shader->UniformMatrix("model", model);
 
         this->texture->Bind(); 
 
-        glm::mat4 model(1.0f);
-        glBindVertexArray(this->VAO);
-        this->shader->UniformMatrix("model", model);
+        this->VAO->bind();
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+
+        this->VAO->unbind();
     }
 };
 
 
 class MP5 : public Engine::Scene::Entity {
-    public:
-    GLuint modelVAO;
+public:
+    Engine::Render::VertexArray *modelVAO = nullptr;
     Engine::Render::VertexBuffer *modelVBO = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
     Tool::ObjModel *model = nullptr;
@@ -386,51 +382,47 @@ class MP5 : public Engine::Scene::Entity {
         std::vector<float> data = this->model->Data();
 
         // Draw model
-        glGenVertexArrays(1, &this->modelVAO);
+        this->modelVAO = Engine::Render::VertexArray::GetInstance();
         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
 
-        glBindVertexArray(modelVAO);
+        this->modelVAO->bind();
         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
+        this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
+        this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
 
         this->modelVBO->unbind();
-
-        glBindVertexArray(0);
+        this->modelVAO->unbind();
         // End draw model
     }
 
     void Draw() {
         glm::mat4 view(1.0f);
+        glm::mat4 model(1.0f);
+        glm::mat4 projection(1.0f);
+
         view = camera.GetViewMatrix();
-        glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
         // Draw model
-        glm::mat4 model(1.0f);
         this->shaderModel->Use();
         this->shaderModel->UniformMatrix("model", model);
         this->shaderModel->UniformMatrix("view", view);
         this->shaderModel->UniformMatrix("projection", projection);
 
-        // this->modelTexture->Bind();
-        
-        glBindVertexArray(this->modelVAO);
+        this->modelVAO->bind();
 
         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
-        glBindVertexArray(0);
+
+        this->modelVAO->unbind();
         // End draw model
     }
 };
 
 
 class Tank : public Engine::Scene::Entity {
-    public:
-    GLuint modelVAO;
+public:
+    Engine::Render::VertexArray *modelVAO = nullptr;
     Engine::Render::VertexBuffer *modelVBO = nullptr;
     Engine::Render::ShaderProgram *shaderModel = nullptr;
     Engine::Render::Texture *modelTexture = nullptr;
@@ -458,32 +450,29 @@ class Tank : public Engine::Scene::Entity {
         std::vector<float> data = this->model->Data();
 
         // Draw model
-        glGenVertexArrays(1, &this->modelVAO);
+        this->modelVAO = Engine::Render::VertexArray::GetInstance();
         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
 
-        glBindVertexArray(modelVAO);
+        this->modelVAO->bind();
         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
+        this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
+        this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
 
         this->modelVBO->unbind();
-
-        glBindVertexArray(0);
+        this->modelVAO->unbind();
         // End draw model
     }
 
     void Draw() {
         glm::mat4 view(1.0f);
+        glm::mat4 model(1.0f);
+        glm::mat4 projection(1.0f);
+
         view = camera.GetViewMatrix();
-        glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
 
         // Draw model
-        glm::mat4 model(1.0f);
         this->shaderModel->Use();
         this->shaderModel->UniformMatrix("model", model);
         this->shaderModel->UniformMatrix("view", view);
@@ -491,10 +480,11 @@ class Tank : public Engine::Scene::Entity {
 
         this->modelTexture->Bind();
 
-        glBindVertexArray(this->modelVAO);
+        this->modelVAO->bind();
 
         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
-        glBindVertexArray(0);
+
+        this->modelVAO->unbind();
         // End draw model
     }
 };
@@ -507,7 +497,7 @@ void callback() {
 
 class UserApplication : public Engine::EngineApplication {
 public:
-    GLuint skyboxVAO;
+    Engine::Render::VertexArray *skyboxVAO = nullptr;
     Engine::Render::VertexBuffer *skyboxVBO = nullptr;
     Engine::Render::ShaderProgram *skyboxShader = nullptr;
 
@@ -598,14 +588,16 @@ public:
         cubemap->Build(faces);
 
         // Bind skybox
-        glGenVertexArrays(1, &skyboxVAO);
+        this->skyboxVAO = Engine::Render::VertexArray::GetInstance();
         this->skyboxVBO = Engine::Render::VertexBuffer::GetInstance();
-        glBindVertexArray(skyboxVAO);
+
+        this->skyboxVAO->bind();
         this->skyboxVBO->bind(skyboxVertices, sizeof(skyboxVertices));
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        skyboxVBO->unbind();
-        glBindVertexArray(0);
+
+        this->skyboxVAO->layout(3, 3 * sizeof(float), 0);
+
+        this->skyboxVBO->unbind();
+        this->skyboxVAO->unbind();
         // End skybox
 
         Box *box = new Box("box");
@@ -635,8 +627,9 @@ public:
 
         glm::mat4 model(1.0f);
         glm::mat4 view(1.0f);
+        glm::mat4 projection(1.0f);
+
         view = camera.GetViewMatrix();
-        glm::mat4 projection(1.0f);	
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
 
         // Draw skybox
@@ -644,10 +637,14 @@ public:
         skyboxShader->Use();
         this->skyboxShader->UniformMatrix("view", view);
         this->skyboxShader->UniformMatrix("projection", projection);
-        glBindVertexArray(skyboxVAO);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->object);
+
+        this->skyboxVAO->bind();
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+
+        this->skyboxVAO->unbind();
+
         glDepthFunc(GL_LESS);
         // End skybox
 

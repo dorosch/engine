@@ -28,6 +28,17 @@ namespace Engine {
             virtual void bind(uint32_t *, uint32_t) = 0;
             virtual void unbind() = 0;
         };
+
+
+        class VertexArray : public Buffer {
+        public:
+            uint32_t layouts = 0;
+
+            static VertexArray *GetInstance();
+            virtual void bind() = 0;
+            virtual void unbind() = 0;
+            virtual void layout(uint32_t, uint32_t, uint32_t) = 0;
+        };
     }
 }
 

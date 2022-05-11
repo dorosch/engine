@@ -25,3 +25,14 @@ IndexBuffer *IndexBuffer::GetInstance() {
             throw std::logic_error("IndexBuffer - unsopported backend API");
     }
 }
+
+
+VertexArray *VertexArray::GetInstance() {
+    switch (GetBackendAPI()) {
+        case Backend::OPENGL:
+            return new OpenglVertexArray();
+            break;
+        default:
+            throw std::logic_error("VertexArray - unsopported backend API");
+    }
+}
