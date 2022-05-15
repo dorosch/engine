@@ -17,7 +17,8 @@
 #include "core/window/base.hpp"
 #include "core/window/glfw.hpp"
 #include "core/render/api.hpp"
-#include "core/scene/entity.hpp"
+#include "core/scene/scene.hpp"
+#include "core/scene/ecs/entity.hpp"
 
 using namespace Tool::Logger;
 
@@ -31,8 +32,8 @@ namespace Engine {
         private:
             EngineApplication *app = nullptr;
 
-            void SelectEntity(Engine::Scene::Entity *);
-            void DrawSceneGraph(Engine::Scene::Entity *, std::vector<Engine::Scene::Entity*>);
+            // void SelectNode(std::shared_ptr<Scene::Node>);
+            // void DrawSceneGraph(std::shared_ptr<Scene::Node>, std::vector<std::shared_ptr<Scene::Node>>);
 
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");

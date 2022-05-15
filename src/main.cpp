@@ -33,6 +33,7 @@
 #include "core/render/texture/base.hpp"
 #include "core/render/texture/cubemap/base.hpp"
 #include "core/scene/scene.hpp"
+#include "core/scene/ecs/entity.hpp"
 #include "core/window/base.hpp"
 #include "core/window/glfw.hpp"
 #include "core/event/observer.hpp"
@@ -254,241 +255,249 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 
+// class Box : public Engine::Scene::Entity {
+// public:
+//     Engine::Render::VertexArray *VAO = nullptr;
+//     Engine::Render::VertexBuffer *VBO = nullptr;
+//     Engine::Render::ShaderProgram *shader = nullptr;
+//     Engine::Render::Texture *texture = nullptr;
+
+//     Box(std::string name) : Engine::Scene::Entity(name) {}
+
+//     void Run() {
+//         std::filesystem::path cwd = std::filesystem::current_path();
+
+//         this->shader = Engine::Render::ShaderProgram::GetInstance();
+//         this->shader->Build(
+//             cwd / "resources" / "shaders" / "position-texture.vert",
+//             cwd / "resources" / "shaders" / "position-texture.frag"
+//         );
+
+//         this->texture = Engine::Render::Texture::GetInstance();
+//         this->texture->Build(
+//             cwd / "resources" / "textures" / "container.jpg"
+//         );
+
+//         float vertices[] = {
+//             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+//              0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+//              0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+//              0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+//             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+//             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+//             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+//              0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+//              0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+//              0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+//             -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+//             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+//             -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+//             -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+//             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+//             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+//             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+//             -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+//              0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+//              0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+//              0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+//              0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+//              0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+//              0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+//             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+//              0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+//              0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+//              0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+//             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+//             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+//             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+//              0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+//              0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+//              0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+//             -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+//             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+//         };
+
+
+//         this->VAO = Engine::Render::VertexArray::GetInstance();
+//         this->VBO = Engine::Render::VertexBuffer::GetInstance();
+
+//         this->VAO->bind();
+//         this->VBO->bind(vertices, sizeof(vertices));
+
+//         this->VAO->layout(3, 5 * sizeof(GLfloat), 0);
+//         this->VAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
+
+//         this->VBO->unbind();
+//         this->VAO->unbind();
+//     }
+
+//     void Draw() {
+//         glm::mat4 model(1.0f);
+//         glm::mat4 view(1.0f);
+//         glm::mat4 projection(1.0f);
+
+//         view = camera.GetViewMatrix();
+//         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+
+//         this->shader->Use();
+//         this->shader->UniformColor("testColor", color[0], color[1], color[2]);
+//         this->shader->UniformPosition("ourPosition", position[0], position[1], position[2]);
+
+//         this->shader->UniformMatrix("view", view);
+//         this->shader->UniformMatrix("projection", projection);
+//         this->shader->UniformMatrix("model", model);
+
+//         this->texture->Bind(); 
+
+//         this->VAO->bind();
+
+//         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+//         this->VAO->unbind();
+//     }
+// };
+
+
+// class MP5 : public Engine::Scene::Entity {
+// public:
+//     Engine::Render::VertexArray *modelVAO = nullptr;
+//     Engine::Render::VertexBuffer *modelVBO = nullptr;
+//     Engine::Render::ShaderProgram *shaderModel = nullptr;
+//     Tool::ObjModel *model = nullptr;
+
+//     MP5(std::string name) : Engine::Scene::Entity(name) {}
+
+//     void Run() {
+//         std::filesystem::path cwd = std::filesystem::current_path();
+
+//         this->model = new Tool::ObjModel(cwd / "resources" / "models" / "MP5SD" / "MP5SD.obj");
+//         model->Load();
+//         this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
+//         this->shaderModel->Build(
+//             cwd / "resources" / "shaders" / "model.vert",
+//             cwd / "resources" / "shaders" / "model.frag"
+//         );
+
+//         std::vector<float> data = this->model->Data();
+
+//         // Draw model
+//         this->modelVAO = Engine::Render::VertexArray::GetInstance();
+//         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
+
+//         this->modelVAO->bind();
+//         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
+
+//         this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
+//         this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
+
+//         this->modelVBO->unbind();
+//         this->modelVAO->unbind();
+//         // End draw model
+//     }
+
+//     void Draw() {
+//         glm::mat4 view(1.0f);
+//         glm::mat4 model(1.0f);
+//         glm::mat4 projection(1.0f);
+
+//         view = camera.GetViewMatrix();
+//         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+
+//         // Draw model
+//         this->shaderModel->Use();
+//         this->shaderModel->UniformMatrix("model", model);
+//         this->shaderModel->UniformMatrix("view", view);
+//         this->shaderModel->UniformMatrix("projection", projection);
+
+//         this->modelVAO->bind();
+
+//         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
+
+//         this->modelVAO->unbind();
+//         // End draw model
+//     }
+// };
+
+
+// class Tank : public Engine::Scene::Entity {
+// public:
+//     Engine::Render::VertexArray *modelVAO = nullptr;
+//     Engine::Render::VertexBuffer *modelVBO = nullptr;
+//     Engine::Render::ShaderProgram *shaderModel = nullptr;
+//     Engine::Render::Texture *modelTexture = nullptr;
+//     Tool::ObjModel *model = nullptr;
+
+//     Tank(std::string name) : Engine::Scene::Entity(name) {}
+
+//     void Run() {
+//         std::filesystem::path cwd = std::filesystem::current_path();
+
+//         this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
+//         model->Load();
+
+//         this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
+//         this->shaderModel->Build(
+//             cwd / "resources" / "shaders" / "model.vert",
+//             cwd / "resources" / "shaders" / "model.frag"
+//         );
+
+//         this->modelTexture = Engine::Render::Texture::GetInstance();
+//         this->modelTexture->Build(
+//             cwd / "resources" / "models" / "T-90A" / "textures" / "8eca739b.jpg"
+//         );
+
+//         std::vector<float> data = this->model->Data();
+
+//         // Draw model
+//         this->modelVAO = Engine::Render::VertexArray::GetInstance();
+//         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
+
+//         this->modelVAO->bind();
+//         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
+
+//         this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
+//         this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
+
+//         this->modelVBO->unbind();
+//         this->modelVAO->unbind();
+//         // End draw model
+//     }
+
+//     void Draw() {
+//         glm::mat4 view(1.0f);
+//         glm::mat4 model(1.0f);
+//         glm::mat4 projection(1.0f);
+
+//         view = camera.GetViewMatrix();
+//         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+
+//         // Draw model
+//         this->shaderModel->Use();
+//         this->shaderModel->UniformMatrix("model", model);
+//         this->shaderModel->UniformMatrix("view", view);
+//         this->shaderModel->UniformMatrix("projection", projection);
+
+//         this->modelTexture->Bind();
+
+//         this->modelVAO->bind();
+
+//         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
+
+//         this->modelVAO->unbind();
+//         // End draw model
+//     }
+// };
+
+
 class Box : public Engine::Scene::Entity {
 public:
-    Engine::Render::VertexArray *VAO = nullptr;
-    Engine::Render::VertexBuffer *VBO = nullptr;
-    Engine::Render::ShaderProgram *shader = nullptr;
-    Engine::Render::Texture *texture = nullptr;
-
-    Box(std::string name) : Engine::Scene::Entity(name) {}
-
-    void Run() {
-        std::filesystem::path cwd = std::filesystem::current_path();
-
-        this->shader = Engine::Render::ShaderProgram::GetInstance();
-        this->shader->Build(
-            cwd / "resources" / "shaders" / "position-texture.vert",
-            cwd / "resources" / "shaders" / "position-texture.frag"
-        );
-
-        this->texture = Engine::Render::Texture::GetInstance();
-        this->texture->Build(
-            cwd / "resources" / "textures" / "container.jpg"
-        );
-
-        float vertices[] = {
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-        };
-
-
-        this->VAO = Engine::Render::VertexArray::GetInstance();
-        this->VBO = Engine::Render::VertexBuffer::GetInstance();
-
-        this->VAO->bind();
-        this->VBO->bind(vertices, sizeof(vertices));
-
-        this->VAO->layout(3, 5 * sizeof(GLfloat), 0);
-        this->VAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
-
-        this->VBO->unbind();
-        this->VAO->unbind();
-    }
-
-    void Draw() {
-        glm::mat4 model(1.0f);
-        glm::mat4 view(1.0f);
-        glm::mat4 projection(1.0f);
-
-        view = camera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
-
-        this->shader->Use();
-        this->shader->UniformColor("testColor", color[0], color[1], color[2]);
-        this->shader->UniformPosition("ourPosition", position[0], position[1], position[2]);
-
-        this->shader->UniformMatrix("view", view);
-        this->shader->UniformMatrix("projection", projection);
-        this->shader->UniformMatrix("model", model);
-
-        this->texture->Bind(); 
-
-        this->VAO->bind();
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        this->VAO->unbind();
-    }
-};
-
-
-class MP5 : public Engine::Scene::Entity {
-public:
-    Engine::Render::VertexArray *modelVAO = nullptr;
-    Engine::Render::VertexBuffer *modelVBO = nullptr;
-    Engine::Render::ShaderProgram *shaderModel = nullptr;
-    Tool::ObjModel *model = nullptr;
-
-    MP5(std::string name) : Engine::Scene::Entity(name) {}
-
-    void Run() {
-        std::filesystem::path cwd = std::filesystem::current_path();
-
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "MP5SD" / "MP5SD.obj");
-        model->Load();
-        this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
-        this->shaderModel->Build(
-            cwd / "resources" / "shaders" / "model.vert",
-            cwd / "resources" / "shaders" / "model.frag"
-        );
-
-        std::vector<float> data = this->model->Data();
-
-        // Draw model
-        this->modelVAO = Engine::Render::VertexArray::GetInstance();
-        this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
-
-        this->modelVAO->bind();
-        this->modelVBO->bind(data.data(), data.size() * sizeof(float));
-
-        this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
-        this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
-
-        this->modelVBO->unbind();
-        this->modelVAO->unbind();
-        // End draw model
-    }
-
-    void Draw() {
-        glm::mat4 view(1.0f);
-        glm::mat4 model(1.0f);
-        glm::mat4 projection(1.0f);
-
-        view = camera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
-
-        // Draw model
-        this->shaderModel->Use();
-        this->shaderModel->UniformMatrix("model", model);
-        this->shaderModel->UniformMatrix("view", view);
-        this->shaderModel->UniformMatrix("projection", projection);
-
-        this->modelVAO->bind();
-
-        glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
-
-        this->modelVAO->unbind();
-        // End draw model
-    }
-};
-
-
-class Tank : public Engine::Scene::Entity {
-public:
-    Engine::Render::VertexArray *modelVAO = nullptr;
-    Engine::Render::VertexBuffer *modelVBO = nullptr;
-    Engine::Render::ShaderProgram *shaderModel = nullptr;
-    Engine::Render::Texture *modelTexture = nullptr;
-    Tool::ObjModel *model = nullptr;
-
-    Tank(std::string name) : Engine::Scene::Entity(name) {}
-
-    void Run() {
-        std::filesystem::path cwd = std::filesystem::current_path();
-
-        this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
-        model->Load();
-
-        this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
-        this->shaderModel->Build(
-            cwd / "resources" / "shaders" / "model.vert",
-            cwd / "resources" / "shaders" / "model.frag"
-        );
-
-        this->modelTexture = Engine::Render::Texture::GetInstance();
-        this->modelTexture->Build(
-            cwd / "resources" / "models" / "T-90A" / "textures" / "8eca739b.jpg"
-        );
-
-        std::vector<float> data = this->model->Data();
-
-        // Draw model
-        this->modelVAO = Engine::Render::VertexArray::GetInstance();
-        this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
-
-        this->modelVAO->bind();
-        this->modelVBO->bind(data.data(), data.size() * sizeof(float));
-
-        this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
-        this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
-
-        this->modelVBO->unbind();
-        this->modelVAO->unbind();
-        // End draw model
-    }
-
-    void Draw() {
-        glm::mat4 view(1.0f);
-        glm::mat4 model(1.0f);
-        glm::mat4 projection(1.0f);
-
-        view = camera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
-
-        // Draw model
-        this->shaderModel->Use();
-        this->shaderModel->UniformMatrix("model", model);
-        this->shaderModel->UniformMatrix("view", view);
-        this->shaderModel->UniformMatrix("projection", projection);
-
-        this->modelTexture->Bind();
-
-        this->modelVAO->bind();
-
-        glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
-
-        this->modelVAO->unbind();
-        // End draw model
+    Box() {
+        transform = std::make_unique<Engine::Scene::Component::Transform>();
     }
 };
 
@@ -609,12 +618,15 @@ public:
         this->skyboxVAO->unbind();
         // End skybox
 
-        Box *box = new Box("box");
-        MP5 *mp5 = new MP5("mp5");
-        Tank *tank = new Tank("tank");
-        this->scene->root->children.push_back(box);
-        this->scene->root->children.push_back(mp5);
-        this->scene->root->children.push_back(tank);
+        // Box *box = new Box("box");
+        // MP5 *mp5 = new MP5("mp5");
+        // Tank *tank = new Tank("tank");
+        // this->scene->root->children.push_back(box);
+        // this->scene->root->children.push_back(mp5);
+        // this->scene->root->children.push_back(tank);
+
+        // std::shared_ptr<Box> box = std::make_unique<Box>();
+        // scene->root->objects.push_back(box);
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);

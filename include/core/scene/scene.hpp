@@ -1,25 +1,36 @@
 #ifndef __SCENE__
 #define __SCENE__
 
-#include "core/scene/entity.hpp"
+#include <memory>
+#include <vector>
+
+#include "core/scene/ecs/entity.hpp"
 
 
 namespace Engine {
     namespace Scene {
-        class RootEntity : public Entity {
+        class Node {
         public:
-            RootEntity(std::string name) : Entity(name) {}
-            void Run() {}
-            void Draw() {}
+            std::string name;
+            std::unique_ptr<Node> parent;
+            std::vector<std::shared_ptr<Node>> children;
+            std::vector<std::shared_ptr<Entity>> objects;
+
+            Node(std::string name) {
+                name = name;
+            }
         };
 
 
         class Scene {
         public:
-            RootEntity *root = nullptr;
+            std::unique_ptr<Node> root;
 
-            Scene();
-            ~Scene();
+            Scene() {
+                root = std::make_unique<Node>(std::string("root"));
+            }
+
+            virtual ~Scene() {};
             void Startup();
             void Update();
         };

@@ -3,51 +3,46 @@
 using namespace Engine::Scene;
 
 
-Scene::Scene() {
-    root = new RootEntity(std::string("root"));
-}
-
-
-Scene::~Scene() {
-    delete root;
-}
+// Scene::Scene() {
+//     root = std::make_unique<Node>(std::string("root"));
+// }
 
 
 void Scene::Startup() {
-    std::vector<Entity*> nodes;
+    // std::vector<std::unique_ptr<Node>> nodes;
 
-    for (Entity *node : root->children) {
-        nodes.push_back(node);
-    }
+    // for (std::unique_ptr<Node> node : root->children) {
+    //     nodes.push_back(node);
+    // }
 
-    while (!nodes.empty()) {
-        Entity *node = nodes.back();
-        nodes.pop_back();
+    // while (!nodes.empty()) {
+    //     std::unique_ptr<Node> node = nodes.back();
+    //     nodes.pop_back();
 
-        for (Entity *child : node->children) {
-            nodes.push_back(child);
-        }
+    //     for (std::unique_ptr<Node> child : node->children) {
+    //         nodes.push_back(child);
+    //     }
 
-        node->Run();
-    }
+    //     // node->Run();
+    // }
 }
 
 
 void Scene::Update() {
-    std::vector<Entity*> nodes;
+    // std::vector<std::unique_ptr<Node>> nodes;
 
-    for (Entity *node : root->children) {
-        nodes.push_back(node);
-    }
+    // for (std::unique_ptr<Node> node : root->children) {
+    //     nodes.push_back(node);
+    // }
 
-    while (!nodes.empty()) {
-        Entity *node = nodes.back();
-        nodes.pop_back();
+    // while (!nodes.empty()) {
+    //     std::unique_ptr<Node> node = nodes.back();
+    //     nodes.pop_back();
 
-        for (Entity *child : node->children) {
-            nodes.push_back(child);
-        }
+    //     for (std::unique_ptr<Node> child : node->children) {
+    //         nodes.push_back(child);
+    //     }
 
-        node->Draw();
-    }
+    //     // node->Draw();
+    // }
 }
