@@ -63,8 +63,8 @@ namespace Engine {
                     break;
                 default:
                     logger->critical("unknown render backend API");
-                }
             }
+        }
         
         void Run() {
             /**

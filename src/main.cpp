@@ -221,21 +221,24 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
 
-    if(firstMouse)
-    {
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (io.WantCaptureMouse == false) {
+        if(firstMouse) {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        GLfloat xoffset = xpos - lastX;
+        GLfloat yoffset = lastY - ypos;
+    
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
-    }
 
-    GLfloat xoffset = xpos - lastX;
-    GLfloat yoffset = lastY - ypos;
-    
-    lastX = xpos;
-    lastY = ypos;
-
-    if (mouseCamera) {
-        camera.ProcessMouseMovement(xoffset, yoffset);
+        if (mouseCamera) {
+            camera.ProcessMouseMovement(xoffset, yoffset);
+        }
     }
 }	
 
@@ -494,6 +497,10 @@ void callback() {
     std::cout << "Callback event" << std::endl;
 }
 
+void window_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 
 class UserApplication : public Engine::EngineApplication {
 public:
@@ -523,6 +530,8 @@ public:
         // bd->PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
         // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
         // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
+
+        glfwSetWindowSizeCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, window_size_callback);
 
         std::filesystem::path cwd = std::filesystem::current_path();
 

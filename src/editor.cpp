@@ -17,6 +17,8 @@ namespace Engine {
             ImGui::CreateContext();
             ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
             ImGui::StyleColorsDark();
 
             // Setup Platform/Renderer backends
@@ -38,7 +40,6 @@ namespace Engine {
                     throw std::logic_error("Unsopported backend API");
             }
         }
-
 
         void EngineEditor::Update() {
             logger->trace(std::string("Update"));
@@ -83,10 +84,6 @@ namespace Engine {
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            // int display_w, display_h;
-            // glfwGetFramebufferSize(this->app->window->object, &display_w, &display_h);
-            // glViewport(0, 0, display_w, display_h);
         }
 
 
