@@ -14,6 +14,9 @@ namespace Engine {
             std::unique_ptr<Component::Transform> transform;
             std::unique_ptr<Component::Material> material;
 
+            Entity() {};
+            virtual ~Entity() {};
+
             inline bool HasComponent(Component::Type type) {
                 switch (type) {
                     case Component::Type::TRANSFORM:

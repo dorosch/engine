@@ -60,15 +60,15 @@ namespace Engine {
                 );
             ImGui::End();
 
-            // ImGui::Begin("Scene graph", &closed);
-            //     if (ImGui::TreeNode(app->scene->root->name.c_str())) {
-            //         for (std::shared_ptr<Scene::Node> node : app->scene->root->children) {
-            //             DrawSceneGraph(node, node->children);
-            //         }
+            ImGui::Begin("Scene graph", &closed);
+                if (ImGui::TreeNode(app->scene->root->name.c_str())) {
+                    for (std::shared_ptr<Scene::Node> node : app->scene->root->children) {
+                        DrawSceneGraph(node, node->children);
+                    }
 
-            //         ImGui::TreePop();
-            //     }
-            // ImGui::End();
+                    ImGui::TreePop();
+                }
+            ImGui::End();
 
             if (wireframe) {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -91,30 +91,32 @@ namespace Engine {
         }
 
 
-        // void EngineEditor::DrawSceneGraph(std::shared_ptr<Scene::Node> node, std::vector<std::shared_ptr<Scene::Node>> children) {
-        //     if (children.empty()) {
-        //         ImGui::TreeNodeEx(node->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        void EngineEditor::DrawSceneGraph(std::shared_ptr<Scene::Node> node, std::vector<std::shared_ptr<Scene::Node>> children) {
+            // TODO: Draw objects from node
 
-        //         if (ImGui::IsItemClicked()) {
-        //             SelectNode(node);
-        //         }
-        //     }
-        //     else {
-        //         bool open = ImGui::TreeNodeEx(node->name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+            if (children.empty()) {
+                ImGui::TreeNodeEx(node->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
 
-        //         if (open) {
-        //             for (std::shared_ptr<Scene::Node> node : children) {
-        //                 DrawSceneGraph(node, node->children);
-        //             }
+                if (ImGui::IsItemClicked()) {
+                    SelectNode(node);
+                }
+            }
+            else {
+                bool open = ImGui::TreeNodeEx(node->name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
 
-        //             ImGui::TreePop();
-        //         }
-        //     }
-        // }
+                if (open) {
+                    for (std::shared_ptr<Scene::Node> node : children) {
+                        DrawSceneGraph(node, node->children);
+                    }
+
+                    ImGui::TreePop();
+                }
+            }
+        }
 
 
-        // void EngineEditor::SelectNode(std::shared_ptr<Scene::Node> entity) {
-        //     logger->info(fmt::format("Selected node: {}", entity->name));
-        // }
+        void EngineEditor::SelectNode(std::shared_ptr<Scene::Node> node) {
+            logger->info(fmt::format("Selected node: {}", node->name));
+        }
     }
 }

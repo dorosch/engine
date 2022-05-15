@@ -17,7 +17,7 @@ namespace Engine {
             std::vector<std::shared_ptr<Entity>> objects;
 
             Node(std::string name) {
-                name = name;
+                this->name = name;
             }
         };
 
@@ -26,10 +26,7 @@ namespace Engine {
         public:
             std::unique_ptr<Node> root;
 
-            Scene() {
-                root = std::make_unique<Node>(std::string("root"));
-            }
-
+            Scene();
             virtual ~Scene() {};
             void Startup();
             void Update();

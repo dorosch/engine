@@ -8,7 +8,7 @@ namespace Engine {
     namespace Scene {
         class System {
         public:
-            std::String name;
+            std::string name;
         };
     }
 }

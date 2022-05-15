@@ -496,7 +496,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class Box : public Engine::Scene::Entity {
 public:
-    Box() {
+    Box() : Entity() {
         transform = std::make_unique<Engine::Scene::Component::Transform>();
     }
 };
@@ -625,8 +625,8 @@ public:
         // this->scene->root->children.push_back(mp5);
         // this->scene->root->children.push_back(tank);
 
-        // std::shared_ptr<Box> box = std::make_unique<Box>();
-        // scene->root->objects.push_back(box);
+        std::shared_ptr<Box> box = std::make_shared<Box>();
+        scene->root->objects.push_back(box);
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);

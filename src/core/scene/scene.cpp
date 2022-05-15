@@ -3,9 +3,9 @@
 using namespace Engine::Scene;
 
 
-// Scene::Scene() {
-//     root = std::make_unique<Node>(std::string("root"));
-// }
+Scene::Scene() {
+    root = std::make_unique<Node>(std::string("root"));
+}
 
 
 void Scene::Startup() {
