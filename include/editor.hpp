@@ -32,8 +32,8 @@ namespace Engine {
         private:
             EngineApplication *app = nullptr;
 
-            void SelectNode(std::shared_ptr<Scene::Node>);
-            void DrawSceneGraph(std::shared_ptr<Scene::Node>, std::vector<std::shared_ptr<Scene::Node>>);
+            void SelectEntity(std::shared_ptr<Scene::Entity>);
+            void DrawSceneGraph(std::shared_ptr<Scene::Node>);
 
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("editor");

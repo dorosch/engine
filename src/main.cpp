@@ -497,6 +497,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 class Box : public Engine::Scene::Entity {
 public:
     Box() : Entity() {
+        name = std::string("box");
         transform = std::make_unique<Engine::Scene::Component::Transform>();
     }
 };
@@ -626,7 +627,7 @@ public:
         // this->scene->root->children.push_back(tank);
 
         std::shared_ptr<Box> box = std::make_shared<Box>();
-        scene->root->objects.push_back(box);
+        scene->root->entities.push_back(box);
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);

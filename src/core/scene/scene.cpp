@@ -4,7 +4,7 @@ using namespace Engine::Scene;
 
 
 Scene::Scene() {
-    root = std::make_unique<Node>(std::string("root"));
+    root = std::make_shared<Node>(std::string("root"));
 }
 
 

@@ -11,6 +11,7 @@ namespace Engine {
     namespace Scene {
         class Entity {
         public:
+            std::string name;
             std::unique_ptr<Component::Transform> transform;
             std::unique_ptr<Component::Material> material;
 

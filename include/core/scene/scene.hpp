@@ -14,7 +14,7 @@ namespace Engine {
             std::string name;
             std::unique_ptr<Node> parent;
             std::vector<std::shared_ptr<Node>> children;
-            std::vector<std::shared_ptr<Entity>> objects;
+            std::vector<std::shared_ptr<Entity>> entities;
 
             Node(std::string name) {
                 this->name = name;
@@ -24,7 +24,7 @@ namespace Engine {
 
         class Scene {
         public:
-            std::unique_ptr<Node> root;
+            std::shared_ptr<Node> root;
 
             Scene();
             virtual ~Scene() {};
