@@ -2,9 +2,6 @@
 #include "editor.hpp"
 
 
-// float position[] = {0.0, 0.0, 0.0};
-// float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-
 std::shared_ptr<Engine::Scene::Entity> selectedEntity;
 
 
@@ -67,6 +64,13 @@ namespace Engine {
                     for (std::shared_ptr<Scene::Entity> entity : app->scene->root->entities) {
                         ImGui::TreeNodeEx(entity->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
 
+                        if (ImGui::BeginPopupContextItem()) {
+                            ImGui::Text("This a popup for ");
+                            if (ImGui::Button("Close"))
+                                ImGui::CloseCurrentPopup();
+                            ImGui::EndPopup();
+                        }
+
                         if (ImGui::IsItemClicked()) {
                             SelectEntity(entity);
                         }
@@ -80,26 +84,31 @@ namespace Engine {
                 }
             ImGui::End();
 
-            ImGui::Begin("Entity properties", &closed);
+            ImGui::ShowDemoWindow(&closed);
+
+            ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
                     if (selectedEntity->HasComponent(Scene::Component::Type::TRANSFORM)) {
-                        ImGui::Text("Transformation:");
+                        if (ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen)) {
+                            if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -1.0, 1.0)) {
+                                logger->info("Slider position is changed!");
+                            }
 
-                        if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -1.0, 1.0)) {
-                            logger->info("Slider position is changed!");
-                        }
+                            if (ImGui::SliderFloat3("rotation", &selectedEntity->transform->rotation[0], -1.0, 1.0)) {
+                                logger->info("Slider rotation is changed!");
+                            }
 
-                        if (ImGui::SliderFloat3("rotation", &selectedEntity->transform->rotation[0], -1.0, 1.0)) {
-                            logger->info("Slider rotation is changed!");
+                            if (ImGui::SliderFloat3("scale", &selectedEntity->transform->scale[0], -1.0, 1.0)) {
+                                logger->info("Slider scale is changed!");
+                            }
                         }
-
-                        if (ImGui::SliderFloat3("scale", &selectedEntity->transform->scale[0], -1.0, 1.0)) {
-                            logger->info("Slider scale is changed!");
-                        }
+                          
                     }
 
                     if (selectedEntity->HasComponent(Scene::Component::Type::MATERIAL)) {
-                        ImGui::Text("Material:");
+                        if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_None)) {
+                            ImGui::Text("Material component");
+                        }
                     }
                 }
             ImGui::End();

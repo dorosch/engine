@@ -154,10 +154,6 @@ namespace Engine {
 // ***************************************************************************************
 
 
-// extern float position[];
-// extern float color[];
-
-
 Engine::Scene::OpenglCamera camera;
 bool keys[1024];
 GLfloat lastX = 400, lastY = 300;
@@ -498,7 +494,7 @@ class Box : public Engine::Scene::Entity {
 public:
     Box() : Entity() {
         name = std::string("box");
-        transform = std::make_unique<Engine::Scene::Component::Transform>();
+        material = std::make_unique<Engine::Scene::Component::Material>();
     }
 };
 
