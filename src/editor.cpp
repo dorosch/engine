@@ -2,8 +2,10 @@
 #include "editor.hpp"
 
 
-float position[] = {0.0, 0.0, 0.0};
-float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+// float position[] = {0.0, 0.0, 0.0};
+// float color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+std::shared_ptr<Engine::Scene::Entity> selectedEntity;
 
 
 namespace Engine {
@@ -78,6 +80,30 @@ namespace Engine {
                 }
             ImGui::End();
 
+            ImGui::Begin("Entity properties", &closed);
+                if (selectedEntity != nullptr) {
+                    if (selectedEntity->HasComponent(Scene::Component::Type::TRANSFORM)) {
+                        ImGui::Text("Transformation:");
+
+                        if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -1.0, 1.0)) {
+                            logger->info("Slider position is changed!");
+                        }
+
+                        if (ImGui::SliderFloat3("rotation", &selectedEntity->transform->rotation[0], -1.0, 1.0)) {
+                            logger->info("Slider rotation is changed!");
+                        }
+
+                        if (ImGui::SliderFloat3("scale", &selectedEntity->transform->scale[0], -1.0, 1.0)) {
+                            logger->info("Slider scale is changed!");
+                        }
+                    }
+
+                    if (selectedEntity->HasComponent(Scene::Component::Type::MATERIAL)) {
+                        ImGui::Text("Material:");
+                    }
+                }
+            ImGui::End();
+
             if (wireframe) {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             }
@@ -131,6 +157,8 @@ namespace Engine {
 
 
         void EngineEditor::SelectEntity(std::shared_ptr<Scene::Entity> entity) {
+            selectedEntity = entity;
+
             logger->info(fmt::format("Selected entity: {}", entity->name));
 
             if (entity->HasComponent(Scene::Component::Type::TRANSFORM)) {

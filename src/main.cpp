@@ -154,8 +154,8 @@ namespace Engine {
 // ***************************************************************************************
 
 
-extern float position[];
-extern float color[];
+// extern float position[];
+// extern float color[];
 
 
 Engine::Scene::OpenglCamera camera;
