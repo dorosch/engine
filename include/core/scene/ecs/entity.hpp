@@ -12,7 +12,7 @@ namespace Engine {
         class Entity {
         public:
             std::string name;
-            std::unique_ptr<Component::Transform> transform;
+            std::unique_ptr<Component::Transform> transform = std::make_unique<Component::Transform>();
             std::unique_ptr<Component::Material> material;
 
             Entity() {};
