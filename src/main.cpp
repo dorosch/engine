@@ -495,6 +495,7 @@ public:
     Box() : Entity() {
         name = std::string("box");
         material = std::make_unique<Engine::Scene::Component::Material>();
+        mesh = std::make_unique<Engine::Scene::Component::Plane>();
     }
 };
 

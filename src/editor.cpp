@@ -110,6 +110,12 @@ namespace Engine {
                             ImGui::Text("Material component");
                         }
                     }
+
+                    if (selectedEntity->HasComponent(Scene::Component::Type::MESH)) {
+                        if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
+                            ImGui::Text("Mesh: %s", selectedEntity->mesh->name.c_str());
+                        }
+                    }
                 }
             ImGui::End();
 
@@ -176,6 +182,10 @@ namespace Engine {
 
             if (entity->HasComponent(Scene::Component::Type::MATERIAL)) {
                 logger->info("Entity support material");
+            }
+
+            if (entity->HasComponent(Scene::Component::Type::MESH)) {
+                logger->info("Entity support mesh");
             }
         }
     }
