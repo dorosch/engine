@@ -113,7 +113,7 @@ namespace Engine {
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::MESH)) {
                         if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
-                            ImGui::Text("Mesh: %s", selectedEntity->mesh->name.c_str());
+                            ImGui::Text("Mesh: %s", selectedEntity->name.c_str());
                         }
                     }
                 }

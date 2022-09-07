@@ -37,6 +37,7 @@
 #include "core/window/base.hpp"
 #include "core/window/glfw.hpp"
 #include "core/event/observer.hpp"
+#include "core/geometry/primitives.hpp"
 
 
 namespace Engine {
@@ -490,16 +491,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 // };
 
 
-class Box : public Engine::Object {
-public:
-    Box() : Engine::Object() {
-        name = std::string("box");
-        // material = std::make_unique<Engine::Ecs::Component::Material>();
-        // mesh = std::make_unique<Engine::Ecs::Component::Plane>();
-    }
-};
-
-
 void callback() {
     std::cout << "Callback event" << std::endl;
 }
@@ -623,8 +614,8 @@ public:
         // this->scene->root->children.push_back(mp5);
         // this->scene->root->children.push_back(tank);
 
-        std::shared_ptr<Box> box = std::make_shared<Box>();
-        scene->root->entities.push_back(box);
+        std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
+        scene->root->entities.push_back(plane);
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);

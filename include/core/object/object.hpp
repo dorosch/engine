@@ -5,7 +5,10 @@
 
 
 namespace Engine {
-    class Object : public Ecs::Entity {};
+    class Object : public Ecs::Entity {
+    public:
+        Object() : Ecs::Entity() {};
+    };
 }
 
 #endif

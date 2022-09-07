@@ -1,10 +1,8 @@
-#ifndef __TYPE__
-#define __TYPE__
+#ifndef __MATH_TYPE__
+#define __MATH_TYPE__
 
 #include <glm/glm.hpp>
 
-
-// TODO: Rename type.hpp
 
 struct Vertex {
     glm::vec3 position;
