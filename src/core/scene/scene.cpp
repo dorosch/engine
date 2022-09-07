@@ -8,41 +8,41 @@ Scene::Scene() {
 }
 
 
-void Scene::Startup() {
-    // std::vector<std::unique_ptr<Node>> nodes;
+// void Scene::Startup() {
+//     std::vector<std::unique_ptr<Node>> nodes;
 
-    // for (std::unique_ptr<Node> node : root->children) {
-    //     nodes.push_back(node);
-    // }
+//     for (std::unique_ptr<Node> node : root->children) {
+//         nodes.push_back(node);
+//     }
 
-    // while (!nodes.empty()) {
-    //     std::unique_ptr<Node> node = nodes.back();
-    //     nodes.pop_back();
+//     while (!nodes.empty()) {
+//         std::unique_ptr<Node> node = nodes.back();
+//         nodes.pop_back();
 
-    //     for (std::unique_ptr<Node> child : node->children) {
-    //         nodes.push_back(child);
-    //     }
+//         for (std::unique_ptr<Node> child : node->children) {
+//             nodes.push_back(child);
+//         }
 
-    //     // node->Run();
-    // }
-}
+//         // node->Run();
+//     }
+// }
 
 
-void Scene::Update() {
-    // std::vector<std::unique_ptr<Node>> nodes;
+// void Scene::Update() {
+//     std::vector<std::unique_ptr<Node>> nodes;
 
-    // for (std::unique_ptr<Node> node : root->children) {
-    //     nodes.push_back(node);
-    // }
+//     for (std::unique_ptr<Node> node : root->children) {
+//         nodes.push_back(node);
+//     }
 
-    // while (!nodes.empty()) {
-    //     std::unique_ptr<Node> node = nodes.back();
-    //     nodes.pop_back();
+//     while (!nodes.empty()) {
+//         std::unique_ptr<Node> node = nodes.back();
+//         nodes.pop_back();
 
-    //     for (std::unique_ptr<Node> child : node->children) {
-    //         nodes.push_back(child);
-    //     }
+//         for (std::unique_ptr<Node> child : node->children) {
+//             nodes.push_back(child);
+//         }
 
-    //     // node->Draw();
-    // }
-}
+//         node->Draw();
+//     }
+// }

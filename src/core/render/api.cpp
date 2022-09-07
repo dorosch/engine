@@ -23,3 +23,8 @@ Backend Render::GetBackendAPI() {
 void Render::SetBackendAPI(Backend backendAPI) {
     BackendAPI = backendAPI;
 }
+
+
+void Render::RenderScene(Engine::Scene::Scene *scene) {
+
+}

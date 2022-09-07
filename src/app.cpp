@@ -3,7 +3,6 @@
 using namespace Engine;
 
 
-
 EngineApplication::EngineApplication() {
     logger->trace(std::string("constructor"));
 

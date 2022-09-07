@@ -34,6 +34,7 @@ namespace Engine {
         Window::WindowProvider *window = nullptr;
         Editor::EngineEditor *editor = nullptr;
         Scene::Scene *scene = nullptr;
+        std::unique_ptr<Render::Render> &render = Render::Render::GetInstance();
 
         EngineApplication();
         virtual ~EngineApplication();

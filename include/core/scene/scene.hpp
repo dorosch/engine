@@ -28,8 +28,6 @@ namespace Engine {
 
             Scene();
             virtual ~Scene() {};
-            void Startup();
-            void Update();
         };
     }
 }

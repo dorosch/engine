@@ -3,6 +3,11 @@
 
 #include <memory>
 
+#include "tools/logger.hpp"
+#include "core/scene/scene.hpp"
+
+using namespace Tool::Logger;
+
 
 namespace Engine {
     namespace Render {
@@ -17,9 +22,12 @@ namespace Engine {
             Backend BackendAPI = Backend::OPENGL;
 
         public:
+            std::unique_ptr<Logger> logger = std::make_unique<Logger>("render");
+
             static std::unique_ptr<Render>& GetInstance();
             Backend GetBackendAPI();
             void SetBackendAPI(Backend);
+            void RenderScene(Engine::Scene::Scene *);
         };
     }
 }

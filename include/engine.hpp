@@ -87,7 +87,6 @@ namespace Engine {
             glEnable(GL_MULTISAMPLE);
 
             app->Run();
-            app->scene->Startup();
 
             while (app->window->IsOpen()) {
                 glfwPollEvents();
@@ -95,11 +94,10 @@ namespace Engine {
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                // TODO: Update app before scene after move skybox to the entity
-                app->scene->Update();
                 app->Update();
                 app->editor->Update();
                 app->window->Update();
+                app->render->RenderScene(app->scene);
             }
 
             logger->info("shutdown...");
