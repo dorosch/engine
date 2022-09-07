@@ -6,7 +6,7 @@ using namespace Engine::Render;
 
 
 VertexBuffer *VertexBuffer::GetInstance() {
-    switch (GetBackendAPI()) {
+    switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
             return new OpenglVertexBuffer();
             break;
@@ -17,7 +17,7 @@ VertexBuffer *VertexBuffer::GetInstance() {
 
 
 IndexBuffer *IndexBuffer::GetInstance() {
-    switch (GetBackendAPI()) {
+    switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
             return new OpenglIndexBuffer();
             break;
@@ -28,7 +28,7 @@ IndexBuffer *IndexBuffer::GetInstance() {
 
 
 VertexArray *VertexArray::GetInstance() {
-    switch (GetBackendAPI()) {
+    switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
             return new OpenglVertexArray();
             break;

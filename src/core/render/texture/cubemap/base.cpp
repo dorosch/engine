@@ -5,7 +5,7 @@ using namespace Engine::Render;
 
 
 Cubemap *Cubemap::GetInstance() {
-    switch (GetBackendAPI()) {
+    switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
             return new OpenglCubemap();
             break;

@@ -1,6 +1,8 @@
 #ifndef __RENDER_API__
 #define __RENDER_API__
 
+#include <memory>
+
 
 namespace Engine {
     namespace Render {
@@ -9,11 +11,16 @@ namespace Engine {
         };
 
 
-        static Backend BackendAPI = Backend::OPENGL;
+        class Render {
+        private:
+            static std::unique_ptr<Render> singleton;
+            Backend BackendAPI = Backend::OPENGL;
 
-
-        Backend GetBackendAPI();
-        void SetBackendAPI(Backend);
+        public:
+            static std::unique_ptr<Render>& GetInstance();
+            Backend GetBackendAPI();
+            void SetBackendAPI(Backend);
+        };
     }
 }
 

@@ -5,7 +5,7 @@ using namespace Engine::Render;
 
 
 Texture *Texture::GetInstance() {
-    switch (GetBackendAPI()) {
+    switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
             return new OpenglTexture();
             break;

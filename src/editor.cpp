@@ -31,7 +31,7 @@ namespace Engine {
                     throw std::logic_error("Undefined WindowProvider");
             }
 
-            switch (Engine::Render::GetBackendAPI()) {
+            switch (Engine::Render::Render::GetInstance()->GetBackendAPI()) {
                 case Render::Backend::OPENGL:
                     ImGui_ImplOpenGL3_Init(GLSL_VERSION);
                     break;

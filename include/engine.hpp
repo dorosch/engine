@@ -57,7 +57,7 @@ namespace Engine {
             logger->info(fmt::format("engine version: {}", ENGINE_VERSION));
             logger->info(fmt::format("glsl version: {}", GLSL_VERSION));
 
-            switch (Render::BackendAPI) {
+            switch (Render::Render::GetInstance()->GetBackendAPI()) {
                 case Render::Backend::OPENGL:
                     logger->info("backend API: OpenGL");
                     break;
@@ -101,6 +101,8 @@ namespace Engine {
                 app->editor->Update();
                 app->window->Update();
             }
+
+            logger->info("shutdown...");
 
             app->editor->Shutdown();
             app->window->Shutdown();

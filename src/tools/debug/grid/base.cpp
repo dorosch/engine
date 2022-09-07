@@ -6,7 +6,7 @@ using namespace Tool::Debug;
 
 
 DebugFloorGrid *DebugFloorGrid::GetInstance() {
-    switch (Engine::Render::GetBackendAPI()) {
+    switch (Engine::Render::Render::GetInstance()->GetBackendAPI()) {
         case Engine::Render::Backend::OPENGL:
             return new OpenglDebugFloorGrid();
             break;

@@ -25,7 +25,7 @@ std::string ShaderProgram::ReadShaderFile(std::filesystem::path path) {
 
 
 ShaderProgram *ShaderProgram::GetInstance() {
-    switch (GetBackendAPI()) {
+    switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
             return new OpenglShaderProgram();
             break;

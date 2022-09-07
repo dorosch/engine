@@ -6,7 +6,7 @@ using namespace Tool::Debug;
 
 
 DebugAxes *DebugAxes::GetInstance() {
-    switch (Engine::Render::GetBackendAPI()) {
+    switch (Engine::Render::Render::GetInstance()->GetBackendAPI()) {
         case Engine::Render::Backend::OPENGL:
             return new OpenglDebugAxes();
             break;

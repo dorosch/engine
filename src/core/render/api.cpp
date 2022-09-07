@@ -1,13 +1,25 @@
 #include "core/render/api.hpp"
 
-using namespace Engine;
+using namespace Engine::Render;
 
 
-Render::Backend Render::GetBackendAPI() {
-    return Render::BackendAPI;
+std::unique_ptr<Render> Render::singleton = nullptr;
+
+
+std::unique_ptr<Render>& Render::GetInstance() {
+    if(singleton == nullptr) {
+        singleton = std::make_unique<Render>();
+    }
+
+    return singleton;
 }
 
 
-void Render::SetBackendAPI(Render::Backend backendAPI) {
-    Render::BackendAPI = backendAPI;
+Backend Render::GetBackendAPI() {
+    return BackendAPI;
+}
+
+
+void Render::SetBackendAPI(Backend backendAPI) {
+    BackendAPI = backendAPI;
 }
