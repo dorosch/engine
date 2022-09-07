@@ -5,7 +5,7 @@
 
 
 namespace Engine {
-    namespace Scene {
+    namespace Ecs {
         class System {
         public:
             std::string name;

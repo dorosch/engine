@@ -11,7 +11,7 @@
 
 
 namespace Engine {
-    namespace Scene {
+    namespace Ecs {
         namespace Component {
             enum Type {
                 TRANSFORM,

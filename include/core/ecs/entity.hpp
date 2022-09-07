@@ -4,11 +4,11 @@
 #include <memory>
 #include <string>
 
-#include "core/scene/ecs/component.hpp"
+#include "core/ecs/component.hpp"
 
 
 namespace Engine {
-    namespace Scene {
+    namespace Ecs {
         class Entity {
         public:
             std::string name;

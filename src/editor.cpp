@@ -2,7 +2,7 @@
 #include "editor.hpp"
 
 
-std::shared_ptr<Engine::Scene::Entity> selectedEntity;
+std::shared_ptr<Engine::Object> selectedEntity;
 
 
 namespace Engine {
@@ -61,7 +61,7 @@ namespace Engine {
 
             ImGui::Begin("Scene graph", &closed);
                 if (ImGui::TreeNode(app->scene->root->name.c_str())) {
-                    for (std::shared_ptr<Scene::Entity> entity : app->scene->root->entities) {
+                    for (std::shared_ptr<Object> entity : app->scene->root->entities) {
                         ImGui::TreeNodeEx(entity->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
 
                         if (ImGui::BeginPopupContextItem()) {
@@ -88,7 +88,7 @@ namespace Engine {
 
             ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
-                    if (selectedEntity->HasComponent(Scene::Component::Type::TRANSFORM)) {
+                    if (selectedEntity->HasComponent(Ecs::Component::Type::TRANSFORM)) {
                         if (ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen)) {
                             if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -1.0, 1.0)) {
                                 logger->info("Slider position is changed!");
@@ -105,13 +105,13 @@ namespace Engine {
                           
                     }
 
-                    if (selectedEntity->HasComponent(Scene::Component::Type::MATERIAL)) {
+                    if (selectedEntity->HasComponent(Ecs::Component::Type::MATERIAL)) {
                         if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_None)) {
                             ImGui::Text("Material component");
                         }
                     }
 
-                    if (selectedEntity->HasComponent(Scene::Component::Type::MESH)) {
+                    if (selectedEntity->HasComponent(Ecs::Component::Type::MESH)) {
                         if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
                             ImGui::Text("Mesh: %s", selectedEntity->mesh->name.c_str());
                         }
@@ -148,7 +148,7 @@ namespace Engine {
                 ImGui::TreeNode(node->name.c_str());
             }
 
-            for (std::shared_ptr<Scene::Entity> entity : node->entities) {
+            for (std::shared_ptr<Object> entity : node->entities) {
                 ImGui::TreeNodeEx(entity->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
 
                 if (ImGui::IsItemClicked()) {
@@ -171,20 +171,20 @@ namespace Engine {
         }
 
 
-        void EngineEditor::SelectEntity(std::shared_ptr<Scene::Entity> entity) {
+        void EngineEditor::SelectEntity(std::shared_ptr<Object> entity) {
             selectedEntity = entity;
 
             logger->info(fmt::format("Selected entity: {}", entity->name));
 
-            if (entity->HasComponent(Scene::Component::Type::TRANSFORM)) {
+            if (entity->HasComponent(Ecs::Component::Type::TRANSFORM)) {
                 logger->info("Entity support transform");
             }
 
-            if (entity->HasComponent(Scene::Component::Type::MATERIAL)) {
+            if (entity->HasComponent(Ecs::Component::Type::MATERIAL)) {
                 logger->info("Entity support material");
             }
 
-            if (entity->HasComponent(Scene::Component::Type::MESH)) {
+            if (entity->HasComponent(Ecs::Component::Type::MESH)) {
                 logger->info("Entity support mesh");
             }
         }

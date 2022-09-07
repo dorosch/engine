@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "core/scene/ecs/entity.hpp"
+#include "core/object/object.hpp"
 
 
 namespace Engine {
@@ -14,7 +14,7 @@ namespace Engine {
             std::string name;
             std::unique_ptr<Node> parent;
             std::vector<std::shared_ptr<Node>> children;
-            std::vector<std::shared_ptr<Entity>> entities;
+            std::vector<std::shared_ptr<Object>> entities;
 
             Node(std::string name) {
                 this->name = name;

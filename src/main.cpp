@@ -33,7 +33,7 @@
 #include "core/render/texture/base.hpp"
 #include "core/render/texture/cubemap/base.hpp"
 #include "core/scene/scene.hpp"
-#include "core/scene/ecs/entity.hpp"
+#include "core/object/object.hpp"
 #include "core/window/base.hpp"
 #include "core/window/glfw.hpp"
 #include "core/event/observer.hpp"
@@ -490,12 +490,12 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 // };
 
 
-class Box : public Engine::Scene::Entity {
+class Box : public Engine::Object {
 public:
-    Box() : Entity() {
+    Box() : Engine::Object() {
         name = std::string("box");
-        material = std::make_unique<Engine::Scene::Component::Material>();
-        mesh = std::make_unique<Engine::Scene::Component::Plane>();
+        // material = std::make_unique<Engine::Ecs::Component::Material>();
+        // mesh = std::make_unique<Engine::Ecs::Component::Plane>();
     }
 };
 

@@ -18,7 +18,7 @@
 #include "core/window/glfw.hpp"
 #include "core/render/api.hpp"
 #include "core/scene/scene.hpp"
-#include "core/scene/ecs/entity.hpp"
+#include "core/object/object.hpp"
 
 using namespace Tool::Logger;
 
@@ -32,7 +32,7 @@ namespace Engine {
         private:
             EngineApplication *app = nullptr;
 
-            void SelectEntity(std::shared_ptr<Scene::Entity>);
+            void SelectEntity(std::shared_ptr<Object>);
             void DrawSceneGraph(std::shared_ptr<Scene::Node>);
 
         public:
