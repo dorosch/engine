@@ -86,6 +86,7 @@ namespace Engine {
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_MULTISAMPLE);
 
+            app->render->Startup();
             app->Run();
 
             while (app->window->IsOpen()) {
@@ -96,15 +97,16 @@ namespace Engine {
 
                 app->Update();
                 app->editor->Update();
-                app->window->Update();
                 app->render->RenderScene(app->scene);
+                app->window->Update();
             }
 
             logger->info("shutdown...");
 
+            app->Shutdown();
+            app->render->Shutdown();
             app->editor->Shutdown();
             app->window->Shutdown();
-            app->Shutdown();
         }
     };
 }

@@ -600,7 +600,7 @@ public:
 
         this->skyboxVAO->bind();
         this->skyboxVBO->bind(skyboxVertices, sizeof(skyboxVertices));
-
+    
         this->skyboxVAO->layout(3, 3 * sizeof(float), 0);
 
         this->skyboxVBO->unbind();

@@ -40,16 +40,24 @@ namespace Engine {
             class Material : public Component {
             public:
                 Type type = Type::MATERIAL;
-
-                std::unique_ptr<Render::ShaderProgram> shader;
             };
 
 
             class Mesh : public Component {
             public:
                 Type type = Type::MESH;
-                std::vector<Vertex> vertices;
-                std::vector<uint32_t> indices;
+                // float *vertices;
+                // uint32_t *indices;
+                // float vertices[] = {
+                //     0.5f,  0.5f, 0.0f,  // Top Right
+                //     0.5f, -0.5f, 0.0f,  // Bottom Right
+                //     -0.5f, -0.5f, 0.0f,  // Bottom Left
+                //     -0.5f,  0.5f, 0.0f   // Top Left 
+                // };
+                // uint32_t indices[] = {
+                //     0, 1, 3,  // First Triangle
+                //     1, 2, 3   // Second Triangle
+                // };
                 std::unique_ptr<Render::VertexArray> VAO;
                 std::unique_ptr<Render::VertexBuffer> VBO;
                 std::unique_ptr<Render::IndexBuffer> EBO;
