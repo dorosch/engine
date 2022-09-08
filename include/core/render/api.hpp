@@ -34,7 +34,7 @@ namespace Engine {
             void SetBackendAPI(Backend);
             void Startup();
             void Shutdown();
-            void RenderScene(Engine::Scene::Scene *);
+            void RenderScene(Engine::Scene::Scene *, glm::mat4);
         };
     }
 }

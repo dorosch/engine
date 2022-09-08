@@ -97,7 +97,8 @@ namespace Engine {
 
                 app->Update();
                 app->editor->Update();
-                app->render->RenderScene(app->scene);
+                // TODO: Uncomment after move camera as part of scene
+                // app->render->RenderScene(app->scene);
                 app->window->Update();
             }
 

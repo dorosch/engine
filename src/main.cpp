@@ -614,8 +614,12 @@ public:
         // this->scene->root->children.push_back(mp5);
         // this->scene->root->children.push_back(tank);
 
+        std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
+        scene->root->entities.push_back(plane);
         std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
         scene->root->entities.push_back(cube);
+        std::shared_ptr<Engine::Geometry::Cube> cube2 = std::make_shared<Engine::Geometry::Cube>();
+        scene->root->entities.push_back(cube2);
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -641,6 +645,8 @@ public:
 
         view = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
+
+        render->RenderScene(scene, projection * view);
 
         // Draw skybox
         glDepthFunc(GL_LEQUAL);
@@ -668,8 +674,6 @@ public:
 
     void Shutdown() {
         logger->trace(std::string("Shutdown"));
-
-        delete this->debugAxes;
     }
 };
 

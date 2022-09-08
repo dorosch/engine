@@ -43,13 +43,20 @@ void Render::Shutdown() {
 }
 
 
-void Render::RenderScene(Engine::Scene::Scene *scene) {
+void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP) {
     // TODO: Only for opengl backend
 
     for (std::shared_ptr<Object> object : scene->root->entities) {
         if (object->HasComponent(Ecs::Component::Type::MESH)) {
             // TODO: If object hasn't own shader component
             shader->Use();
+            shader->UniformPosition(
+                "transform_position",
+                object->transform->position[0],
+                object->transform->position[1],
+                object->transform->position[2]
+            );
+            shader->UniformMatrix("MVP", MVP);
 
             object->mesh->VAO->bind();
             glDrawElements(GL_TRIANGLES, object->mesh->indices.size(), GL_UNSIGNED_INT, 0);
