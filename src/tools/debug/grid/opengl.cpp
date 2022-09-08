@@ -41,7 +41,6 @@ OpenglDebugFloorGrid::OpenglDebugFloorGrid() {
 OpenglDebugFloorGrid::~OpenglDebugFloorGrid() {
     glDeleteVertexArrays(1, &this->VAO);
 
-    delete this->VBO;
     delete this->shader;
 }
 

@@ -1,6 +1,8 @@
 #ifndef __DEBUG_AXES_OPENGL__
 #define __DEBUG_AXES_OPENGL__
 
+#include <memory>
+
 #include <GL/glew.h>
 
 #include "tools/debug/axes/base.hpp"
@@ -17,7 +19,7 @@ namespace Tool {
         protected:
             GLuint VAO;
             glm::mat4 MVP;
-            VertexBuffer *VBO = nullptr;
+            std::unique_ptr<VertexBuffer> VBO;
             ShaderProgram *shader = nullptr;
 
         public:

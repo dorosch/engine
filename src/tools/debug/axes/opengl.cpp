@@ -44,7 +44,6 @@ OpenglDebugAxes::OpenglDebugAxes() {
 OpenglDebugAxes::~OpenglDebugAxes() {
     glDeleteVertexArrays(1, &this->VAO);
 
-    delete this->VBO;
     delete this->shader;
 }
 

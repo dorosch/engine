@@ -1,6 +1,7 @@
 #ifndef __DEBUG_GRID_OPENGL__
 #define __DEBUG_GRID_OPENGL__
 
+#include <memory>
 #include <vector>
 
 #include <GL/glew.h>
@@ -20,7 +21,7 @@ namespace Tool {
             GLuint VAO;
             glm::mat4 MVP;
             std::vector<glm::vec3> vertices;
-            VertexBuffer *VBO = nullptr;
+            std::unique_ptr<VertexBuffer> VBO;
             ShaderProgram *shader = nullptr;
 
         public:

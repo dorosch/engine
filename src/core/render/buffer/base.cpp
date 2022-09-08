@@ -5,33 +5,30 @@
 using namespace Engine::Render;
 
 
-VertexBuffer *VertexBuffer::GetInstance() {
+std::unique_ptr<VertexBuffer> VertexBuffer::GetInstance() {
     switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
-            return new OpenglVertexBuffer();
-            break;
+            return std::make_unique<OpenglVertexBuffer>();
         default:
             throw std::logic_error("VertexBuffer - unsopported backend API");
     }
 }
 
 
-IndexBuffer *IndexBuffer::GetInstance() {
+std::unique_ptr<IndexBuffer> IndexBuffer::GetInstance() {
     switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
-            return new OpenglIndexBuffer();
-            break;
+            return std::make_unique<OpenglIndexBuffer>();
         default:
             throw std::logic_error("IndexBuffer - unsopported backend API");
     }
 }
 
 
-VertexArray *VertexArray::GetInstance() {
+std::unique_ptr<VertexArray> VertexArray::GetInstance() {
     switch (Render::GetInstance()->GetBackendAPI()) {
         case Backend::OPENGL:
-            return new OpenglVertexArray();
-            break;
+            return std::make_unique<OpenglVertexArray>();
         default:
             throw std::logic_error("VertexArray - unsopported backend API");
     }

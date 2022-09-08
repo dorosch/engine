@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "core/math/type.hpp"
+#include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 
 
@@ -47,9 +48,13 @@ namespace Engine {
             class Mesh : public Component {
             public:
                 Type type = Type::MESH;
-
                 std::vector<Vertex> vertices;
                 std::vector<uint32_t> indices;
+                std::unique_ptr<Render::VertexArray> VAO;
+                std::unique_ptr<Render::VertexBuffer> VBO;
+                std::unique_ptr<Render::IndexBuffer> EBO;
+
+                Mesh();
             };
         }   
     }

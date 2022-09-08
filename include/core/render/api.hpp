@@ -18,13 +18,13 @@ namespace Engine {
 
         class Render {
         private:
-            static std::unique_ptr<Render> singleton;
+            static std::shared_ptr<Render> singleton;
             Backend BackendAPI = Backend::OPENGL;
 
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("render");
 
-            static std::unique_ptr<Render>& GetInstance();
+            static std::shared_ptr<Render>& GetInstance();
             Backend GetBackendAPI();
             void SetBackendAPI(Backend);
             void RenderScene(Engine::Scene::Scene *);

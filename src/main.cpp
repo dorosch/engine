@@ -502,8 +502,8 @@ void window_size_callback(GLFWwindow* window, int width, int height) {
 
 class UserApplication : public Engine::EngineApplication {
 public:
-    Engine::Render::VertexArray *skyboxVAO = nullptr;
-    Engine::Render::VertexBuffer *skyboxVBO = nullptr;
+    std::unique_ptr<Engine::Render::VertexArray> skyboxVAO;
+    std::unique_ptr<Engine::Render::VertexBuffer> skyboxVBO;
     Engine::Render::ShaderProgram *skyboxShader = nullptr;
 
     Tool::Debug::DebugAxes *debugAxes = nullptr;

@@ -3,12 +3,12 @@
 using namespace Engine::Render;
 
 
-std::unique_ptr<Render> Render::singleton = nullptr;
+std::shared_ptr<Render> Render::singleton = nullptr;
 
 
-std::unique_ptr<Render>& Render::GetInstance() {
+std::shared_ptr<Render>& Render::GetInstance() {
     if(singleton == nullptr) {
-        singleton = std::make_unique<Render>();
+        singleton = std::make_shared<Render>();
     }
 
     return singleton;

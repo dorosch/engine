@@ -14,7 +14,7 @@ namespace Engine {
 
         class VertexBuffer : public Buffer {
         public:
-            static VertexBuffer *GetInstance();
+            static std::unique_ptr<VertexBuffer> GetInstance();
             virtual void bind(float *, uint32_t) = 0;
             virtual void unbind() = 0;
         };
@@ -24,7 +24,7 @@ namespace Engine {
         public:
             uint32_t count = 0;
 
-            static IndexBuffer *GetInstance();
+            static std::unique_ptr<IndexBuffer> GetInstance();
             virtual void bind(uint32_t *, uint32_t) = 0;
             virtual void unbind() = 0;
         };
@@ -34,7 +34,7 @@ namespace Engine {
         public:
             uint32_t layouts = 0;
 
-            static VertexArray *GetInstance();
+            static std::unique_ptr<VertexArray> GetInstance();
             virtual void bind() = 0;
             virtual void unbind() = 0;
             virtual void layout(uint32_t, uint32_t, uint32_t) = 0;
