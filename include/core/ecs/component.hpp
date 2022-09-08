@@ -46,23 +46,17 @@ namespace Engine {
             class Mesh : public Component {
             public:
                 Type type = Type::MESH;
-                // float *vertices;
-                // uint32_t *indices;
-                // float vertices[] = {
-                //     0.5f,  0.5f, 0.0f,  // Top Right
-                //     0.5f, -0.5f, 0.0f,  // Bottom Right
-                //     -0.5f, -0.5f, 0.0f,  // Bottom Left
-                //     -0.5f,  0.5f, 0.0f   // Top Left 
-                // };
-                // uint32_t indices[] = {
-                //     0, 1, 3,  // First Triangle
-                //     1, 2, 3   // Second Triangle
-                // };
+                std::vector<float> vertices;
+                std::vector<uint32_t> indices;
                 std::unique_ptr<Render::VertexArray> VAO;
                 std::unique_ptr<Render::VertexBuffer> VBO;
                 std::unique_ptr<Render::IndexBuffer> EBO;
 
-                Mesh();
+                /*
+                 * Mesh initialization places the vertex data on the GPU and 
+                 * places it there. Temporary solution for creating a mesh.
+                 */
+                void Initialize();
             };
         }   
     }

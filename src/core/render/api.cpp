@@ -51,11 +51,9 @@ void Render::RenderScene(Engine::Scene::Scene *scene) {
             // TODO: If object hasn't own shader component
             shader->Use();
 
-            // object->mesh->VAO->bind();
-             glBindVertexArray(object->mesh->VAO->object);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            // object->mesh->VAO->unbind();
-            glBindVertexArray(0);
+            object->mesh->VAO->bind();
+            glDrawElements(GL_TRIANGLES, object->mesh->indices.size(), GL_UNSIGNED_INT, 0);
+            object->mesh->VAO->unbind();
         }
     }
 }

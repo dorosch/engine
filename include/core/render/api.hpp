@@ -27,7 +27,6 @@ namespace Engine {
 
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("render");
-
             std::unique_ptr<ShaderProgram> shader;
 
             static std::shared_ptr<Render>& GetInstance();

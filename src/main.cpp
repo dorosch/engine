@@ -614,8 +614,8 @@ public:
         // this->scene->root->children.push_back(mp5);
         // this->scene->root->children.push_back(tank);
 
-        std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
-        scene->root->entities.push_back(plane);
+        std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
+        scene->root->entities.push_back(cube);
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);
