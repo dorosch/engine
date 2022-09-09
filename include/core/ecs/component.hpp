@@ -17,7 +17,8 @@ namespace Engine {
             enum Type {
                 TRANSFORM,
                 MATERIAL,
-                MESH
+                MESH,
+                LIGHT
             };
 
 
@@ -58,7 +59,16 @@ namespace Engine {
                  */
                 void Initialize();
             };
-        }   
+
+
+            class Light : public Component {
+            public:
+                Type type = Type::LIGHT;
+
+                float intensity = 1.0f;
+                glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+            };
+        }
     }
 }
 

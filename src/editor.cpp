@@ -85,7 +85,7 @@ namespace Engine {
             ImGui::End();
 
             // Demo window for see examples of widgets
-            // ImGui::ShowDemoWindow(&closed);
+            ImGui::ShowDemoWindow(&closed);
 
             ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
@@ -115,6 +115,13 @@ namespace Engine {
                     if (selectedEntity->HasComponent(Ecs::Component::Type::MESH)) {
                         if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
                             ImGui::Text("Mesh: %s", selectedEntity->name.c_str());
+                        }
+                    }
+
+                    if (selectedEntity->HasComponent(Ecs::Component::Type::LIGHT)) {
+                        if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_None)) {
+                            ImGui::ColorEdit3("color", &selectedEntity->light->color[0]);
+                            ImGui::SliderFloat("intensity", &selectedEntity->light->intensity, 0, 1.0);
                         }
                     }
                 }
@@ -187,6 +194,10 @@ namespace Engine {
 
             if (entity->HasComponent(Ecs::Component::Type::MESH)) {
                 logger->info("Entity support mesh");
+            }
+
+            if (entity->HasComponent(Ecs::Component::Type::LIGHT)) {
+                logger->info("Entity support light");
             }
         }
     }

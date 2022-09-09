@@ -15,6 +15,7 @@ namespace Engine {
             std::unique_ptr<Component::Transform> transform = std::make_unique<Component::Transform>();
             std::unique_ptr<Component::Material> material;
             std::unique_ptr<Component::Mesh> mesh;
+            std::unique_ptr<Component::Light> light;
 
             Entity() {};
             virtual ~Entity() {};
@@ -27,6 +28,8 @@ namespace Engine {
                         return material != nullptr;
                     case Component::Type::MESH:
                         return mesh != nullptr;
+                    case Component::Type::LIGHT:
+                        return light != nullptr;
                     default:
                         // TODO: Add logger->error
                         return false;
