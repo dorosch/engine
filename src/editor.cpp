@@ -97,7 +97,7 @@ namespace Engine {
             ImGui::End();
 
             // Demo window for see examples of widgets
-            ImGui::ShowDemoWindow(&closed);
+            // ImGui::ShowDemoWindow(&closed);
 
             ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
@@ -126,7 +126,12 @@ namespace Engine {
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::MESH)) {
                         if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
-                            ImGui::Text("Mesh: %s", selectedEntity->name.c_str());
+                            ImGui::Text(
+                                "vertices: %ld  indices: %ld  triangles: %ld",
+                                selectedEntity->mesh->vertices.size() / 3,
+                                selectedEntity->mesh->indices.size(),
+                                selectedEntity->mesh->indices.size() / 3
+                            );
                         }
                     }
 

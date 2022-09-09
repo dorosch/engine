@@ -28,6 +28,7 @@ namespace Engine {
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("render");
             std::unique_ptr<ShaderProgram> shader;
+            std::unique_ptr<ShaderProgram> lightingShader;
 
             static std::shared_ptr<Render>& GetInstance();
             Backend GetBackendAPI();
@@ -35,7 +36,7 @@ namespace Engine {
             void Startup();
             void Shutdown();
             void RenderScene(Engine::Scene::Scene *, glm::mat4);
-            void RenderObject(Engine::Object *, glm::mat4);
+            void RenderObject(Engine::Object *, glm::mat4, Graphics::Lighting::Light *);
         };
     }
 }
