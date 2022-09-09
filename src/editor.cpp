@@ -84,7 +84,8 @@ namespace Engine {
                 }
             ImGui::End();
 
-            ImGui::ShowDemoWindow(&closed);
+            // Demo window for see examples of widgets
+            // ImGui::ShowDemoWindow(&closed);
 
             ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
