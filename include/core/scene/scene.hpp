@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "core/object/object.hpp"
+#include "core/graphics/lighting/base.hpp"
 
 
 namespace Engine {
@@ -25,6 +26,7 @@ namespace Engine {
         class Scene {
         public:
             std::shared_ptr<Node> root;
+            std::vector<std::shared_ptr<Graphics::Lighting::Light>> lighting;
 
             Scene();
             virtual ~Scene() {};

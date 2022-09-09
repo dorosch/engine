@@ -1,9 +1,9 @@
-#include "core/graphics/lighting/debug.hpp"
+#include "core/graphics/lighting/base.hpp"
 
 using namespace Engine::Graphics::Lighting;
 
 
-DebugLight::DebugLight() {
+Light::Light() {
     name = "Light";
     light = std::make_unique<Ecs::Component::Light>();
 }

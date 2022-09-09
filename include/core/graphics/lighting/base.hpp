@@ -8,9 +8,9 @@
 namespace Engine {
     namespace Graphics {
         namespace Lighting {
-            class DebugLight : public Geometry::Cube {
+            class Light : public Geometry::Cube {
             public:
-                DebugLight();
+                Light();
             };
         }
     }

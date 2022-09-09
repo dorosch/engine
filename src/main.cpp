@@ -38,7 +38,7 @@
 #include "core/window/glfw.hpp"
 #include "core/event/observer.hpp"
 #include "core/geometry/primitives.hpp"
-#include "core/graphics/lighting/debug.hpp"
+#include "core/graphics/lighting/base.hpp"
 
 
 namespace Engine {
@@ -453,12 +453,12 @@ public:
         // End geometry primitives
 
         // Add light to the scene
-        std::shared_ptr<Engine::Graphics::Lighting::DebugLight> light = 
-            std::make_unique<Engine::Graphics::Lighting::DebugLight>();
+        std::shared_ptr<Engine::Graphics::Lighting::Light> light = 
+            std::make_shared<Engine::Graphics::Lighting::Light>();
         
         light->transform->position = {-3.0f, 3.0f, -3.0f};
 
-        scene->root->entities.push_back(light);
+        scene->lighting.push_back(light);
         // End light
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;

@@ -35,6 +35,7 @@ namespace Engine {
             void Startup();
             void Shutdown();
             void RenderScene(Engine::Scene::Scene *, glm::mat4);
+            void RenderObject(Engine::Object *, glm::mat4);
         };
     }
 }

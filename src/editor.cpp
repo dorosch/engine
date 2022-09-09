@@ -82,6 +82,18 @@ namespace Engine {
 
                     ImGui::TreePop();
                 }
+
+                if (ImGui::TreeNode("Lighting")) {
+                    for (std::shared_ptr<Graphics::Lighting::Light> light : app->scene->lighting) {
+                        ImGui::TreeNodeEx(light->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+
+                        if (ImGui::IsItemClicked()) {
+                            SelectEntity(light);
+                        }
+                    }
+
+                    ImGui::TreePop();
+                }
             ImGui::End();
 
             // Demo window for see examples of widgets
