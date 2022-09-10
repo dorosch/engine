@@ -103,7 +103,7 @@ namespace Engine {
                 if (selectedEntity != nullptr) {
                     if (selectedEntity->HasComponent(Ecs::Component::Type::TRANSFORM)) {
                         if (ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen)) {
-                            if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -1.0, 1.0)) {
+                            if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -10.0, 10.0)) {
 
                             }
 

@@ -11,12 +11,12 @@ out vec3 FragPos;
 
 
 void main() {
-    gl_Position = MVP * vec4(
+    vec3 new_position = vec3(
         position.x + transform_position.x,
         position.y + transform_position.y,
-        position.z + transform_position.z,
-        1.0
+        position.z + transform_position.z
     );
-    FragPos = position;
+    FragPos = new_position;
     Normal = normal;
+    gl_Position = MVP * vec4(new_position, 1.0f);
 }
