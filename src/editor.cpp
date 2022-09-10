@@ -104,15 +104,15 @@ namespace Engine {
                     if (selectedEntity->HasComponent(Ecs::Component::Type::TRANSFORM)) {
                         if (ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen)) {
                             if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -1.0, 1.0)) {
-                                logger->info("Slider position is changed!");
+
                             }
 
                             if (ImGui::SliderFloat3("rotation", &selectedEntity->transform->rotation[0], -1.0, 1.0)) {
-                                logger->info("Slider rotation is changed!");
+
                             }
 
                             if (ImGui::SliderFloat3("scale", &selectedEntity->transform->scale[0], -1.0, 1.0)) {
-                                logger->info("Slider scale is changed!");
+
                             }
                         }
                           
@@ -126,12 +126,7 @@ namespace Engine {
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::MESH)) {
                         if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
-                            ImGui::Text(
-                                "vertices: %ld  indices: %ld  triangles: %ld",
-                                selectedEntity->mesh->vertices.size() / 3,
-                                selectedEntity->mesh->indices.size(),
-                                selectedEntity->mesh->indices.size() / 3
-                            );
+                            ImGui::Text("vertices: %ld", selectedEntity->mesh->vertices.size());
                         }
                     }
 

@@ -48,10 +48,8 @@ namespace Engine {
             public:
                 Type type = Type::MESH;
                 std::vector<float> vertices;
-                std::vector<uint32_t> indices;
                 std::unique_ptr<Render::VertexArray> VAO;
                 std::unique_ptr<Render::VertexBuffer> VBO;
-                std::unique_ptr<Render::IndexBuffer> EBO;
 
                 /*
                  * Mesh initialization places the vertex data on the GPU and 

@@ -8,13 +8,12 @@ using namespace Engine::Ecs::Component;
 void Mesh::Initialize() {
     VAO = Engine::Render::VertexArray::GetInstance();
     VBO = Engine::Render::VertexBuffer::GetInstance();
-    EBO = Engine::Render::IndexBuffer::GetInstance();
 
     VAO->bind();
     VBO->bind(vertices.data(), vertices.size() * sizeof(float));
-    EBO->bind(indices.data(), indices.size() * sizeof(uint32_t));
 
-    VAO->layout(3, 3 * sizeof(float), 0);
+    VAO->layout(3, 6 * sizeof(float), 0);
+    VAO->layout(3, 6 * sizeof(float), 3 * sizeof(float));
 
     VBO->unbind();
     VAO->unbind();

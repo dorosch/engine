@@ -75,7 +75,7 @@ void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP) {
         lightingShader->UniformMatrix("MVP", MVP);
 
         lighting->mesh->VAO->bind();
-        glDrawElements(GL_TRIANGLES, lighting->mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, lighting->mesh->vertices.size() / 6);
         lighting->mesh->VAO->unbind();
     }
 }
@@ -98,9 +98,16 @@ void Render::RenderObject(Object *object, glm::mat4 MVP, Graphics::Lighting::Lig
             lighting->light->color[1],
             lighting->light->color[2]
         );
+        shader->UniformPosition(
+            "lightingPosition",
+            lighting->transform->position[0],
+            lighting->transform->position[1],
+            lighting->transform->position[2]
+        );
 
         object->mesh->VAO->bind();
-        glDrawElements(GL_TRIANGLES, object->mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        // TODO: Add calculation of the number of lines to the mesh method
+        glDrawArrays(GL_TRIANGLES, 0, object->mesh->vertices.size() / 6);
         object->mesh->VAO->unbind();
     }
 }
