@@ -1,41 +1,14 @@
-#include <optional>
-#include <functional>
 #include <memory>
-#include <vector>
-#include <iostream>
-#include <fmt/format.h>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <filesystem>
-#include <iostream>
 
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <SOIL/SOIL.h>
 
 #include "engine.hpp"
-#include "app.hpp"
-#include "meta.hpp"
-#include "editor.hpp"
-#include "tools/model.hpp"
-#include "tools/logger.hpp"
 #include "tools/debug/axes/base.hpp"
 #include "tools/debug/grid/base.hpp"
-#include "core/render/buffer/base.hpp"
-#include "core/render/shader/base.hpp"
-#include "core/render/texture/base.hpp"
-#include "core/render/texture/cubemap/base.hpp"
-#include "core/scene/scene.hpp"
-#include "core/object/object.hpp"
-#include "core/window/base.hpp"
 #include "core/window/glfw.hpp"
-#include "core/event/observer.hpp"
 #include "core/geometry/primitives.hpp"
 #include "core/graphics/lighting/base.hpp"
 #include "core/graphics/cameras/camera.hpp"
@@ -185,11 +158,6 @@ void window_size_callback(GLFWwindow* window, int width, int height) {
 
 class UserApplication : public Engine::EngineApplication {
 public:
-    // Engine::Render::Cubemap *cubemap;
-    // Engine::Render::ShaderProgram *skyboxShader = nullptr;
-    // std::unique_ptr<Engine::Render::VertexArray> skyboxVAO;
-    // std::unique_ptr<Engine::Render::VertexBuffer> skyboxVBO;
-
     Tool::Debug::DebugAxes *debugAxes = nullptr;
     Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
@@ -220,82 +188,6 @@ public:
         // Camera and controller setup
         camera = std::make_unique<Engine::Graphics::Camera::Camera>();
         cameraController = std::make_unique<CameraController>(camera.get());
-
-        // std::filesystem::path cwd = std::filesystem::current_path();
-
-        // this->skyboxShader = Engine::Render::ShaderProgram::GetInstance();
-        // this->skyboxShader->Build(
-        //     cwd / "resources" / "shaders" / "skybox" / "shader.vert",
-        //     cwd / "resources" / "shaders" / "skybox" / "shader.frag"
-        // );
-        
-        // float skyboxVertices[] = {
-        //     // positions          
-        //     -1000.0f,  1000.0f, -1000.0f,
-        //     -1000.0f, -1000.0f, -1000.0f,
-        //      1000.0f, -1000.0f, -1000.0f,
-        //      1000.0f, -1000.0f, -1000.0f,
-        //      1000.0f,  1000.0f, -1000.0f,
-        //     -1000.0f,  1000.0f, -1000.0f,
-
-        //     -1000.0f, -1000.0f,  1000.0f,
-        //     -1000.0f, -1000.0f, -1000.0f,
-        //     -1000.0f,  1000.0f, -1000.0f,
-        //     -1000.0f,  1000.0f, -1000.0f,
-        //     -1000.0f,  1000.0f,  1000.0f,
-        //     -1000.0f, -1000.0f,  1000.0f,
-
-        //      1000.0f, -1000.0f, -1000.0f,
-        //      1000.0f, -1000.0f,  1000.0f,
-        //      1000.0f,  1000.0f,  1000.0f,
-        //      1000.0f,  1000.0f,  1000.0f,
-        //      1000.0f,  1000.0f, -1000.0f,
-        //      1000.0f, -1000.0f, -1000.0f,
-
-        //     -1000.0f, -1000.0f,  1000.0f,
-        //     -1000.0f,  1000.0f,  1000.0f,
-        //      1000.0f,  1000.0f,  1000.0f,
-        //      1000.0f,  1000.0f,  1000.0f,
-        //      1000.0f, -1000.0f,  1000.0f,
-        //     -1000.0f, -1000.0f,  1000.0f,
-
-        //     -1000.0f,  1000.0f, -1000.0f,
-        //      1000.0f,  1000.0f, -1000.0f,
-        //      1000.0f,  1000.0f,  1000.0f,
-        //      1000.0f,  1000.0f,  1000.0f,
-        //     -1000.0f,  1000.0f,  1000.0f,
-        //     -1000.0f,  1000.0f, -1000.0f,
-
-        //     -1000.0f, -1000.0f, -1000.0f,
-        //     -1000.0f, -1000.0f,  1000.0f,
-        //      1000.0f, -1000.0f, -1000.0f,
-        //      1000.0f, -1000.0f, -1000.0f,
-        //     -1000.0f, -1000.0f,  1000.0f,
-        //      1000.0f, -1000.0f,  1000.0f
-        // };
-        // std::vector<std::filesystem::path> faces = {
-        //     cwd / "resources" / "textures" / "skybox" / "default" / "right.jpg",
-        //     cwd / "resources" / "textures" / "skybox" / "default" / "left.jpg",
-        //     cwd / "resources" / "textures" / "skybox" / "default" / "top.jpg",
-        //     cwd / "resources" / "textures" / "skybox" / "default" / "bottom.jpg",
-        //     cwd / "resources" / "textures" / "skybox" / "default" / "front.jpg",
-        //     cwd / "resources" / "textures" / "skybox" / "default" / "back.jpg"
-        // };
-        // cubemap = Engine::Render::Cubemap::GetInstance();
-        // cubemap->Build(faces);
-
-        // // Bind skybox
-        // this->skyboxVAO = Engine::Render::VertexArray::GetInstance();
-        // this->skyboxVBO = Engine::Render::VertexBuffer::GetInstance();
-
-        // this->skyboxVAO->bind();
-        // this->skyboxVBO->bind(skyboxVertices, sizeof(skyboxVertices));
-    
-        // this->skyboxVAO->layout(3, 3 * sizeof(float), 0);
-
-        // this->skyboxVBO->unbind();
-        // this->skyboxVAO->unbind();
-        // // End skybox
 
         // Add geometry primitives to the scene
         std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
@@ -358,30 +250,14 @@ public:
         view = camera->getViewMatrix();
         projection = camera->getProjectionMatrix();
  
+                // TODO: Move to the editor as debug flag
+        this->debugAxes->SetMVP(projection * view);
+        this->debugAxes->Enable();
+
+        this->debugFloorGrid->SetMVP(projection * view);
+        this->debugFloorGrid->Enable();
+
         render->RenderScene(scene, projection * view * model, camera->position);
-
-        // // Draw skybox
-        // glDepthFunc(GL_LEQUAL);
-        // skyboxShader->Use();
-        // this->skyboxShader->UniformMatrix("view", view);
-        // this->skyboxShader->UniformMatrix("projection", projection);
-        // glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->object);
-
-        // this->skyboxVAO->bind();
-
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // this->skyboxVAO->unbind();
-
-        // glDepthFunc(GL_LESS);
-        // // End skybox
-
-        // TODO: Move to the editor as debug flag
-        // this->debugAxes->SetMVP(projection * view);
-        // this->debugAxes->Enable();
-
-        // this->debugFloorGrid->SetMVP(projection * view);
-        // this->debugFloorGrid->Enable();
     }
 
     void Shutdown() {
