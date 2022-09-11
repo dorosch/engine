@@ -10,8 +10,6 @@ namespace Engine {
         void EngineEditor::Startup(EngineApplication *app) {
             this->app = app;
 
-            logger->trace(std::string("Init"));
-
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
             ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -60,16 +58,27 @@ namespace Engine {
             ImGui::End();
 
             ImGui::Begin("Scene graph", &closed);
+                if (ImGui::BeginPopupContextItem()) {
+                    ImGui::Text("Add");
+                    ImGui::Separator();
+
+                    if (ImGui::BeginMenu("mesh")) {
+                        if (ImGui::MenuItem("Plane")) {
+                            std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
+                            app->scene->root->entities.push_back(plane);
+                        }
+                        if (ImGui::MenuItem("Cube")) {
+                            std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
+                            app->scene->root->entities.push_back(cube);
+                        }
+                        ImGui::EndMenu();
+                    }
+                    ImGui::EndPopup();
+                }
+
                 if (ImGui::TreeNode(app->scene->root->name.c_str())) {
                     for (std::shared_ptr<Object> entity : app->scene->root->entities) {
                         ImGui::TreeNodeEx(entity->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
-
-                        if (ImGui::BeginPopupContextItem()) {
-                            ImGui::Text("This a popup for ");
-                            if (ImGui::Button("Close"))
-                                ImGui::CloseCurrentPopup();
-                            ImGui::EndPopup();
-                        }
 
                         if (ImGui::IsItemClicked()) {
                             SelectEntity(entity);
@@ -97,7 +106,7 @@ namespace Engine {
             ImGui::End();
 
             // Demo window for see examples of widgets
-            // ImGui::ShowDemoWindow(&closed);
+            ImGui::ShowDemoWindow(&closed);
 
             ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
