@@ -23,8 +23,6 @@ float lastY = 0;
 float lastOffsetX = 0.0f;
 float lastOffsetY = 0.0f;
 float mouseScrollbackY = 0.0f;
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
 
 GLuint screenWidth = 1920;
 GLuint screenHeight = 1080;
@@ -165,25 +163,18 @@ public:
     std::unique_ptr<CameraController> cameraController;
 
     void Startup() {
-        logger->trace(std::string("Startup"));
-
         this->window->settings = {
             screenWidth, screenHeight, false, true, "Application"
         };
     }
 
     void Run() {
-        glfwSetWindowSizeCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, window_size_callback);
-
-        // TODO: Need custom event system because events need for application and editor
-        // bd->PrevUserCallbackWindowFocus = glfwSetWindowFocusCallback(window, ImGui_ImplGlfw_WindowFocusCallback);
-        // bd->PrevUserCallbackCursorEnter = glfwSetCursorEnterCallback(window, ImGui_ImplGlfw_CursorEnterCallback);
-        // bd->PrevUserCallbackCursorPos = glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
-        // bd->PrevUserCallbackMousebutton = glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
-        // bd->PrevUserCallbackScroll = glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
-        // bd->PrevUserCallbackKey = glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
-        // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
-        // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
+        GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
+        glfwSetKeyCallback(window, key_callback);
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetScrollCallback(window, scroll_callback);
+        glfwSetWindowSizeCallback(window, window_size_callback);
 
         // Camera and controller setup
         camera = std::make_unique<Engine::Graphics::Camera::Camera>();
@@ -211,23 +202,15 @@ public:
         scene->lighting.push_back(light);
         // End light
 
-        GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
-        glfwSetMouseButtonCallback(window, mouse_button_callback);
-        // glfwSetCursorPosCallback(window, cursor_position_callback);
-        glfwSetKeyCallback(window, key_callback);
-        glfwSetCursorPosCallback(window, mouse_callback);
-        glfwSetScrollCallback(window, scroll_callback);
-
         this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
         this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
     }
 
-    void Update() {
-        GLfloat currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+    void Update(float delta) {
+        glm::mat4 view = camera->getViewMatrix();
+        glm::mat4 projection = camera->getProjectionMatrix();
 
-        cameraController->update(deltaTime);
+        cameraController->update(delta);
 
         if (mouseCamera) {
             cameraController->processMouse(lastOffsetX, lastOffsetY);
@@ -242,22 +225,15 @@ public:
             mouseScrollback = false;
             mouseScrollbackY = 0.0f;
         }
-
-        glm::mat4 model(1.0f);
-        glm::mat4 view(1.0f);
-        glm::mat4 projection(1.0f);
-
-        view = camera->getViewMatrix();
-        projection = camera->getProjectionMatrix();
  
-                // TODO: Move to the editor as debug flag
+        // TODO: Move to the editor as debug flag
         this->debugAxes->SetMVP(projection * view);
         this->debugAxes->Enable();
 
         this->debugFloorGrid->SetMVP(projection * view);
         this->debugFloorGrid->Enable();
 
-        render->RenderScene(scene, projection * view * model, camera->position);
+        render->RenderScene(scene, projection * view, camera->position);
     }
 
     void Shutdown() {

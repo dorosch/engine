@@ -74,7 +74,7 @@ namespace Engine {
              * continues updating user application and all managers. 
              */
 
-            logger->trace(std::string("run"));
+            float deltaTime = 0.0f, lastFrame = 0.0f;
 
             app->window->Create();
             app->editor->Startup(app);
@@ -91,12 +91,16 @@ namespace Engine {
             app->Run();
 
             while (app->window->IsOpen()) {
+                float currentFrame = glfwGetTime();
+                deltaTime = currentFrame - lastFrame;
+                lastFrame = currentFrame;
+
                 glfwPollEvents();
 
                 glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                app->Update();
+                app->Update(deltaTime);
                 app->editor->Update();
                 // TODO: Uncomment after move camera as part of scene
                 // app->render->RenderScene(app->scene);
