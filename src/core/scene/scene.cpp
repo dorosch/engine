@@ -5,44 +5,10 @@ using namespace Engine::Scene;
 
 Scene::Scene() {
     root = std::make_shared<Node>(std::string("root"));
+    environment = std::make_unique<Environment>();
 }
 
 
-// void Scene::Startup() {
-//     std::vector<std::unique_ptr<Node>> nodes;
-
-//     for (std::unique_ptr<Node> node : root->children) {
-//         nodes.push_back(node);
-//     }
-
-//     while (!nodes.empty()) {
-//         std::unique_ptr<Node> node = nodes.back();
-//         nodes.pop_back();
-
-//         for (std::unique_ptr<Node> child : node->children) {
-//             nodes.push_back(child);
-//         }
-
-//         // node->Run();
-//     }
-// }
-
-
-// void Scene::Update() {
-//     std::vector<std::unique_ptr<Node>> nodes;
-
-//     for (std::unique_ptr<Node> node : root->children) {
-//         nodes.push_back(node);
-//     }
-
-//     while (!nodes.empty()) {
-//         std::unique_ptr<Node> node = nodes.back();
-//         nodes.pop_back();
-
-//         for (std::unique_ptr<Node> child : node->children) {
-//             nodes.push_back(child);
-//         }
-
-//         node->Draw();
-//     }
-// }
+void Scene::startup() {
+    environment->startup();
+}

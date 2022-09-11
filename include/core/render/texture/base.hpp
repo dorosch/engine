@@ -7,7 +7,6 @@
 #include <GL/glew.h>
 
 #include "tools/logger.hpp"
-#include "core/render/api.hpp"
 
 
 namespace Engine {

@@ -87,6 +87,7 @@ namespace Engine {
             glEnable(GL_MULTISAMPLE);
 
             app->render->Startup();
+            app->scene->startup();
             app->Run();
 
             while (app->window->IsOpen()) {

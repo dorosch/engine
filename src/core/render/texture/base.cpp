@@ -5,11 +5,14 @@ using namespace Engine::Render;
 
 
 Texture *Texture::GetInstance() {
-    switch (Render::GetInstance()->GetBackendAPI()) {
-        case Backend::OPENGL:
-            return new OpenglTexture();
-            break;
-        default:
-            throw std::logic_error("Texture - unsopported backend API");
-    }
+    return new OpenglTexture();
+
+    // TODO: Need to have static render backend
+    // switch (Render::GetInstance()->GetBackendAPI()) {
+    //     case Backend::OPENGL:
+    //         return new OpenglTexture();
+    //         break;
+    //     default:
+    //         throw std::logic_error("Texture - unsopported backend API");
+    // }
 }

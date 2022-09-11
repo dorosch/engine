@@ -25,11 +25,13 @@ std::string ShaderProgram::ReadShaderFile(std::filesystem::path path) {
 
 
 ShaderProgram *ShaderProgram::GetInstance() {
-    switch (Render::GetInstance()->GetBackendAPI()) {
-        case Backend::OPENGL:
-            return new OpenglShaderProgram();
-            break;
-        default:
-            throw std::logic_error("ShaderProgram - unsopported backend API");
-    }
+    return new OpenglShaderProgram();
+
+    // switch (Render::GetInstance()->GetBackendAPI()) {
+    //     case Backend::OPENGL:
+    //         return new OpenglShaderProgram();
+    //         break;
+    //     default:
+    //         throw std::logic_error("ShaderProgram - unsopported backend API");
+    // }
 }

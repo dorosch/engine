@@ -8,6 +8,7 @@
 #include "tools/logger.hpp"
 #include "core/render/shader/base.hpp"
 #include "core/render/shader/opengl.hpp"
+#include "core/graphics/lighting/base.hpp"
 #include "core/scene/scene.hpp"
 
 using namespace Tool::Logger;

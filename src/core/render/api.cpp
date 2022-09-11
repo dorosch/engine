@@ -1,7 +1,5 @@
 #include "core/render/api.hpp"
 
-#include <iostream>
-
 using namespace Engine::Render;
 
 
@@ -78,6 +76,8 @@ void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP, glm::vec3 c
         glDrawArrays(GL_TRIANGLES, 0, lighting->mesh->vertices.size() / 6);
         lighting->mesh->VAO->unbind();
     }
+
+    scene->environment->skybox->update(MVP);
 }
 
 

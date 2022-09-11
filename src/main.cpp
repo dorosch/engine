@@ -27,7 +27,6 @@
 #include "tools/logger.hpp"
 #include "tools/debug/axes/base.hpp"
 #include "tools/debug/grid/base.hpp"
-#include "core/render/api.hpp"
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 #include "core/render/texture/base.hpp"
@@ -54,7 +53,8 @@ float mouseScrollbackY = 0.0f;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-GLuint screenWidth = 1920, screenHeight = 1080;
+GLuint screenWidth = 1920;
+GLuint screenHeight = 1080;
 
 
 class CameraController {
@@ -185,13 +185,13 @@ void window_size_callback(GLFWwindow* window, int width, int height) {
 
 class UserApplication : public Engine::EngineApplication {
 public:
-    std::unique_ptr<Engine::Render::VertexArray> skyboxVAO;
-    std::unique_ptr<Engine::Render::VertexBuffer> skyboxVBO;
-    Engine::Render::ShaderProgram *skyboxShader = nullptr;
+    // Engine::Render::Cubemap *cubemap;
+    // Engine::Render::ShaderProgram *skyboxShader = nullptr;
+    // std::unique_ptr<Engine::Render::VertexArray> skyboxVAO;
+    // std::unique_ptr<Engine::Render::VertexBuffer> skyboxVBO;
 
     Tool::Debug::DebugAxes *debugAxes = nullptr;
     Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
-    Engine::Render::Cubemap *cubemap;
 
     std::unique_ptr<Engine::Graphics::Camera::Camera> camera;
     std::unique_ptr<CameraController> cameraController;
@@ -205,6 +205,8 @@ public:
     }
 
     void Run() {
+        glfwSetWindowSizeCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, window_size_callback);
+
         // TODO: Need custom event system because events need for application and editor
         // bd->PrevUserCallbackWindowFocus = glfwSetWindowFocusCallback(window, ImGui_ImplGlfw_WindowFocusCallback);
         // bd->PrevUserCallbackCursorEnter = glfwSetCursorEnterCallback(window, ImGui_ImplGlfw_CursorEnterCallback);
@@ -215,87 +217,85 @@ public:
         // bd->PrevUserCallbackChar = glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
         // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
 
-        glfwSetWindowSizeCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, window_size_callback);
-
         // Camera and controller setup
         camera = std::make_unique<Engine::Graphics::Camera::Camera>();
         cameraController = std::make_unique<CameraController>(camera.get());
 
-        std::filesystem::path cwd = std::filesystem::current_path();
+        // std::filesystem::path cwd = std::filesystem::current_path();
 
-        this->skyboxShader = Engine::Render::ShaderProgram::GetInstance();
-        this->skyboxShader->Build(
-            cwd / "resources" / "shaders" / "skybox" / "shader.vert",
-            cwd / "resources" / "shaders" / "skybox" / "shader.frag"
-        );
+        // this->skyboxShader = Engine::Render::ShaderProgram::GetInstance();
+        // this->skyboxShader->Build(
+        //     cwd / "resources" / "shaders" / "skybox" / "shader.vert",
+        //     cwd / "resources" / "shaders" / "skybox" / "shader.frag"
+        // );
         
-        float skyboxVertices[] = {
-            // positions          
-            -1000.0f,  1000.0f, -1000.0f,
-            -1000.0f, -1000.0f, -1000.0f,
-             1000.0f, -1000.0f, -1000.0f,
-             1000.0f, -1000.0f, -1000.0f,
-             1000.0f,  1000.0f, -1000.0f,
-            -1000.0f,  1000.0f, -1000.0f,
+        // float skyboxVertices[] = {
+        //     // positions          
+        //     -1000.0f,  1000.0f, -1000.0f,
+        //     -1000.0f, -1000.0f, -1000.0f,
+        //      1000.0f, -1000.0f, -1000.0f,
+        //      1000.0f, -1000.0f, -1000.0f,
+        //      1000.0f,  1000.0f, -1000.0f,
+        //     -1000.0f,  1000.0f, -1000.0f,
 
-            -1000.0f, -1000.0f,  1000.0f,
-            -1000.0f, -1000.0f, -1000.0f,
-            -1000.0f,  1000.0f, -1000.0f,
-            -1000.0f,  1000.0f, -1000.0f,
-            -1000.0f,  1000.0f,  1000.0f,
-            -1000.0f, -1000.0f,  1000.0f,
+        //     -1000.0f, -1000.0f,  1000.0f,
+        //     -1000.0f, -1000.0f, -1000.0f,
+        //     -1000.0f,  1000.0f, -1000.0f,
+        //     -1000.0f,  1000.0f, -1000.0f,
+        //     -1000.0f,  1000.0f,  1000.0f,
+        //     -1000.0f, -1000.0f,  1000.0f,
 
-             1000.0f, -1000.0f, -1000.0f,
-             1000.0f, -1000.0f,  1000.0f,
-             1000.0f,  1000.0f,  1000.0f,
-             1000.0f,  1000.0f,  1000.0f,
-             1000.0f,  1000.0f, -1000.0f,
-             1000.0f, -1000.0f, -1000.0f,
+        //      1000.0f, -1000.0f, -1000.0f,
+        //      1000.0f, -1000.0f,  1000.0f,
+        //      1000.0f,  1000.0f,  1000.0f,
+        //      1000.0f,  1000.0f,  1000.0f,
+        //      1000.0f,  1000.0f, -1000.0f,
+        //      1000.0f, -1000.0f, -1000.0f,
 
-            -1000.0f, -1000.0f,  1000.0f,
-            -1000.0f,  1000.0f,  1000.0f,
-             1000.0f,  1000.0f,  1000.0f,
-             1000.0f,  1000.0f,  1000.0f,
-             1000.0f, -1000.0f,  1000.0f,
-            -1000.0f, -1000.0f,  1000.0f,
+        //     -1000.0f, -1000.0f,  1000.0f,
+        //     -1000.0f,  1000.0f,  1000.0f,
+        //      1000.0f,  1000.0f,  1000.0f,
+        //      1000.0f,  1000.0f,  1000.0f,
+        //      1000.0f, -1000.0f,  1000.0f,
+        //     -1000.0f, -1000.0f,  1000.0f,
 
-            -1000.0f,  1000.0f, -1000.0f,
-             1000.0f,  1000.0f, -1000.0f,
-             1000.0f,  1000.0f,  1000.0f,
-             1000.0f,  1000.0f,  1000.0f,
-            -1000.0f,  1000.0f,  1000.0f,
-            -1000.0f,  1000.0f, -1000.0f,
+        //     -1000.0f,  1000.0f, -1000.0f,
+        //      1000.0f,  1000.0f, -1000.0f,
+        //      1000.0f,  1000.0f,  1000.0f,
+        //      1000.0f,  1000.0f,  1000.0f,
+        //     -1000.0f,  1000.0f,  1000.0f,
+        //     -1000.0f,  1000.0f, -1000.0f,
 
-            -1000.0f, -1000.0f, -1000.0f,
-            -1000.0f, -1000.0f,  1000.0f,
-             1000.0f, -1000.0f, -1000.0f,
-             1000.0f, -1000.0f, -1000.0f,
-            -1000.0f, -1000.0f,  1000.0f,
-             1000.0f, -1000.0f,  1000.0f
-        };
-        std::vector<std::filesystem::path> faces = {
-            cwd / "resources" / "textures" / "skybox" / "default" / "right.jpg",
-            cwd / "resources" / "textures" / "skybox" / "default" / "left.jpg",
-            cwd / "resources" / "textures" / "skybox" / "default" / "top.jpg",
-            cwd / "resources" / "textures" / "skybox" / "default" / "bottom.jpg",
-            cwd / "resources" / "textures" / "skybox" / "default" / "front.jpg",
-            cwd / "resources" / "textures" / "skybox" / "default" / "back.jpg"
-        };
-        cubemap = Engine::Render::Cubemap::GetInstance();
-        cubemap->Build(faces);
+        //     -1000.0f, -1000.0f, -1000.0f,
+        //     -1000.0f, -1000.0f,  1000.0f,
+        //      1000.0f, -1000.0f, -1000.0f,
+        //      1000.0f, -1000.0f, -1000.0f,
+        //     -1000.0f, -1000.0f,  1000.0f,
+        //      1000.0f, -1000.0f,  1000.0f
+        // };
+        // std::vector<std::filesystem::path> faces = {
+        //     cwd / "resources" / "textures" / "skybox" / "default" / "right.jpg",
+        //     cwd / "resources" / "textures" / "skybox" / "default" / "left.jpg",
+        //     cwd / "resources" / "textures" / "skybox" / "default" / "top.jpg",
+        //     cwd / "resources" / "textures" / "skybox" / "default" / "bottom.jpg",
+        //     cwd / "resources" / "textures" / "skybox" / "default" / "front.jpg",
+        //     cwd / "resources" / "textures" / "skybox" / "default" / "back.jpg"
+        // };
+        // cubemap = Engine::Render::Cubemap::GetInstance();
+        // cubemap->Build(faces);
 
-        // Bind skybox
-        this->skyboxVAO = Engine::Render::VertexArray::GetInstance();
-        this->skyboxVBO = Engine::Render::VertexBuffer::GetInstance();
+        // // Bind skybox
+        // this->skyboxVAO = Engine::Render::VertexArray::GetInstance();
+        // this->skyboxVBO = Engine::Render::VertexBuffer::GetInstance();
 
-        this->skyboxVAO->bind();
-        this->skyboxVBO->bind(skyboxVertices, sizeof(skyboxVertices));
+        // this->skyboxVAO->bind();
+        // this->skyboxVBO->bind(skyboxVertices, sizeof(skyboxVertices));
     
-        this->skyboxVAO->layout(3, 3 * sizeof(float), 0);
+        // this->skyboxVAO->layout(3, 3 * sizeof(float), 0);
 
-        this->skyboxVBO->unbind();
-        this->skyboxVAO->unbind();
-        // End skybox
+        // this->skyboxVBO->unbind();
+        // this->skyboxVAO->unbind();
+        // // End skybox
 
         // Add geometry primitives to the scene
         std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
@@ -360,28 +360,28 @@ public:
  
         render->RenderScene(scene, projection * view * model, camera->position);
 
-        // Draw skybox
-        glDepthFunc(GL_LEQUAL);
-        skyboxShader->Use();
-        this->skyboxShader->UniformMatrix("view", view);
-        this->skyboxShader->UniformMatrix("projection", projection);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->object);
+        // // Draw skybox
+        // glDepthFunc(GL_LEQUAL);
+        // skyboxShader->Use();
+        // this->skyboxShader->UniformMatrix("view", view);
+        // this->skyboxShader->UniformMatrix("projection", projection);
+        // glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->object);
 
-        this->skyboxVAO->bind();
+        // this->skyboxVAO->bind();
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        this->skyboxVAO->unbind();
+        // this->skyboxVAO->unbind();
 
-        glDepthFunc(GL_LESS);
-        // End skybox
+        // glDepthFunc(GL_LESS);
+        // // End skybox
 
         // TODO: Move to the editor as debug flag
-        this->debugAxes->SetMVP(projection * view);
-        this->debugAxes->Enable();
+        // this->debugAxes->SetMVP(projection * view);
+        // this->debugAxes->Enable();
 
-        this->debugFloorGrid->SetMVP(projection * view);
-        this->debugFloorGrid->Enable();
+        // this->debugFloorGrid->SetMVP(projection * view);
+        // this->debugFloorGrid->Enable();
     }
 
     void Shutdown() {

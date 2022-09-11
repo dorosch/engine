@@ -5,11 +5,14 @@ using namespace Engine::Render;
 
 
 Cubemap *Cubemap::GetInstance() {
-    switch (Render::GetInstance()->GetBackendAPI()) {
-        case Backend::OPENGL:
-            return new OpenglCubemap();
-            break;
-        default:
-            throw std::logic_error("Cubemap - unsopported backend API");
-    }
+    return new OpenglCubemap();
+
+    // TODO: Need to have static render backend
+    // switch (Render::GetInstance()->GetBackendAPI()) {
+    //     case Backend::OPENGL:
+    //         return new OpenglCubemap();
+    //         break;
+    //     default:
+    //         throw std::logic_error("Cubemap - unsopported backend API");
+    // }
 }
