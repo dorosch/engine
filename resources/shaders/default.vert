@@ -17,6 +17,7 @@ void main() {
         position.z + transform_position.z
     );
     FragPos = new_position;
+    // TODO: Need to transpose and inverse model matrix for scaling
     Normal = normal;
     gl_Position = MVP * vec4(new_position, 1.0f);
 }

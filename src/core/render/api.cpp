@@ -50,13 +50,13 @@ void Render::Shutdown() {
 }
 
 
-void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP) {
+void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP, glm::vec3 cameraPosition) {
     // TODO: Only for opengl backend
 
     std::shared_ptr<Graphics::Lighting::Light> lighting = scene->lighting[0];
 
     for (std::shared_ptr<Object> object : scene->root->entities) {
-        RenderObject(object.get(), MVP, lighting.get());
+        RenderObject(object.get(), MVP, cameraPosition, lighting.get());
     }
 
     // for (std::shared_ptr<Graphics::Lighting::Light> light : scene->lighting) {
@@ -81,7 +81,7 @@ void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP) {
 }
 
 
-void Render::RenderObject(Object *object, glm::mat4 MVP, Graphics::Lighting::Light *lighting) {
+void Render::RenderObject(Object *object, glm::mat4 MVP, glm::vec3 cameraPosition, Graphics::Lighting::Light *lighting) {
     if (object->HasComponent(Ecs::Component::Type::MESH)) {
         // TODO: If object hasn't own shader component
         shader->Use();
@@ -103,6 +103,12 @@ void Render::RenderObject(Object *object, glm::mat4 MVP, Graphics::Lighting::Lig
             lighting->transform->position[0],
             lighting->transform->position[1],
             lighting->transform->position[2]
+        );
+        shader->UniformPosition(
+            "viewPosition",
+            cameraPosition.x,
+            cameraPosition.y,
+            cameraPosition.z
         );
 
         object->mesh->VAO->bind();

@@ -35,8 +35,8 @@ namespace Engine {
             void SetBackendAPI(Backend);
             void Startup();
             void Shutdown();
-            void RenderScene(Engine::Scene::Scene *, glm::mat4);
-            void RenderObject(Engine::Object *, glm::mat4, Graphics::Lighting::Light *);
+            void RenderScene(Engine::Scene::Scene *, glm::mat4, glm::vec3);
+            void RenderObject(Engine::Object *, glm::mat4, glm::vec3, Graphics::Lighting::Light *);
         };
     }
 }

@@ -486,7 +486,7 @@ public:
         view = camera.GetViewMatrix();
         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
 
-        render->RenderScene(scene, projection * view);
+        render->RenderScene(scene, projection * view, camera.Position);
 
         // Draw skybox
         glDepthFunc(GL_LEQUAL);
