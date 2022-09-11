@@ -39,156 +39,91 @@
 #include "core/event/observer.hpp"
 #include "core/geometry/primitives.hpp"
 #include "core/graphics/lighting/base.hpp"
+#include "core/graphics/cameras/camera.hpp"
 
 
-namespace Engine {
-    using namespace Tool::Logger;
-
-
-    namespace Scene {
-        enum CameraDirection {
-            FORWARD,
-            BACKWARD,
-            LEFT,
-            RIGHT
-        };
-
-
-        class Camera {};
-
-
-        class OpenglCamera : public Camera {
-        public:
-            glm::vec3 Position;
-            glm::vec3 Front;
-            glm::vec3 Up;
-            glm::vec3 Right;
-            glm::vec3 WorldUp;
-    
-            // Eular Angles
-            GLfloat Yaw;
-            GLfloat Pitch;
-    
-            // Camera options
-            GLfloat MovementSpeed;
-            GLfloat MouseSensitivity;
-            GLfloat Zoom;
-
-            OpenglCamera() {
-                this->Position = glm::vec3(5.0f, 5.0f, 5.0f);
-                this->WorldUp = glm::vec3(0.0f, 5.0f, 0.0f);
-                this->Yaw = -90.0f;
-                this->Pitch = 0.0f;
-                this->MovementSpeed = 10.0f;
-                this->MouseSensitivity = 0.25f;
-                this->Zoom = 60.0f;
-
-                this->updateCameraVectors();
-            }
-
-            virtual ~OpenglCamera() {}
-
-            glm::mat4 GetViewMatrix() {
-                return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
-            }
-
-            void ProcessKeyboard(CameraDirection direction, GLfloat deltaTime) {
-                GLfloat velocity = this->MovementSpeed * deltaTime;
-        
-                if (direction == FORWARD)
-                    this->Position += this->Front * velocity;
-                if (direction == BACKWARD)
-                    this->Position -= this->Front * velocity;
-                if (direction == LEFT)
-                    this->Position -= this->Right * velocity;
-                if (direction == RIGHT)
-                    this->Position += this->Right * velocity;
-            }
-
-            void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true) {
-                xoffset *= this->MouseSensitivity;
-                yoffset *= this->MouseSensitivity;
-
-                this->Yaw   += xoffset;
-                this->Pitch += yoffset;
-
-                // Make sure that when pitch is out of bounds, screen doesn't get flipped
-                if (constrainPitch) {
-                    if (this->Pitch > 89.0f)
-                        this->Pitch = 89.0f;
-                    if (this->Pitch < -89.0f)
-                        this->Pitch = -89.0f;
-                }
-
-                // Update Front, Right and Up Vectors using the updated Eular angles
-                this->updateCameraVectors();
-            }
-
-            // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-            void ProcessMouseScroll(GLfloat yoffset) {
-                if (this->Zoom >= 1.0f && this->Zoom <= 45.0f)
-                    this->Zoom -= yoffset;
-                if (this->Zoom <= 1.0f)
-                    this->Zoom = 1.0f;
-                if (this->Zoom >= 45.0f)
-                    this->Zoom = 45.0f;
-            }
-
-            void updateCameraVectors() {
-                // Calculate the new Front vector
-                glm::vec3 front;
-                front.x = cos(glm::radians(this->Yaw)) * cos(glm::radians(this->Pitch));
-                front.y = sin(glm::radians(this->Pitch));
-                front.z = sin(glm::radians(this->Yaw)) * cos(glm::radians(this->Pitch));
-                this->Front = glm::normalize(front);
-
-                // Also re-calculate the Right and Up vector
-                this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));
-                this->Up = glm::normalize(glm::cross(this->Right, this->Front));
-            }
-        };
-    }
-}
-
-
-// ***************************************************************************************
-// ************************************* APPLICATION *************************************
-// ***************************************************************************************
-
-
-Engine::Scene::OpenglCamera camera;
 bool keys[1024];
-GLfloat lastX = 400, lastY = 300;
-bool firstMouse = true;
 bool mouseCamera = false;
+bool mouseScrollback = false;
 
-GLfloat deltaTime = 0.0f;
-GLfloat lastFrame = 0.0f;
+float lastX = 0;
+float lastY = 0;
+float lastOffsetX = 0.0f;
+float lastOffsetY = 0.0f;
+float mouseScrollbackY = 0.0f;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 GLuint screenWidth = 1920, screenHeight = 1080;
 
 
-// Moves/alters the camera positions based on user input
-void Do_Movement() {
-    // Camera controls
-    if(keys[GLFW_KEY_W])
-        camera.ProcessKeyboard(Engine::Scene::CameraDirection::FORWARD, deltaTime);
-    if(keys[GLFW_KEY_S])
-        camera.ProcessKeyboard(Engine::Scene::CameraDirection::BACKWARD, deltaTime);
-    if(keys[GLFW_KEY_A])
-        camera.ProcessKeyboard(Engine::Scene::CameraDirection::LEFT, deltaTime);
-    if(keys[GLFW_KEY_D])
-        camera.ProcessKeyboard(Engine::Scene::CameraDirection::RIGHT, deltaTime);
-}
+class CameraController {
+public:
+    Engine::Graphics::Camera::Camera *camera = nullptr;
 
-// Is called whenever a key is pressed/released via GLFW
+    CameraController(Engine::Graphics::Camera::Camera *targetCamera) {
+        camera = targetCamera;
+    }
+
+    void update(float delta) {
+        float velocity = camera->speed * delta;
+
+        if(keys[GLFW_KEY_W]) {
+            camera->position += camera->front * velocity;
+        }
+        else if(keys[GLFW_KEY_S]) {
+            camera->position -= camera->front * velocity;
+        }
+        else if(keys[GLFW_KEY_A]) {
+            camera->position -= camera->right * velocity;
+        }
+        else if(keys[GLFW_KEY_D]) {
+            camera->position += camera->right * velocity;
+        }
+    }
+
+    void processMouse(float x, float y) {
+        x *= camera->sensitivity;
+        y *= camera->sensitivity;
+
+        camera->yaw += x;
+        camera->pitch += y;
+
+        if (camera->pitch > 89.0f) {
+            camera->pitch = 89.0f;
+        }
+
+        if (camera->pitch < -89.0f) {
+            camera->pitch = -89.0f;
+        }
+
+        camera->updateVectors();
+    }
+
+    void processMouseScroll(float y) {
+        if (1.0f <= camera->zoom && camera->zoom <= 45.0f) {
+            camera->zoom -= y;
+        }
+
+        if (camera->zoom < 1.0f) {
+            camera->zoom = 1.0f;
+        }
+
+        if (camera->zoom > 45.0f) {
+            camera->zoom = 45.0f;
+        }
+    }
+};
+
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mode);
 
-    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GL_TRUE);
-    if (key >= 0 && key < 1024)
-    {
+    }
+
+    if (key >= 0 && key < 1024) {
         if(action == GLFW_PRESS)
             keys[key] = true;
         else if(action == GLFW_RELEASE)
@@ -196,9 +131,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
-static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
-
-}
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
@@ -207,8 +139,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
     // For keyboard io.WantCaptureKeyboard
     if (io.WantCaptureMouse == false) {
-
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            lastOffsetX = 0;
+            lastOffsetY = 0;
+
             mouseCamera = true;
         }
         else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
@@ -223,21 +157,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     ImGuiIO& io = ImGui::GetIO();
 
     if (io.WantCaptureMouse == false) {
-        if(firstMouse) {
-            lastX = xpos;
-            lastY = ypos;
-            firstMouse = false;
-        }
-
-        GLfloat xoffset = xpos - lastX;
-        GLfloat yoffset = lastY - ypos;
+        lastOffsetX = xpos - lastX;
+        lastOffsetY = lastY - ypos;
     
         lastX = xpos;
         lastY = ypos;
-
-        if (mouseCamera) {
-            camera.ProcessMouseMovement(xoffset, yoffset);
-        }
     }
 }	
 
@@ -248,84 +172,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     ImGuiIO& io = ImGui::GetIO();
 
     if (io.WantCaptureMouse == false) {
-        camera.ProcessMouseScroll(yoffset);
+        mouseScrollback = true;
+        mouseScrollbackY = yoffset;
     }
 }
 
-
-// class Tank : public Engine::Scene::Entity {
-// public:
-//     Engine::Render::VertexArray *modelVAO = nullptr;
-//     Engine::Render::VertexBuffer *modelVBO = nullptr;
-//     Engine::Render::ShaderProgram *shaderModel = nullptr;
-//     Engine::Render::Texture *modelTexture = nullptr;
-//     Tool::ObjModel *model = nullptr;
-
-//     Tank(std::string name) : Engine::Scene::Entity(name) {}
-
-//     void Run() {
-//         std::filesystem::path cwd = std::filesystem::current_path();
-
-//         this->model = new Tool::ObjModel(cwd / "resources" / "models" / "T-90A" / "T-90A.obj");
-//         model->Load();
-
-//         this->shaderModel = Engine::Render::ShaderProgram::GetInstance();
-//         this->shaderModel->Build(
-//             cwd / "resources" / "shaders" / "model.vert",
-//             cwd / "resources" / "shaders" / "model.frag"
-//         );
-
-//         this->modelTexture = Engine::Render::Texture::GetInstance();
-//         this->modelTexture->Build(
-//             cwd / "resources" / "models" / "T-90A" / "textures" / "8eca739b.jpg"
-//         );
-
-//         std::vector<float> data = this->model->Data();
-
-//         // Draw model
-//         this->modelVAO = Engine::Render::VertexArray::GetInstance();
-//         this->modelVBO = Engine::Render::VertexBuffer::GetInstance();
-
-//         this->modelVAO->bind();
-//         this->modelVBO->bind(data.data(), data.size() * sizeof(float));
-
-//         this->modelVAO->layout(3, 5 * sizeof(GLfloat), 0);
-//         this->modelVAO->layout(2, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
-
-//         this->modelVBO->unbind();
-//         this->modelVAO->unbind();
-//         // End draw model
-//     }
-
-//     void Draw() {
-//         glm::mat4 view(1.0f);
-//         glm::mat4 model(1.0f);
-//         glm::mat4 projection(1.0f);
-
-//         view = camera.GetViewMatrix();
-//         projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
-
-//         // Draw model
-//         this->shaderModel->Use();
-//         this->shaderModel->UniformMatrix("model", model);
-//         this->shaderModel->UniformMatrix("view", view);
-//         this->shaderModel->UniformMatrix("projection", projection);
-
-//         this->modelTexture->Bind();
-
-//         this->modelVAO->bind();
-
-//         glDrawArrays(GL_TRIANGLES, 0, this->model->vertices.size());
-
-//         this->modelVAO->unbind();
-//         // End draw model
-//     }
-// };
-
-
-void callback() {
-    std::cout << "Callback event" << std::endl;
-}
 
 void window_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -341,6 +192,9 @@ public:
     Tool::Debug::DebugAxes *debugAxes = nullptr;
     Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
     Engine::Render::Cubemap *cubemap;
+
+    std::unique_ptr<Engine::Graphics::Camera::Camera> camera;
+    std::unique_ptr<CameraController> cameraController;
 
     void Startup() {
         logger->trace(std::string("Startup"));
@@ -362,6 +216,10 @@ public:
         // bd->PrevUserCallbackMonitor = glfwSetMonitorCallback(ImGui_ImplGlfw_MonitorCallback);
 
         glfwSetWindowSizeCallback(static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object, window_size_callback);
+
+        // Camera and controller setup
+        camera = std::make_unique<Engine::Graphics::Camera::Camera>();
+        cameraController = std::make_unique<CameraController>(camera.get());
 
         std::filesystem::path cwd = std::filesystem::current_path();
 
@@ -463,7 +321,7 @@ public:
 
         GLFWwindow *window = static_cast<Engine::Window::GLFWWindowProvider*>(this->window)->object;
         glfwSetMouseButtonCallback(window, mouse_button_callback);
-        glfwSetCursorPosCallback(window, cursor_position_callback);
+        // glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetKeyCallback(window, key_callback);
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
@@ -473,20 +331,34 @@ public:
     }
 
     void Update() {
-        Do_Movement();
-
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        cameraController->update(deltaTime);
+
+        if (mouseCamera) {
+            cameraController->processMouse(lastOffsetX, lastOffsetY);
+
+            lastOffsetX = 0.0f;
+            lastOffsetY = 0.0f;
+        }
+
+        if (mouseScrollback) {
+            cameraController->processMouseScroll(mouseScrollbackY);
+
+            mouseScrollback = false;
+            mouseScrollbackY = 0.0f;
+        }
 
         glm::mat4 model(1.0f);
         glm::mat4 view(1.0f);
         glm::mat4 projection(1.0f);
 
-        view = camera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth/(float)screenHeight, 0.1f, 1000.0f);
-
-        render->RenderScene(scene, projection * view, camera.Position);
+        view = camera->getViewMatrix();
+        projection = camera->getProjectionMatrix();
+ 
+        render->RenderScene(scene, projection * view * model, camera->position);
 
         // Draw skybox
         glDepthFunc(GL_LEQUAL);
