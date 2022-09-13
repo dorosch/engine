@@ -106,30 +106,25 @@ namespace Engine {
             ImGui::End();
 
             // Demo window for see examples of widgets
-            ImGui::ShowDemoWindow(&closed);
+            // ImGui::ShowDemoWindow(&closed);
 
             ImGui::Begin("Object properties", &closed);
                 if (selectedEntity != nullptr) {
                     if (selectedEntity->HasComponent(Ecs::Component::Type::TRANSFORM)) {
                         if (ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen)) {
-                            if (ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -10.0, 10.0)) {
-
-                            }
-
-                            if (ImGui::SliderFloat3("rotation", &selectedEntity->transform->rotation[0], -1.0, 1.0)) {
-
-                            }
-
-                            if (ImGui::SliderFloat3("scale", &selectedEntity->transform->scale[0], -1.0, 1.0)) {
-
-                            }
-                        }
-                          
+                            ImGui::SliderFloat3("position", &selectedEntity->transform->position[0], -10.0, 10.0);
+                            ImGui::SliderFloat3("rotation", &selectedEntity->transform->rotation[0], -1.0, 1.0);
+                            ImGui::SliderFloat3("scale", &selectedEntity->transform->scale[0], -1.0, 1.0);
+                        }                          
                     }
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::MATERIAL)) {
                         if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_None)) {
-                            ImGui::Text("Material component");
+                            ImGui::SliderFloat("shininess", &selectedEntity->material->shininess, 0.1, 256.0);
+                            ImGui::ColorEdit3("color", &selectedEntity->material->color[0]);
+                            ImGui::SliderFloat3("ambient", &selectedEntity->material->ambient[0], 0.0, 1.0);
+                            ImGui::SliderFloat3("diffuse", &selectedEntity->material->diffuse[0], 0.0, 1.0);
+                            ImGui::SliderFloat3("specular", &selectedEntity->material->specular[0], 0.0, 1.0);
                         }
                     }
 
@@ -141,8 +136,11 @@ namespace Engine {
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::LIGHT)) {
                         if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_None)) {
-                            ImGui::ColorEdit3("color", &selectedEntity->light->color[0]);
                             ImGui::SliderFloat("intensity", &selectedEntity->light->intensity, 0, 1.0);
+                            ImGui::ColorEdit3("color", &selectedEntity->light->color[0]);
+                            ImGui::SliderFloat3("ambient", &selectedEntity->light->ambient[0], 0.0, 1.0);
+                            ImGui::SliderFloat3("diffuse", &selectedEntity->light->diffuse[0], 0.0, 1.0);
+                            ImGui::SliderFloat3("specular", &selectedEntity->light->specular[0], 0.0, 1.0);
                         }
                     }
                 }

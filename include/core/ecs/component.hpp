@@ -41,12 +41,19 @@ namespace Engine {
             class Material : public Component {
             public:
                 Type type = Type::MATERIAL;
+
+                float shininess = 10;
+                glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+                glm::vec3 ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+                glm::vec3 diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
+                glm::vec3 specular = glm::vec3(0.0f, 0.0f, 0.0f);
             };
 
 
             class Mesh : public Component {
             public:
                 Type type = Type::MESH;
+
                 std::vector<float> vertices;
                 std::unique_ptr<Render::VertexArray> VAO;
                 std::unique_ptr<Render::VertexBuffer> VBO;
@@ -65,6 +72,9 @@ namespace Engine {
 
                 float intensity = 1.0f;
                 glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+                glm::vec3 ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+                glm::vec3 diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+                glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
             };
         }
     }

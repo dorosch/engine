@@ -188,6 +188,12 @@ public:
         cube->transform->position = {-3.0f, 1.5f, 2.0f};
         cube2->transform->position = {2.5f, -0.5f, -3.0f};
 
+        cube->material = std::make_unique<Engine::Ecs::Component::Material>();
+        cube->material->ambient = glm::vec3(1.0f, 0.5f, 0.31f);
+        cube->material->diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+        cube->material->specular = glm::vec3(0.5f, 0.5f, 0.5f);
+        cube->material->shininess = 32.0f;
+
         scene->root->entities.push_back(plane);
         scene->root->entities.push_back(cube);
         scene->root->entities.push_back(cube2);

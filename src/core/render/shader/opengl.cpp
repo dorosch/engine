@@ -126,6 +126,12 @@ void OpenglShaderProgram::Use() {
 }
 
 
+void OpenglShaderProgram::UniformFloat(const char *attribute, float value) {
+    GLint variable = glGetUniformLocation(this->object, attribute);
+    glUniform1f(variable, value);
+}
+
+
 void OpenglShaderProgram::UniformColor(const char *attribute, float r, float g, float b) {
     GLint color = glGetUniformLocation(this->object, attribute);
     glUniform3f(color, r, g, b);

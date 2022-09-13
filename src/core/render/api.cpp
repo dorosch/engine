@@ -40,6 +40,12 @@ void Render::Startup() {
         cwd / "resources" / "shaders" / "graphics" / "lighting" / "lighting.vert",
         cwd / "resources" / "shaders" / "graphics" / "lighting" / "lighting.frag"
     );
+
+    materialShader = std::make_unique<OpenglShaderProgram>();
+    materialShader->Build(
+        cwd / "resources" / "shaders" / "default.vert",
+        cwd / "resources" / "shaders" / "material.frag"
+    );
 }
 
 
@@ -83,33 +89,130 @@ void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP, glm::vec3 c
 
 void Render::RenderObject(Object *object, glm::mat4 MVP, glm::vec3 cameraPosition, Graphics::Lighting::Light *lighting) {
     if (object->HasComponent(Ecs::Component::Type::MESH)) {
-        // TODO: If object hasn't own shader component
-        shader->Use();
-        shader->UniformPosition(
-            "transform_position",
-            object->transform->position[0],
-            object->transform->position[1],
-            object->transform->position[2]
-        );
-        shader->UniformMatrix("MVP", MVP);
-        shader->UniformPosition(
-            "lighting",
-            lighting->light->color[0],
-            lighting->light->color[1],
-            lighting->light->color[2]
-        );
-        shader->UniformPosition(
-            "lightingPosition",
-            lighting->transform->position[0],
-            lighting->transform->position[1],
-            lighting->transform->position[2]
-        );
-        shader->UniformPosition(
-            "viewPosition",
-            cameraPosition.x,
-            cameraPosition.y,
-            cameraPosition.z
-        );
+        if (object->HasComponent(Ecs::Component::Type::MATERIAL)) {
+            materialShader->Use();
+
+            materialShader->UniformPosition(
+                "transform_position",
+                object->transform->position[0],
+                object->transform->position[1],
+                object->transform->position[2]
+            );
+            materialShader->UniformMatrix("MVP", MVP);
+            materialShader->UniformPosition(
+                "viewPosition",
+                cameraPosition.x,
+                cameraPosition.y,
+                cameraPosition.z
+            );
+
+            materialShader->UniformPosition(
+                "light.position",
+                lighting->transform->position.x,
+                lighting->transform->position.y,
+                lighting->transform->position.z
+            );
+            materialShader->UniformPosition(
+                "light.color",
+                lighting->light->color.x,
+                lighting->light->color.y,
+                lighting->light->color.z
+            );
+            materialShader->UniformPosition(
+                "light.ambient",
+                lighting->light->ambient.x,
+                lighting->light->ambient.y,
+                lighting->light->ambient.z
+            );
+            materialShader->UniformPosition(
+                "light.diffuse",
+                lighting->light->diffuse.x,
+                lighting->light->diffuse.y,
+                lighting->light->diffuse.z
+            );
+            materialShader->UniformPosition(
+                "light.specular",
+                lighting->light->specular.x,
+                lighting->light->specular.y,
+                lighting->light->specular.z
+            );
+            materialShader->UniformFloat("light.intensity", lighting->light->intensity);
+
+            materialShader->UniformPosition(
+                "material.ambient",
+                object->material->ambient.x,
+                object->material->ambient.y,
+                object->material->ambient.z
+            );
+            materialShader->UniformPosition(
+                "material.diffuse",
+                object->material->diffuse.x,
+                object->material->diffuse.y,
+                object->material->diffuse.z
+            );
+            materialShader->UniformPosition(
+                "material.specular",
+                object->material->specular.x,
+                object->material->specular.y,
+                object->material->specular.z
+            );
+            materialShader->UniformPosition(
+                "material.color",
+                object->material->color.x,
+                object->material->color.y,
+                object->material->color.z
+            );
+            materialShader->UniformFloat("material.shininess", object->material->shininess);
+        }
+        else {
+            shader->Use();
+
+            shader->UniformPosition(
+                "transform_position",
+                object->transform->position[0],
+                object->transform->position[1],
+                object->transform->position[2]
+            );
+            shader->UniformMatrix("MVP", MVP);
+            shader->UniformPosition(
+                "viewPosition",
+                cameraPosition.x,
+                cameraPosition.y,
+                cameraPosition.z
+            );
+
+            shader->UniformPosition(
+                "light.position",
+                lighting->transform->position.x,
+                lighting->transform->position.y,
+                lighting->transform->position.z
+            );
+            shader->UniformPosition(
+                "light.color",
+                lighting->light->color.x,
+                lighting->light->color.y,
+                lighting->light->color.z
+            );
+            shader->UniformPosition(
+                "light.ambient",
+                lighting->light->ambient.x,
+                lighting->light->ambient.y,
+                lighting->light->ambient.z
+            );
+            shader->UniformPosition(
+                "light.diffuse",
+                lighting->light->diffuse.x,
+                lighting->light->diffuse.y,
+                lighting->light->diffuse.z
+            );
+            shader->UniformPosition(
+                "light.specular",
+                lighting->light->specular.x,
+                lighting->light->specular.y,
+                lighting->light->specular.z
+            );
+            shader->UniformFloat("light.intensity", lighting->light->intensity);
+        }
 
         object->mesh->VAO->bind();
         // TODO: Add calculation of the number of lines to the mesh method
