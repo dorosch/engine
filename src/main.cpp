@@ -185,8 +185,13 @@ public:
         std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
         std::shared_ptr<Engine::Geometry::Cube> cube2 = std::make_shared<Engine::Geometry::Cube>();
 
+        plane->transform->rotation = {0.0f, 1.0f, 1.0f};
+        plane->transform->scale = {20.0f, 20.0f, 1.0f};
+
         cube->transform->position = {-3.0f, 1.5f, 2.0f};
-        cube2->transform->position = {2.5f, -0.5f, -3.0f};
+        cube->transform->rotation = {0.0f, 1.0f, 1.0f};
+        cube2->transform->position = {2.5f, 1.5f, -3.0f};
+        cube2->transform->rotation = {0.0f, 1.0f, 1.0f};
 
         cube->material = std::make_unique<Engine::Ecs::Component::Material>();
         cube->material->ambient = glm::vec3(1.0f, 0.5f, 0.31f);
@@ -200,13 +205,17 @@ public:
         // End geometry primitives
 
         // Add sun to the scene
-        std::shared_ptr<Engine::Graphics::Lighting::DirectionalLight> sun = 
-            std::make_shared<Engine::Graphics::Lighting::DirectionalLight>();
+        std::shared_ptr<Engine::Graphics::Lighting::PointLight> sun = 
+            std::make_shared<Engine::Graphics::Lighting::PointLight>();
 
         sun->name = "Sun";
         sun->light->intensity = 2.0f;
+        sun->light->constant = 1.0f;
+        sun->light->linear = 0.045;
+        sun->light->quadratic = 0.0075;
         sun->light->direction = {3.0f, -3.0f, 1.0f};
         sun->transform->position = {-3.0f, 3.0f, -3.0f};
+        sun->transform->scale = {0.1f, 0.1f, 0.1f};
 
         scene->lighting.push_back(sun);
         // End sun light
@@ -242,7 +251,7 @@ public:
         this->debugFloorGrid->SetMVP(projection * view);
         this->debugFloorGrid->Enable();
 
-        render->RenderScene(scene, projection * view, camera->position);
+        render->RenderScene(scene, projection, view, camera->position);
     }
 
     void Shutdown() {

@@ -141,10 +141,10 @@ namespace Engine {
                                     ImGui::Text("type: directional");
                                     break;
                                 case Engine::Graphics::Lighting::Type::POINT:
-                                    ImGui::Text("type: directional");
+                                    ImGui::Text("type: point");
                                     break;
                                 case Engine::Graphics::Lighting::Type::SPOT:
-                                    ImGui::Text("type: directional");
+                                    ImGui::Text("type: spot");
                                     break;
                                 default:
                                     // TODO: Throw exception about unknown lighting type
@@ -157,8 +157,20 @@ namespace Engine {
                             ImGui::SliderFloat3("diffuse", &selectedEntity->light->diffuse[0], 0.0, 1.0);
                             ImGui::SliderFloat3("specular", &selectedEntity->light->specular[0], 0.0, 1.0);
 
-                            if (selectedEntity->light->lightType == Engine::Graphics::Lighting::Type::DIRECTIONAL) {
-                                ImGui::SliderFloat3("direction", &selectedEntity->light->direction[0], -10.0, 10.0);
+                            switch (selectedEntity->light->lightType) {
+                                case Engine::Graphics::Lighting::Type::DIRECTIONAL:
+                                    ImGui::SliderFloat3("direction", &selectedEntity->light->direction[0], -10.0, 10.0);
+                                    break;
+                                case Engine::Graphics::Lighting::Type::POINT:
+                                    ImGui::SliderFloat("constant", &selectedEntity->light->constant, 0, 1.0);
+                                    ImGui::SliderFloat("linear", &selectedEntity->light->linear, 0, 1.0);
+                                    ImGui::SliderFloat("quadratic", &selectedEntity->light->quadratic, 0, 1.0);
+                                    break;
+                                case Engine::Graphics::Lighting::Type::SPOT:
+                                    break;
+                                default:
+                                    // TODO: Throw exception about unknown lighting type
+                                    break;
                             }
                         }
                     }

@@ -55,41 +55,43 @@ void Render::Shutdown() {
 }
 
 
-void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 MVP, glm::vec3 cameraPosition) {
+void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 projection, glm::mat4 view, glm::vec3 cameraPosition) {
     // TODO: Only for opengl backend
 
     std::shared_ptr<Graphics::Lighting::Light> lighting = scene->lighting[0];
 
     for (std::shared_ptr<Object> object : scene->root->entities) {
-        RenderObject(object.get(), MVP, cameraPosition, lighting.get());
+        RenderObject(object.get(), projection, view, cameraPosition, lighting.get());
     }
-
-    // for (std::shared_ptr<Graphics::Lighting::Light> light : scene->lighting) {
-    //     RenderObject(object.get(), MVP);
-    // }
 
     if (lighting->HasComponent(Ecs::Component::Type::LIGHT)) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, lighting->transform->position);
+        model = glm::rotate(model, glm::radians(180.0f), lighting->transform->rotation);
+        model = glm::scale(model, lighting->transform->scale);
+
         lightingShader->Use();
-        lightingShader->UniformPosition(
-            "transform_position",
-            lighting->transform->position[0],
-            lighting->transform->position[1],
-            lighting->transform->position[2]
-        );
-        lightingShader->UniformMatrix("MVP", MVP);
+        lightingShader->UniformMatrix("model", model);
+        lightingShader->UniformMatrix("view", view);
+        lightingShader->UniformMatrix("projection", projection);
 
         // If the editor is enabled, then draw where the light source is
-        // lighting->mesh->VAO->bind();
-        // glDrawArrays(GL_TRIANGLES, 0, lighting->mesh->vertices.size() / 6);
-        // lighting->mesh->VAO->unbind();
+        lighting->mesh->VAO->bind();
+        glDrawArrays(GL_TRIANGLES, 0, lighting->mesh->vertices.size() / 6);
+        lighting->mesh->VAO->unbind();
     }
 
-    scene->environment->skybox->update(MVP);
+    scene->environment->skybox->update(projection * view);
 }
 
 
-void Render::RenderObject(Object *object, glm::mat4 MVP, glm::vec3 cameraPosition, Graphics::Lighting::Light *lighting) {
+void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, glm::vec3 cameraPosition, Graphics::Lighting::Light *lighting) {
     if (object->HasComponent(Ecs::Component::Type::MESH)) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, object->transform->position);
+        model = glm::rotate(model, glm::radians(180.0f), object->transform->rotation);
+        model = glm::scale(model, object->transform->scale);
+
         if (object->HasComponent(Ecs::Component::Type::MATERIAL)) {
             shader = materialShader.get();
         }
@@ -98,13 +100,11 @@ void Render::RenderObject(Object *object, glm::mat4 MVP, glm::vec3 cameraPositio
         }
 
         shader->Use();
-        shader->UniformPosition(
-            "transform_position",
-            object->transform->position[0],
-            object->transform->position[1],
-            object->transform->position[2]
-        );
-        shader->UniformMatrix("MVP", MVP);
+
+        shader->UniformMatrix("model", model);
+        shader->UniformMatrix("view", view);
+        shader->UniformMatrix("projection", projection);
+
         shader->UniformPosition(
             "viewPosition",
             cameraPosition.x,
@@ -114,9 +114,9 @@ void Render::RenderObject(Object *object, glm::mat4 MVP, glm::vec3 cameraPositio
 
         shader->UniformPosition(
             "light.position",
-            object->transform->position.x,
-            object->transform->position.y,
-            object->transform->position.z
+            lighting->transform->position.x,
+            lighting->transform->position.y,
+            lighting->transform->position.z
         );
         shader->UniformPosition(
             "light.color",
@@ -152,6 +152,12 @@ void Render::RenderObject(Object *object, glm::mat4 MVP, glm::vec3 cameraPositio
                 lighting->light->direction.z
             );
             shader->UniformInt("light.isDirection", 1);
+        }
+        else if (lighting->light->lightType == Graphics::Lighting::Type::POINT) {
+            shader->UniformFloat("light.constant", lighting->light->constant);
+            shader->UniformFloat("light.linear", lighting->light->linear);
+            shader->UniformFloat("light.quadratic", lighting->light->quadratic);
+            shader->UniformInt("light.isPoint", 1);
         }
 
         if (object->HasComponent(Ecs::Component::Type::MATERIAL)) {
