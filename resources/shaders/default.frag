@@ -38,6 +38,7 @@ vec3 calculateSpotLight();
 
 void main() {
 	vec3 result;
+	vec3 defaultColor = vec3(0.66f);
 	vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPosition - FragPos);
 
@@ -51,7 +52,7 @@ void main() {
 		result = calculateSpotLight();
 	}
 
-	color = vec4(result * light.intensity, 1.0f);
+	color = vec4(result * defaultColor * light.intensity, 1.0f);
 }
 
 
