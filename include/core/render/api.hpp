@@ -28,7 +28,8 @@ namespace Engine {
 
         public:
             std::unique_ptr<Logger> logger = std::make_unique<Logger>("render");
-            std::unique_ptr<ShaderProgram> shader;
+            ShaderProgram *shader;
+            std::unique_ptr<ShaderProgram> defaultShader;
             std::unique_ptr<ShaderProgram> lightingShader;
             std::unique_ptr<ShaderProgram> materialShader;
 

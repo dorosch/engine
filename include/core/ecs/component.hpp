@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "core/math/type.hpp"
+#include "core/graphics/lighting/type.hpp"
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
 
@@ -30,7 +31,7 @@ namespace Engine {
 
             class Transform : public Component {
             public:
-                Type type = Type::TRANSFORM;
+                const Type type = Type::TRANSFORM;
 
                 glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
                 glm::vec3 rotation = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -40,7 +41,7 @@ namespace Engine {
 
             class Material : public Component {
             public:
-                Type type = Type::MATERIAL;
+                const Type type = Type::MATERIAL;
 
                 float shininess = 10;
                 glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -52,7 +53,7 @@ namespace Engine {
 
             class Mesh : public Component {
             public:
-                Type type = Type::MESH;
+                const Type type = Type::MESH;
 
                 std::vector<float> vertices;
                 std::unique_ptr<Render::VertexArray> VAO;
@@ -68,13 +69,22 @@ namespace Engine {
 
             class Light : public Component {
             public:
-                Type type = Type::LIGHT;
+                const Type type = Type::LIGHT;
+                Graphics::Lighting::Type lightType;
 
                 float intensity = 1.0f;
                 glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
                 glm::vec3 ambient = glm::vec3(0.2f, 0.2f, 0.2f);
                 glm::vec3 diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
                 glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
+                // Only for directional and spot lighting
+                glm::vec3 direction = glm::vec3(0.0f, 0.0f, 0.0f);
+
+                // Only for spot lighting
+                float angle = glm::cos(glm::radians(0.0f));
+
+                Light(Graphics::Lighting::Type type) : lightType(type) {};
             };
         }
     }

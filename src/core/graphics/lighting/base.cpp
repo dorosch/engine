@@ -3,7 +3,7 @@
 using namespace Engine::Graphics::Lighting;
 
 
-Light::Light() {
-    name = "Light";
-    light = std::make_unique<Ecs::Component::Light>();
-}
+// Light::Light() {
+//     name = "Light";
+//     light = std::make_unique<Ecs::Component::Light>();
+// }

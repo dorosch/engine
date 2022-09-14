@@ -199,14 +199,17 @@ public:
         scene->root->entities.push_back(cube2);
         // End geometry primitives
 
-        // Add light to the scene
-        std::shared_ptr<Engine::Graphics::Lighting::Light> light = 
-            std::make_shared<Engine::Graphics::Lighting::Light>();
-        
-        light->transform->position = {-3.0f, 3.0f, -3.0f};
+        // Add sun to the scene
+        std::shared_ptr<Engine::Graphics::Lighting::DirectionalLight> sun = 
+            std::make_shared<Engine::Graphics::Lighting::DirectionalLight>();
 
-        scene->lighting.push_back(light);
-        // End light
+        sun->name = "Sun";
+        sun->light->intensity = 2.0f;
+        sun->light->direction = {3.0f, -3.0f, 1.0f};
+        sun->transform->position = {-3.0f, 3.0f, -3.0f};
+
+        scene->lighting.push_back(sun);
+        // End sun light
 
         this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
         this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();

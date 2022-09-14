@@ -63,14 +63,14 @@ namespace Engine {
                     ImGui::Separator();
 
                     if (ImGui::BeginMenu("mesh")) {
-                        if (ImGui::MenuItem("Plane")) {
-                            std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
-                            app->scene->root->entities.push_back(plane);
-                        }
-                        if (ImGui::MenuItem("Cube")) {
-                            std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
-                            app->scene->root->entities.push_back(cube);
-                        }
+                        // if (ImGui::MenuItem("Plane")) {
+                        //     std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
+                        //     app->scene->root->entities.push_back(plane);
+                        // }
+                        // if (ImGui::MenuItem("Cube")) {
+                        //     std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
+                        //     app->scene->root->entities.push_back(cube);
+                        // }
                         ImGui::EndMenu();
                     }
                     ImGui::EndPopup();
@@ -136,11 +136,30 @@ namespace Engine {
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::LIGHT)) {
                         if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_None)) {
-                            ImGui::SliderFloat("intensity", &selectedEntity->light->intensity, 0, 1.0);
+                            switch (selectedEntity->light->lightType) {
+                                case Engine::Graphics::Lighting::Type::DIRECTIONAL:
+                                    ImGui::Text("type: directional");
+                                    break;
+                                case Engine::Graphics::Lighting::Type::POINT:
+                                    ImGui::Text("type: directional");
+                                    break;
+                                case Engine::Graphics::Lighting::Type::SPOT:
+                                    ImGui::Text("type: directional");
+                                    break;
+                                default:
+                                    // TODO: Throw exception about unknown lighting type
+                                    break;
+                            }
+
+                            ImGui::SliderFloat("intensity", &selectedEntity->light->intensity, 0, 10.0);
                             ImGui::ColorEdit3("color", &selectedEntity->light->color[0]);
                             ImGui::SliderFloat3("ambient", &selectedEntity->light->ambient[0], 0.0, 1.0);
                             ImGui::SliderFloat3("diffuse", &selectedEntity->light->diffuse[0], 0.0, 1.0);
                             ImGui::SliderFloat3("specular", &selectedEntity->light->specular[0], 0.0, 1.0);
+
+                            if (selectedEntity->light->lightType == Engine::Graphics::Lighting::Type::DIRECTIONAL) {
+                                ImGui::SliderFloat3("direction", &selectedEntity->light->direction[0], -10.0, 10.0);
+                            }
                         }
                     }
                 }

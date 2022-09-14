@@ -39,6 +39,7 @@ namespace Engine {
 
             // TODO: Change to Uniform3f, Uniform4m
             virtual void UniformFloat(const char *, float) = 0;
+            virtual void UniformInt(const char *, int) = 0;
             virtual void UniformColor(const char *, float, float, float) = 0;
             virtual void UniformPosition(const char *, float, float, float) = 0;
             virtual void UniformMatrix(const char *, glm::mat4) = 0;

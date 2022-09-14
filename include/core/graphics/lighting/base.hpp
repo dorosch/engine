@@ -1,16 +1,28 @@
-#ifndef __GRAPHICS_LIGHTING_DEBUG__
-#define __GRAPHICS_LIGHTING_DEBUG__
+#ifndef __GRAPHICS_LIGHTING__
+#define __GRAPHICS_LIGHTING__
 
+#include "core/object/object.hpp"
 #include "core/ecs/component.hpp"
-#include "core/geometry/primitives.hpp"
+#include "core/graphics/lighting/type.hpp"
 
 
 namespace Engine {
     namespace Graphics {
         namespace Lighting {
-            class Light : public Geometry::Cube {
+            class Light : public Object {
             public:
-                Light();
+                Light() : Object() {};
+                virtual ~Light() {};
+            };
+
+
+            class DirectionalLight : public Light {
+            public:
+                DirectionalLight() : Light() {
+                    name = "Directional light";
+                    light = std::make_unique<Ecs::Component::Light>(Type::DIRECTIONAL);
+                    // light->lightType = Type::DIRECTIONAL;
+                };
             };
         }
     }
