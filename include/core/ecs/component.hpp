@@ -83,8 +83,8 @@ namespace Engine {
 
                 // Only for point lighting
                 float constant = 1.0f;
-                float linear = 0.7f;
-                float quadratic = 1.8f;
+                float linear = 0.35f;
+                float quadratic = 0.44f;
 
                 // Only for spot lighting
                 float angle = glm::cos(glm::radians(0.0f));
