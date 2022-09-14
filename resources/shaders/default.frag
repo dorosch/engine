@@ -9,6 +9,10 @@ struct Light {
     float linear;
     float quadratic;
 
+	// Only for spot lighting
+	float cutOff;
+	float outerCutOff;
+
 	// Type of lighting
 	int isDirection;
 	int isPoint;
@@ -31,9 +35,9 @@ uniform Light light;
 uniform vec3 viewPosition;
 
 
-vec3 calculateDirectionLight(Light light, vec3 normal, vec3 viewDir);
-vec3 calculatePointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir);
-vec3 calculateSpotLight();
+vec3 calculateDirectionLight(Light, vec3, vec3);
+vec3 calculatePointLight(Light, vec3, vec3, vec3);
+vec3 calculateSpotLight(Light, vec3, vec3, vec3);
 
 
 void main() {
@@ -49,7 +53,7 @@ void main() {
 		result = calculatePointLight(light, norm, FragPos, viewDir);
 	}
 	else if (light.isSpot == 1) {
-		result = calculateSpotLight();
+		result = calculateSpotLight(light, norm, FragPos, viewDir);
 	}
 
 	color = vec4(result * defaultColor * light.intensity, 1.0f);
@@ -99,6 +103,34 @@ vec3 calculatePointLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir) {
 }
 
 
-vec3 calculateSpotLight() {
-	return vec3(0.0f);
+vec3 calculateSpotLight(Light light, vec3 normal, vec3 fragPos, vec3 viewDir) {
+	// Ambient
+	vec3 ambient = light.ambient * light.color;
+
+	// Diffuse
+	vec3 lightDir = normalize(light.position - fragPos);
+	float diff = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse  = light.diffuse * (diff * light.color);
+
+	// Specular
+    vec3 reflectDir = reflect(-lightDir, normal);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = light.specular * (spec * light.color);
+
+	// Spotlight - soft edges
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = (light.cutOff - light.outerCutOff);
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    diffuse  *= intensity;
+    specular *= intensity;
+
+	// TODO: Why it's not work??
+    // Attenuation
+    // float distance = length(light.position - FragPos);
+    // float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    // ambient *= attenuation;
+    // diffuse *= attenuation;
+    // specular *= attenuation;
+
+    return ambient + diffuse + specular;
 }

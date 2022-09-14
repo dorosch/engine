@@ -33,6 +33,15 @@ namespace Engine {
                     light = std::make_unique<Ecs::Component::Light>(Type::POINT);
                 };
             };
+
+
+            class SpotLight : public Light {
+            public:
+                SpotLight() : Light() {
+                    name = "Spot light";
+                    light = std::make_unique<Ecs::Component::Light>(Type::SPOT);
+                };
+            };
         }
     }
 }

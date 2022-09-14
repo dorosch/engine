@@ -63,14 +63,14 @@ namespace Engine {
                     ImGui::Separator();
 
                     if (ImGui::BeginMenu("mesh")) {
-                        // if (ImGui::MenuItem("Plane")) {
-                        //     std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
-                        //     app->scene->root->entities.push_back(plane);
-                        // }
-                        // if (ImGui::MenuItem("Cube")) {
-                        //     std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
-                        //     app->scene->root->entities.push_back(cube);
-                        // }
+                        if (ImGui::MenuItem("Plane")) {
+                            std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
+                            app->scene->root->entities.push_back(plane);
+                        }
+                        if (ImGui::MenuItem("Cube")) {
+                            std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
+                            app->scene->root->entities.push_back(cube);
+                        }
                         ImGui::EndMenu();
                     }
                     ImGui::EndPopup();
@@ -167,6 +167,9 @@ namespace Engine {
                                     ImGui::SliderFloat("quadratic", &selectedEntity->light->quadratic, 0, 1.0);
                                     break;
                                 case Engine::Graphics::Lighting::Type::SPOT:
+                                    ImGui::SliderFloat("cutOff", &selectedEntity->light->cutOff, 0, 90.0);
+                                    ImGui::SliderFloat("outerCutOff", &selectedEntity->light->outerCutOff, 0, 90.0);
+                                    ImGui::SliderFloat3("direction", &selectedEntity->light->direction[0], -10.0, 10.0);
                                     break;
                                 default:
                                     // TODO: Throw exception about unknown lighting type

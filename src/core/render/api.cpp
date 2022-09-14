@@ -159,33 +159,44 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
             shader->UniformFloat("light.quadratic", lighting->light->quadratic);
             shader->UniformInt("light.isPoint", 1);
         }
+        else if (lighting->light->lightType == Graphics::Lighting::Type::SPOT) {
+            shader->UniformInt("light.isSpot", 1);
+            shader->UniformPosition(
+                "light.direction",
+                lighting->light->direction.x,
+                lighting->light->direction.y,
+                lighting->light->direction.z
+            );
+            shader->UniformFloat("light.cutOff", glm::cos(glm::radians(lighting->light->cutOff)));
+            shader->UniformFloat("light.outerCutOff", glm::cos(glm::radians(lighting->light->outerCutOff)));
+        }
 
         if (object->HasComponent(Ecs::Component::Type::MATERIAL)) {
-            materialShader->UniformPosition(
+            shader->UniformPosition(
                 "material.ambient",
                 object->material->ambient.x,
                 object->material->ambient.y,
                 object->material->ambient.z
             );
-            materialShader->UniformPosition(
+            shader->UniformPosition(
                 "material.diffuse",
                 object->material->diffuse.x,
                 object->material->diffuse.y,
                 object->material->diffuse.z
             );
-            materialShader->UniformPosition(
+            shader->UniformPosition(
                 "material.specular",
                 object->material->specular.x,
                 object->material->specular.y,
                 object->material->specular.z
             );
-            materialShader->UniformPosition(
+            shader->UniformPosition(
                 "material.color",
                 object->material->color.x,
                 object->material->color.y,
                 object->material->color.z
             );
-            materialShader->UniformFloat("material.shininess", object->material->shininess);
+            shader->UniformFloat("material.shininess", object->material->shininess);
         }
 
         object->mesh->VAO->bind();

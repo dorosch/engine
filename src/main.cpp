@@ -205,8 +205,8 @@ public:
         // End geometry primitives
 
         // Add sun to the scene
-        std::shared_ptr<Engine::Graphics::Lighting::PointLight> sun = 
-            std::make_shared<Engine::Graphics::Lighting::PointLight>();
+        std::shared_ptr<Engine::Graphics::Lighting::SpotLight> sun = 
+            std::make_shared<Engine::Graphics::Lighting::SpotLight>();
 
         sun->name = "Sun";
         sun->light->intensity = 2.0f;

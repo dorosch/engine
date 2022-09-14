@@ -34,7 +34,7 @@ namespace Engine {
                 const Type type = Type::TRANSFORM;
 
                 glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-                glm::vec3 rotation = glm::vec3(1.0f, 1.0f, 1.0f);
+                glm::vec3 rotation = glm::vec3(0.0f, 1.0f, 1.0f);
                 glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
             };
 
@@ -87,7 +87,8 @@ namespace Engine {
                 float quadratic = 0.44f;
 
                 // Only for spot lighting
-                float angle = glm::cos(glm::radians(0.0f));
+                float cutOff = 12.5f;
+                float outerCutOff = 17.5f;
 
                 Light(Graphics::Lighting::Type type) : lightType(type) {};
             };
