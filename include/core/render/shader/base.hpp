@@ -31,17 +31,14 @@ namespace Engine {
 
         public:
             static ShaderProgram *GetInstance();
-            virtual void Build(std::filesystem::path, std::filesystem::path) = 0;
 
-            virtual std::optional<uint32_t> Compile(Shader, std::string) = 0;
-            virtual void Linking() = 0;
             virtual void Use() = 0;
-
-            // TODO: Change to Uniform3f, Uniform4m
+            virtual void Linking() = 0;
+            virtual std::optional<uint32_t> Compile(Shader, std::string) = 0;
+            virtual void Build(std::filesystem::path, std::filesystem::path) = 0;
             virtual void UniformFloat(const char *, float) = 0;
             virtual void UniformInt(const char *, int) = 0;
-            virtual void UniformColor(const char *, float, float, float) = 0;
-            virtual void UniformPosition(const char *, float, float, float) = 0;
+            virtual void UniformVector(const char *, glm::vec3) = 0;
             virtual void UniformMatrix(const char *, glm::mat4) = 0;
         };
     }

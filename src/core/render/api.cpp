@@ -105,53 +105,18 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
         shader->UniformMatrix("view", view);
         shader->UniformMatrix("projection", projection);
 
-        shader->UniformPosition(
-            "viewPosition",
-            cameraPosition.x,
-            cameraPosition.y,
-            cameraPosition.z
-        );
+        shader->UniformVector("viewPosition", cameraPosition);
 
-        shader->UniformPosition(
-            "light.position",
-            lighting->transform->position.x,
-            lighting->transform->position.y,
-            lighting->transform->position.z
-        );
-        shader->UniformPosition(
-            "light.color",
-            lighting->light->color.x,
-            lighting->light->color.y,
-            lighting->light->color.z
-        );
-        shader->UniformPosition(
-            "light.ambient",
-            lighting->light->ambient.x,
-            lighting->light->ambient.y,
-            lighting->light->ambient.z
-        );
-        shader->UniformPosition(
-            "light.diffuse",
-            lighting->light->diffuse.x,
-            lighting->light->diffuse.y,
-            lighting->light->diffuse.z
-        );
-        shader->UniformPosition(
-            "light.specular",
-            lighting->light->specular.x,
-            lighting->light->specular.y,
-            lighting->light->specular.z
-        );
+        shader->UniformVector("light.position", lighting->transform->position);
+        shader->UniformVector("light.color", lighting->light->color);
+        shader->UniformVector("light.ambient", lighting->light->ambient);
+        shader->UniformVector("light.diffuse", lighting->light->diffuse);
+        shader->UniformVector("light.specular", lighting->light->specular);
         shader->UniformFloat("light.intensity", lighting->light->intensity);
 
         if (lighting->light->lightType == Graphics::Lighting::Type::DIRECTIONAL) {
             shader->UniformInt("light.type", Graphics::Lighting::Type::DIRECTIONAL);
-            shader->UniformPosition(
-                "light.direction",
-                lighting->light->direction.x,
-                lighting->light->direction.y,
-                lighting->light->direction.z
-            );
+            shader->UniformVector("light.direction", lighting->light->direction);
         }
         else if (lighting->light->lightType == Graphics::Lighting::Type::POINT) {
             shader->UniformInt("light.type", Graphics::Lighting::Type::POINT);
@@ -161,12 +126,7 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
         }
         else if (lighting->light->lightType == Graphics::Lighting::Type::SPOT) {
             shader->UniformInt("light.type", Graphics::Lighting::Type::SPOT);
-            shader->UniformPosition(
-                "light.direction",
-                lighting->light->direction.x,
-                lighting->light->direction.y,
-                lighting->light->direction.z
-            );
+            shader->UniformVector("light.direction", lighting->light->direction);
             shader->UniformFloat("light.constant", lighting->light->constant);
             shader->UniformFloat("light.linear", lighting->light->linear);
             shader->UniformFloat("light.quadratic", lighting->light->quadratic);
@@ -175,30 +135,10 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
         }
 
         if (object->HasComponent(Ecs::Component::Type::MATERIAL)) {
-            shader->UniformPosition(
-                "material.ambient",
-                object->material->ambient.x,
-                object->material->ambient.y,
-                object->material->ambient.z
-            );
-            shader->UniformPosition(
-                "material.diffuse",
-                object->material->diffuse.x,
-                object->material->diffuse.y,
-                object->material->diffuse.z
-            );
-            shader->UniformPosition(
-                "material.specular",
-                object->material->specular.x,
-                object->material->specular.y,
-                object->material->specular.z
-            );
-            shader->UniformPosition(
-                "material.color",
-                object->material->color.x,
-                object->material->color.y,
-                object->material->color.z
-            );
+            shader->UniformVector("material.color", object->material->color);
+            shader->UniformVector("material.ambient", object->material->ambient);
+            shader->UniformVector("material.diffuse", object->material->diffuse);
+            shader->UniformVector("material.specular", object->material->specular);
             shader->UniformFloat("material.shininess", object->material->shininess);
         }
 

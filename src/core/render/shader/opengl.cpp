@@ -138,15 +138,9 @@ void OpenglShaderProgram::UniformInt(const char *attribute, int value) {
 }
 
 
-void OpenglShaderProgram::UniformColor(const char *attribute, float r, float g, float b) {
-    GLint color = glGetUniformLocation(this->object, attribute);
-    glUniform3f(color, r, g, b);
-}
-
-
-void OpenglShaderProgram::UniformPosition(const char *attribute, float x, float y, float z) {
-    GLint position = glGetUniformLocation(this->object, attribute);
-    glUniform3f(position, x, y, z);
+void OpenglShaderProgram::UniformVector(const char *attribute, glm::vec3 vector){
+    GLint variable = glGetUniformLocation(this->object, attribute);
+    glUniform3fv(variable, 1, glm::value_ptr(vector));
 }
 
 

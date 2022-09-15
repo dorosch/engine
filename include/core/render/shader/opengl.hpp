@@ -18,17 +18,12 @@ namespace Engine {
             ~OpenglShaderProgram();
 
             std::optional<uint32_t> Compile(Shader, std::string);
-            void Linking();
-
-            void Build(std::filesystem::path, std::filesystem::path);
-
             void Use();
-
-            // TODO: Change to Uniform3f, Uniform4m
+            void Linking();
+            void Build(std::filesystem::path, std::filesystem::path);
             void UniformInt(const char *, int);
             void UniformFloat(const char *, float);
-            void UniformColor(const char *, float, float, float);
-            void UniformPosition(const char *, float, float, float);
+            void UniformVector(const char *, glm::vec3);
             void UniformMatrix(const char *, glm::mat4);
         };
     }
