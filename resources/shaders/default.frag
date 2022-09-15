@@ -1,5 +1,9 @@
 #version 420 core
 
+#define DIRECTIONAL 0
+#define POINT 		1
+#define SPOT 		2
+
 struct Light {
 	// Only for directional lighting
     vec3 direction;
@@ -13,11 +17,7 @@ struct Light {
 	float cutOff;
 	float outerCutOff;
 
-	// Type of lighting
-	int isDirection;
-	int isPoint;
-	int isSpot;
-
+	int type;
     vec3 position;
     vec3 color;
     vec3 ambient;
@@ -46,13 +46,13 @@ void main() {
 	vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPosition - FragPos);
 
-	if (light.isDirection == 1) {
+	if (light.type == DIRECTIONAL) {
 		result = calculateDirectionLight(light, norm, viewDir);
 	}
-	else if (light.isPoint == 1) {
+	else if (light.type == POINT) {
 		result = calculatePointLight(light, norm, FragPos, viewDir);
 	}
-	else if (light.isSpot == 1) {
+	else if (light.type == SPOT) {
 		result = calculateSpotLight(light, norm, FragPos, viewDir);
 	}
 

@@ -145,22 +145,22 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
         shader->UniformFloat("light.intensity", lighting->light->intensity);
 
         if (lighting->light->lightType == Graphics::Lighting::Type::DIRECTIONAL) {
+            shader->UniformInt("light.type", Graphics::Lighting::Type::DIRECTIONAL);
             shader->UniformPosition(
                 "light.direction",
                 lighting->light->direction.x,
                 lighting->light->direction.y,
                 lighting->light->direction.z
             );
-            shader->UniformInt("light.isDirection", 1);
         }
         else if (lighting->light->lightType == Graphics::Lighting::Type::POINT) {
+            shader->UniformInt("light.type", Graphics::Lighting::Type::POINT);
             shader->UniformFloat("light.constant", lighting->light->constant);
             shader->UniformFloat("light.linear", lighting->light->linear);
             shader->UniformFloat("light.quadratic", lighting->light->quadratic);
-            shader->UniformInt("light.isPoint", 1);
         }
         else if (lighting->light->lightType == Graphics::Lighting::Type::SPOT) {
-            shader->UniformInt("light.isSpot", 1);
+            shader->UniformInt("light.type", Graphics::Lighting::Type::SPOT);
             shader->UniformPosition(
                 "light.direction",
                 lighting->light->direction.x,
