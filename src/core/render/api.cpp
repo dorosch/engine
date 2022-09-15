@@ -167,6 +167,9 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
                 lighting->light->direction.y,
                 lighting->light->direction.z
             );
+            shader->UniformFloat("light.constant", lighting->light->constant);
+            shader->UniformFloat("light.linear", lighting->light->linear);
+            shader->UniformFloat("light.quadratic", lighting->light->quadratic);
             shader->UniformFloat("light.cutOff", glm::cos(glm::radians(lighting->light->cutOff)));
             shader->UniformFloat("light.outerCutOff", glm::cos(glm::radians(lighting->light->outerCutOff)));
         }

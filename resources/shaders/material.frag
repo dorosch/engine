@@ -134,13 +134,12 @@ vec3 calculateSpotLight(Light light, Material material, vec3 normal, vec3 fragPo
     diffuse  *= intensity;
     specular *= intensity;
 
-	// TODO: Why it's not work??
     // Attenuation
-    // float distance = length(light.position - FragPos);
-    // float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-    // ambient *= attenuation;
-    // diffuse *= attenuation;
-    // specular *= attenuation;
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
 
     return ambient + diffuse + specular;
 }

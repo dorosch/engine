@@ -81,7 +81,7 @@ namespace Engine {
                 // Only for directional and spot lighting
                 glm::vec3 direction = glm::vec3(0.0f, 0.0f, 0.0f);
 
-                // Only for point lighting
+                // Only for point and spot lighting
                 float constant = 1.0f;
                 float linear = 0.35f;
                 float quadratic = 0.44f;

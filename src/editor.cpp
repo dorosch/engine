@@ -169,6 +169,9 @@ namespace Engine {
                                 case Engine::Graphics::Lighting::Type::SPOT:
                                     ImGui::SliderFloat("cutOff", &selectedEntity->light->cutOff, 0, 90.0);
                                     ImGui::SliderFloat("outerCutOff", &selectedEntity->light->outerCutOff, 0, 90.0);
+                                    ImGui::SliderFloat("constant", &selectedEntity->light->constant, 0, 1.0);
+                                    ImGui::SliderFloat("linear", &selectedEntity->light->linear, 0, 1.0);
+                                    ImGui::SliderFloat("quadratic", &selectedEntity->light->quadratic, 0, 1.0);
                                     ImGui::SliderFloat3("direction", &selectedEntity->light->direction[0], -10.0, 10.0);
                                     break;
                                 default:
