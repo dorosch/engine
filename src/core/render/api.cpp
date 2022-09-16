@@ -58,17 +58,16 @@ void Render::Shutdown() {
 void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 projection, glm::mat4 view, glm::vec3 cameraPosition) {
     // TODO: Only for opengl backend
 
-    std::shared_ptr<Graphics::Lighting::Light> lighting = scene->lighting[0];
-
+    // TODO: Add logger warning if more lights are added than the shader supports
     for (std::shared_ptr<Object> object : scene->root->entities) {
-        RenderObject(object.get(), projection, view, cameraPosition, lighting.get());
+        RenderObject(object.get(), projection, view, cameraPosition, scene->lighting);
     }
 
-    if (lighting->HasComponent(Ecs::Component::Type::LIGHT)) {
+    for (std::shared_ptr<Graphics::Lighting::Light> light : scene->lighting) {
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, lighting->transform->position);
-        model = glm::rotate(model, glm::radians(180.0f), lighting->transform->rotation);
-        model = glm::scale(model, lighting->transform->scale);
+        model = glm::translate(model, light->transform->position);
+        model = glm::rotate(model, glm::radians(180.0f), light->transform->rotation);
+        model = glm::scale(model, light->transform->scale);
 
         lightingShader->Use();
         lightingShader->UniformMatrix("model", model);
@@ -76,16 +75,19 @@ void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 projection, glm:
         lightingShader->UniformMatrix("projection", projection);
 
         // If the editor is enabled, then draw where the light source is
-        lighting->mesh->VAO->bind();
-        glDrawArrays(GL_TRIANGLES, 0, lighting->mesh->vertices.size() / 6);
-        lighting->mesh->VAO->unbind();
+        light->mesh->VAO->bind();
+        glDrawArrays(GL_TRIANGLES, 0, light->mesh->vertices.size() / 6);
+        light->mesh->VAO->unbind();
     }
 
     scene->environment->skybox->update(projection * view);
 }
 
 
-void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, glm::vec3 cameraPosition, Graphics::Lighting::Light *lighting) {
+void Render::RenderObject(
+        Object *object, glm::mat4 projection, glm::mat4 view, glm::vec3 cameraPosition,
+        std::vector<std::shared_ptr<Graphics::Lighting::Light>> lights
+) {
     if (object->HasComponent(Ecs::Component::Type::MESH)) {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, object->transform->position);
@@ -104,34 +106,39 @@ void Render::RenderObject(Object *object, glm::mat4 projection, glm::mat4 view, 
         shader->UniformMatrix("model", model);
         shader->UniformMatrix("view", view);
         shader->UniformMatrix("projection", projection);
-
         shader->UniformVector("viewPosition", cameraPosition);
 
-        shader->UniformVector("light.position", lighting->transform->position);
-        shader->UniformVector("light.color", lighting->light->color);
-        shader->UniformVector("light.ambient", lighting->light->ambient);
-        shader->UniformVector("light.diffuse", lighting->light->diffuse);
-        shader->UniformVector("light.specular", lighting->light->specular);
-        shader->UniformFloat("light.intensity", lighting->light->intensity);
+        shader->UniformInt("lightSourcesCount", lights.size());
 
-        if (lighting->light->lightType == Graphics::Lighting::Type::DIRECTIONAL) {
-            shader->UniformInt("light.type", Graphics::Lighting::Type::DIRECTIONAL);
-            shader->UniformVector("light.direction", lighting->light->direction);
-        }
-        else if (lighting->light->lightType == Graphics::Lighting::Type::POINT) {
-            shader->UniformInt("light.type", Graphics::Lighting::Type::POINT);
-            shader->UniformFloat("light.constant", lighting->light->constant);
-            shader->UniformFloat("light.linear", lighting->light->linear);
-            shader->UniformFloat("light.quadratic", lighting->light->quadratic);
-        }
-        else if (lighting->light->lightType == Graphics::Lighting::Type::SPOT) {
-            shader->UniformInt("light.type", Graphics::Lighting::Type::SPOT);
-            shader->UniformVector("light.direction", lighting->light->direction);
-            shader->UniformFloat("light.constant", lighting->light->constant);
-            shader->UniformFloat("light.linear", lighting->light->linear);
-            shader->UniformFloat("light.quadratic", lighting->light->quadratic);
-            shader->UniformFloat("light.cutOff", glm::cos(glm::radians(lighting->light->cutOff)));
-            shader->UniformFloat("light.outerCutOff", glm::cos(glm::radians(lighting->light->outerCutOff)));
+        for (size_t index = 0; index < lights.size(); index++) {
+            std::shared_ptr<Graphics::Lighting::Light> light = lights[index];
+
+            shader->UniformVector(fmt::format("lights[{}].position", index), light->transform->position);
+            shader->UniformVector(fmt::format("lights[{}].color", index), light->light->color);
+            shader->UniformVector(fmt::format("lights[{}].ambient", index), light->light->ambient);
+            shader->UniformVector(fmt::format("lights[{}].diffuse", index), light->light->diffuse);
+            shader->UniformVector(fmt::format("lights[{}].specular", index), light->light->specular);
+            shader->UniformFloat(fmt::format("lights[{}].intensity", index), light->light->intensity);
+
+            if (light->light->lightType == Graphics::Lighting::Type::DIRECTIONAL) {
+                shader->UniformInt(fmt::format("lights[{}].type", index), Graphics::Lighting::Type::DIRECTIONAL);
+                shader->UniformVector(fmt::format("lights[{}].direction", index), light->light->direction);
+            }
+            else if (light->light->lightType == Graphics::Lighting::Type::POINT) {
+                shader->UniformInt(fmt::format("lights[{}].type", index), Graphics::Lighting::Type::POINT);
+                shader->UniformFloat(fmt::format("lights[{}].constant", index), light->light->constant);
+                shader->UniformFloat(fmt::format("lights[{}].linear", index), light->light->linear);
+                shader->UniformFloat(fmt::format("lights[{}].quadratic", index), light->light->quadratic);
+            }
+            else if (light->light->lightType == Graphics::Lighting::Type::SPOT) {
+                shader->UniformInt(fmt::format("lights[{}].type", index), Graphics::Lighting::Type::SPOT);
+                shader->UniformVector(fmt::format("lights[{}].direction", index), light->light->direction);
+                shader->UniformFloat(fmt::format("lights[{}].constant", index), light->light->constant);
+                shader->UniformFloat(fmt::format("lights[{}].linear", index), light->light->linear);
+                shader->UniformFloat(fmt::format("lights[{}].quadratic", index), light->light->quadratic);
+                shader->UniformFloat(fmt::format("lights[{}].cutOff", index), glm::cos(glm::radians(light->light->cutOff)));
+                shader->UniformFloat(fmt::format("lights[{}].outerCutOff", index), glm::cos(glm::radians(light->light->outerCutOff)));
+            }
         }
 
         if (object->HasComponent(Ecs::Component::Type::MATERIAL)) {

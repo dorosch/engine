@@ -185,6 +185,7 @@ public:
         std::shared_ptr<Engine::Geometry::Cube> cube = std::make_shared<Engine::Geometry::Cube>();
         std::shared_ptr<Engine::Geometry::Cube> cube2 = std::make_shared<Engine::Geometry::Cube>();
 
+        plane->transform->position = {0.0f, 0.1f, 0.0f};
         plane->transform->rotation = {0.0f, 1.0f, 1.0f};
         plane->transform->scale = {20.0f, 20.0f, 1.0f};
 
@@ -207,6 +208,11 @@ public:
         // Add sun to the scene
         std::shared_ptr<Engine::Graphics::Lighting::SpotLight> sun = 
             std::make_shared<Engine::Graphics::Lighting::SpotLight>();
+        std::shared_ptr<Engine::Graphics::Lighting::PointLight> point = 
+            std::make_shared<Engine::Graphics::Lighting::PointLight>();
+        std::shared_ptr<Engine::Graphics::Lighting::PointLight> point2 = 
+            std::make_shared<Engine::Graphics::Lighting::PointLight>();
+
 
         sun->name = "Sun";
         sun->light->intensity = 2.0f;
@@ -217,7 +223,14 @@ public:
         sun->transform->position = {-3.0f, 3.0f, -3.0f};
         sun->transform->scale = {0.1f, 0.1f, 0.1f};
 
+        point->transform->position = {3.0f, 3.0f, 3.0f};
+        point->transform->scale = {0.1f, 0.1f, 0.1f};
+        point2->transform->position = {4.0f, 2.0f, 2.0f};
+        point2->transform->scale = {0.1f, 0.1f, 0.1f};
+
         scene->lighting.push_back(sun);
+        scene->lighting.push_back(point);
+        scene->lighting.push_back(point2);
         // End sun light
 
         this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
@@ -264,9 +277,9 @@ int main() {
     UserApplication *application = new UserApplication();
     Engine::Engine engine(application);
 
-    engine.Startup();
-
     try {
+        engine.Startup();
+
         engine.Run();
     } catch (const std::exception& error) {
         std::cerr << error.what() << std::endl;

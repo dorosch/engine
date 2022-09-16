@@ -36,10 +36,10 @@ namespace Engine {
             virtual void Linking() = 0;
             virtual std::optional<uint32_t> Compile(Shader, std::string) = 0;
             virtual void Build(std::filesystem::path, std::filesystem::path) = 0;
-            virtual void UniformFloat(const char *, float) = 0;
-            virtual void UniformInt(const char *, int) = 0;
-            virtual void UniformVector(const char *, glm::vec3) = 0;
-            virtual void UniformMatrix(const char *, glm::mat4) = 0;
+            virtual void UniformFloat(const std::string &, float) = 0;
+            virtual void UniformInt(const std::string &, int) = 0;
+            virtual void UniformVector(const std::string &, glm::vec3) = 0;
+            virtual void UniformMatrix(const std::string &, glm::mat4) = 0;
         };
     }
 }

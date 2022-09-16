@@ -1,5 +1,7 @@
 #version 420 core
 
+#define MAX_LIGHT_SOURCES 32
+
 #define DIRECTIONAL 0
 #define POINT 		1
 #define SPOT 		2
@@ -37,11 +39,12 @@ struct Material {
 in vec3 Normal;
 in vec3 FragPos;
 
-uniform Light light;
+out vec4 color;
+
 uniform Material material;
 uniform vec3 viewPosition;
-
-out vec4 color;
+uniform int lightSourcesCount;
+uniform Light lights[MAX_LIGHT_SOURCES];
 
 
 vec3 calculateDirectionLight(Light, Material, vec3, vec3);
@@ -50,21 +53,25 @@ vec3 calculateSpotLight(Light, Material, vec3, vec3, vec3);
 
 
 void main() {
-    vec3 result;
+    vec3 result = vec3(0.0f);
 	vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPosition - FragPos);
 
-	if (light.type == DIRECTIONAL) {
-		result = calculateDirectionLight(light, material, norm, viewDir);
-	}
-	else if (light.type == POINT) {
-		result = calculatePointLight(light, material, norm, FragPos, viewDir);
-	}
-	else if (light.type == SPOT) {
-		result = calculateSpotLight(light, material, norm, FragPos, viewDir);
+	for(int index = 0; index < lightSourcesCount; index++) {
+		Light light = lights[index];
+
+		if (light.type == DIRECTIONAL) {
+			result += calculateDirectionLight(light, material, norm, viewDir) * light.intensity;
+		}
+		else if (light.type == POINT) {
+			result += calculatePointLight(light, material, norm, FragPos, viewDir) * light.intensity;
+		}
+		else if (light.type == SPOT) {
+			result += calculateSpotLight(light, material, norm, FragPos, viewDir) * light.intensity;
+		}
 	}
 
-	color = vec4((result * material.color) * light.intensity, 1.0f);
+	color = vec4(result * material.color, 1.0f);
 }
 
 

@@ -126,25 +126,25 @@ void OpenglShaderProgram::Use() {
 }
 
 
-void OpenglShaderProgram::UniformFloat(const char *attribute, float value) {
-    GLint variable = glGetUniformLocation(this->object, attribute);
+void OpenglShaderProgram::UniformFloat(const std::string &attribute, float value) {
+    GLint variable = glGetUniformLocation(this->object, attribute.c_str());
     glUniform1f(variable, value);
 }
 
 
-void OpenglShaderProgram::UniformInt(const char *attribute, int value) {
-    GLint variable = glGetUniformLocation(this->object, attribute);
+void OpenglShaderProgram::UniformInt(const std::string &attribute, int value) {
+    GLint variable = glGetUniformLocation(this->object, attribute.c_str());
     glUniform1i(variable, value);
 }
 
 
-void OpenglShaderProgram::UniformVector(const char *attribute, glm::vec3 vector){
-    GLint variable = glGetUniformLocation(this->object, attribute);
+void OpenglShaderProgram::UniformVector(const std::string &attribute, glm::vec3 vector){
+    GLint variable = glGetUniformLocation(this->object, attribute.c_str());
     glUniform3fv(variable, 1, glm::value_ptr(vector));
 }
 
 
-void OpenglShaderProgram::UniformMatrix(const char *attribure, glm::mat4 matrix) {
-    GLuint targetAttribute = glGetUniformLocation(this->object, attribure);
-    glUniformMatrix4fv(targetAttribute, 1, GL_FALSE, glm::value_ptr(matrix));
+void OpenglShaderProgram::UniformMatrix(const std::string &attribute, glm::mat4 matrix) {
+    GLuint variable = glGetUniformLocation(this->object, attribute.c_str());
+    glUniformMatrix4fv(variable, 1, GL_FALSE, glm::value_ptr(matrix));
 }

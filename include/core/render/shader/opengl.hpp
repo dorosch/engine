@@ -21,10 +21,10 @@ namespace Engine {
             void Use();
             void Linking();
             void Build(std::filesystem::path, std::filesystem::path);
-            void UniformInt(const char *, int);
-            void UniformFloat(const char *, float);
-            void UniformVector(const char *, glm::vec3);
-            void UniformMatrix(const char *, glm::mat4);
+            void UniformInt(const std::string &, int);
+            void UniformFloat(const std::string &, float);
+            void UniformVector(const std::string &, glm::vec3);
+            void UniformMatrix(const std::string &, glm::mat4);
         };
     }
 }
