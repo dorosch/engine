@@ -6,6 +6,7 @@
 
 #include "core/object/object.hpp"
 #include "core/scene/environment.hpp"
+#include "core/graphics/cameras/camera.hpp"
 #include "core/graphics/lighting/base.hpp"
 
 
@@ -26,6 +27,7 @@ namespace Engine {
         class Scene {
         public:
             std::shared_ptr<Node> root;
+            std::vector<std::shared_ptr<Graphics::Camera::Camera>> cameras;
             std::vector<std::shared_ptr<Graphics::Lighting::Light>> lighting;
             std::unique_ptr<Environment> environment;
 

@@ -9,8 +9,8 @@ OBJECTS = $(SOURCES:.cpp=.o)
 
 CXX = g++
 INCLUDE = -I include -I $(IMGUI_DIR) -I $(IMGUI_DIR)/backends
-LDFLAGS = -lSOIL -lGL -lGLU -lGLEW -lglfw -lglut -lfmt -lm -ldl
-CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS)
+LDFLAGS = -lSOIL -lGL -lGLU -lGLEW -lglfw -lfmt -lm -ldl
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic $(INCLUDE) $(LDFLAGS) -pg # pg for gprof profiler
 
 
 all: imgui $(TARGET)

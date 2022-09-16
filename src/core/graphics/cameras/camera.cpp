@@ -4,17 +4,19 @@ using namespace Engine::Graphics::Camera;
 
 
 Camera::Camera() {
-    yaw = -90.0f;
-    pitch = 0.0f;
+    name = "Camera";
+    camera = std::make_unique<Ecs::Component::Camera>();
 
-    zoom = 60.f;
-    speed = 10.0f;
-    sensitivity = 0.25f;
+    camera->yaw = -90.0f;
+    camera->pitch = 0.0f;
 
-    position = glm::vec3(0.0f, 0.0f, 0.0f);
-    direction = glm::vec3(0.0f, 0.0f, 0.0f);
+    camera->zoom = 60.f;
+    camera->speed = 10.0f;
+    camera->sensitivity = 0.25f;
 
-    projection = Projection::PERSPECTIVE;
+    transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    camera->projection = Projection::PERSPECTIVE;
 
     updateVectors();
 }
@@ -25,19 +27,19 @@ void Camera::updateVectors() {
 
     // Calculate the new front vector
     glm::vec3 newFront;
-    newFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    newFront.y = sin(glm::radians(pitch));
-    newFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front = glm::normalize(newFront);
+    newFront.x = cos(glm::radians(camera->yaw)) * cos(glm::radians(camera->pitch));
+    newFront.y = sin(glm::radians(camera->pitch));
+    newFront.z = sin(glm::radians(camera->yaw)) * cos(glm::radians(camera->pitch));
+    camera->front = glm::normalize(newFront);
 
     // Also re-calculate the right and up vector
-    right = glm::normalize(glm::cross(front, unitY));
-    up = glm::normalize(glm::cross(right, front));
+    camera->right = glm::normalize(glm::cross(camera->front, unitY));
+    camera->up = glm::normalize(glm::cross(camera->right, camera->front));
 }
 
 
 glm::mat4 Camera::getViewMatrix() {
-    return glm::lookAt(position, position + front, up);
+    return glm::lookAt(transform->position, transform->position + camera->front, camera->up);
 }
 
 
@@ -46,12 +48,13 @@ glm::mat4 Camera::getProjectionMatrix() {
     float screenWidth = 1920;
     float screenHeight = 1080;
 
-    switch (projection) {
-    case Projection::PERSPECTIVE:
-        return glm::perspective(glm::radians(zoom), screenWidth / screenHeight, 0.1f, 1000.0f);
-    case Projection::ORTHOGRAPHIC:
-        return glm::ortho(0.0f, screenWidth, 0.0f, screenHeight, 0.5f, 10.0f);
-    default:
-        throw UnsupportedCameraProjection();
+    switch (camera->projection) {
+        case Projection::PERSPECTIVE:
+            // TODO: Pass distance with viewport
+            return glm::perspective(glm::radians(camera->zoom), screenWidth / screenHeight, 0.1f, 1000.0f);
+        case Projection::ORTHOGRAPHIC:
+            return glm::ortho(0.0f, screenWidth, 0.0f, screenHeight, 0.5f, 10.0f);
+        default:
+            throw UnsupportedCameraProjection();
     }
 }

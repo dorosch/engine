@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "core/math/type.hpp"
+#include "core/graphics/cameras/type.hpp"
 #include "core/graphics/lighting/type.hpp"
 #include "core/render/buffer/base.hpp"
 #include "core/render/shader/base.hpp"
@@ -15,11 +16,13 @@
 namespace Engine {
     namespace Ecs {
         namespace Component {
+            // TODO: Move enum to the type.hpp
             enum Type {
                 TRANSFORM,
                 MATERIAL,
                 MESH,
-                LIGHT
+                LIGHT,
+                CAMERA
             };
 
 
@@ -91,6 +94,27 @@ namespace Engine {
                 float outerCutOff = glm::cos(glm::radians(17.5f));
 
                 Light(Graphics::Lighting::Type type) : lightType(type) {};
+            };
+
+
+            class Camera : public Component {
+            public:
+                const Type type = Type::LIGHT;
+
+                // TODO: Need to add roll support
+                // float roll;
+                float yaw;
+                float pitch;
+
+                float zoom;
+                float speed;
+                float sensitivity;
+
+                glm::vec3 up;
+                glm::vec3 front;
+                glm::vec3 right;
+
+                Graphics::Camera::Projection projection;
             };
         }
     }

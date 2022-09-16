@@ -16,11 +16,12 @@ namespace Engine {
             std::unique_ptr<Component::Material> material;
             std::unique_ptr<Component::Mesh> mesh;
             std::unique_ptr<Component::Light> light;
+            std::unique_ptr<Component::Camera> camera;
 
             Entity() {};
             virtual ~Entity() {};
 
-            inline bool HasComponent(Component::Type type) {
+            inline bool HasComponent(const Component::Type type) {
                 switch (type) {
                     case Component::Type::TRANSFORM:
                         return transform != nullptr;
@@ -30,6 +31,8 @@ namespace Engine {
                         return mesh != nullptr;
                     case Component::Type::LIGHT:
                         return light != nullptr;
+                    case Component::Type::CAMERA:
+                        return camera != nullptr;
                     default:
                         // TODO: Add logger->error
                         return false;

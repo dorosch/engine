@@ -103,6 +103,18 @@ namespace Engine {
 
                     ImGui::TreePop();
                 }
+
+                if (ImGui::TreeNode("Cameras")) {
+                    for (std::shared_ptr<Graphics::Camera::Camera> camera : app->scene->cameras) {
+                        ImGui::TreeNodeEx(camera->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+
+                        if (ImGui::IsItemClicked()) {
+                            SelectEntity(camera);
+                        }
+                    }
+
+                    ImGui::TreePop();
+                }
             ImGui::End();
 
             // Demo window for see examples of widgets
@@ -179,6 +191,30 @@ namespace Engine {
                                     // TODO: Throw exception about unknown lighting type
                                     break;
                             }
+                        }
+                    }
+
+                    if (selectedEntity->HasComponent(Ecs::Component::Type::CAMERA)) {
+                        if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_None)) {
+                            // Select projection type selector
+                            static int projection = selectedEntity->camera->projection;
+                            const char* projectionNames[] = {"Perspective", "Orthographic"};
+
+                            if (ImGui::SliderInt("projection", &projection, 0, 1, projectionNames[projection])) {
+                                selectedEntity->camera->projection = Graphics::Camera::Projection(projection);
+                            }
+
+                            // TODO: Add viewport settings - https://docs.unity3d.com/Manual/class-Camera.html
+
+                            ImGui::SliderFloat("yaw", &selectedEntity->camera->yaw, 0, 90.0);
+                            ImGui::SliderFloat("pitch", &selectedEntity->camera->pitch, 0, 90.0);
+                            ImGui::SliderFloat("zoom", &selectedEntity->camera->zoom, 0, 90.0);
+                            ImGui::SliderFloat("speed", &selectedEntity->camera->speed, 0, 90.0);
+                            ImGui::SliderFloat("sensitivity", &selectedEntity->camera->sensitivity, 0, 90.0);
+
+                            ImGui::SliderFloat3("up", &selectedEntity->camera->up[0], -10.0, 10.0);
+                            ImGui::SliderFloat3("front", &selectedEntity->camera->front[0], -10.0, 10.0);
+                            ImGui::SliderFloat3("right", &selectedEntity->camera->right[0], -10.0, 10.0);
                         }
                     }
                 }

@@ -31,58 +31,58 @@ GLuint screenHeight = 1080;
 
 class CameraController {
 public:
-    Engine::Graphics::Camera::Camera *camera = nullptr;
+    Engine::Graphics::Camera::Camera *object = nullptr;
 
     CameraController(Engine::Graphics::Camera::Camera *targetCamera) {
-        camera = targetCamera;
+        object = targetCamera;
     }
 
     void update(float delta) {
-        float velocity = camera->speed * delta;
+        float velocity = object->camera->speed * delta;
 
         if(keys[GLFW_KEY_W]) {
-            camera->position += camera->front * velocity;
+            object->transform->position += object->camera->front * velocity;
         }
         else if(keys[GLFW_KEY_S]) {
-            camera->position -= camera->front * velocity;
+            object->transform->position -= object->camera->front * velocity;
         }
         else if(keys[GLFW_KEY_A]) {
-            camera->position -= camera->right * velocity;
+            object->transform->position -= object->camera->right * velocity;
         }
         else if(keys[GLFW_KEY_D]) {
-            camera->position += camera->right * velocity;
+            object->transform->position += object->camera->right * velocity;
         }
     }
 
     void processMouse(float x, float y) {
-        x *= camera->sensitivity;
-        y *= camera->sensitivity;
+        x *= object->camera->sensitivity;
+        y *= object->camera->sensitivity;
 
-        camera->yaw += x;
-        camera->pitch += y;
+        object->camera->yaw += x;
+        object->camera->pitch += y;
 
-        if (camera->pitch > 89.0f) {
-            camera->pitch = 89.0f;
+        if (object->camera->pitch > 89.0f) {
+            object->camera->pitch = 89.0f;
         }
 
-        if (camera->pitch < -89.0f) {
-            camera->pitch = -89.0f;
+        if (object->camera->pitch < -89.0f) {
+            object->camera->pitch = -89.0f;
         }
 
-        camera->updateVectors();
+        object->updateVectors();
     }
 
     void processMouseScroll(float y) {
-        if (1.0f <= camera->zoom && camera->zoom <= 45.0f) {
-            camera->zoom -= y;
+        if (1.0f <= object->camera->zoom && object->camera->zoom <= 45.0f) {
+            object->camera->zoom -= y;
         }
 
-        if (camera->zoom < 1.0f) {
-            camera->zoom = 1.0f;
+        if (object->camera->zoom < 1.0f) {
+            object->camera->zoom = 1.0f;
         }
 
-        if (camera->zoom > 45.0f) {
-            camera->zoom = 45.0f;
+        if (object->camera->zoom > 45.0f) {
+            object->camera->zoom = 45.0f;
         }
     }
 };
@@ -157,10 +157,10 @@ void window_size_callback(GLFWwindow* window, int width, int height) {
 
 class UserApplication : public Engine::EngineApplication {
 public:
-    Tool::Debug::DebugAxes *debugAxes = nullptr;
-    Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
+    // Tool::Debug::DebugAxes *debugAxes = nullptr;
+    // Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
-    std::unique_ptr<Engine::Graphics::Camera::Camera> camera;
+    std::shared_ptr<Engine::Graphics::Camera::Camera> camera;
     std::unique_ptr<CameraController> cameraController;
 
     void Startup() {
@@ -178,8 +178,10 @@ public:
         glfwSetWindowSizeCallback(window, window_size_callback);
 
         // Camera and controller setup
-        camera = std::make_unique<Engine::Graphics::Camera::Camera>();
+        camera = std::make_shared<Engine::Graphics::Camera::Camera>();
         cameraController = std::make_unique<CameraController>(camera.get());
+
+        scene->cameras.push_back(camera);
 
         // Add geometry primitives to the scene
         std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
@@ -233,14 +235,11 @@ public:
         scene->lighting.push_back(point2);
         // End sun light
 
-        this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
-        this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
+        // this->debugAxes = Tool::Debug::DebugAxes::GetInstance();
+        // this->debugFloorGrid = Tool::Debug::DebugFloorGrid::GetInstance();
     }
 
     void Update(float delta) {
-        glm::mat4 view = camera->getViewMatrix();
-        glm::mat4 projection = camera->getProjectionMatrix();
-
         cameraController->update(delta);
 
         if (mouseCamera) {
@@ -258,13 +257,13 @@ public:
         }
  
         // TODO: Move to the editor as debug flag
-        this->debugAxes->SetMVP(projection * view);
-        this->debugAxes->Enable();
+        // this->debugAxes->SetMVP(projection * view);
+        // this->debugAxes->Enable();
 
-        this->debugFloorGrid->SetMVP(projection * view);
-        this->debugFloorGrid->Enable();
+        // this->debugFloorGrid->SetMVP(projection * view);
+        // this->debugFloorGrid->Enable();
 
-        render->RenderScene(scene, projection, view, camera->position);
+        render->RenderScene(scene);
     }
 
     void Shutdown() {

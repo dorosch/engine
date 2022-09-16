@@ -9,6 +9,7 @@
 #include "tools/logger.hpp"
 #include "core/render/shader/base.hpp"
 #include "core/render/shader/opengl.hpp"
+#include "core/graphics/cameras/camera.hpp"
 #include "core/graphics/lighting/base.hpp"
 #include "core/scene/scene.hpp"
 
@@ -39,8 +40,7 @@ namespace Engine {
             void SetBackendAPI(Backend);
             void Startup();
             void Shutdown();
-            void RenderScene(Engine::Scene::Scene *, glm::mat4, glm::mat4, glm::vec3);
-            void RenderObject(Engine::Object *, glm::mat4, glm::mat4, glm::vec3, std::vector<std::shared_ptr<Graphics::Lighting::Light>> &);
+            void RenderScene(const Engine::Scene::Scene *);
         };
     }
 }
