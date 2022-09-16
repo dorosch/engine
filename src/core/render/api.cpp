@@ -86,7 +86,7 @@ void Render::RenderScene(Engine::Scene::Scene *scene, glm::mat4 projection, glm:
 
 void Render::RenderObject(
         Object *object, glm::mat4 projection, glm::mat4 view, glm::vec3 cameraPosition,
-        std::vector<std::shared_ptr<Graphics::Lighting::Light>> lights
+        std::vector<std::shared_ptr<Graphics::Lighting::Light>> &lights
 ) {
     if (object->HasComponent(Ecs::Component::Type::MESH)) {
         glm::mat4 model = glm::mat4(1.0f);
@@ -136,8 +136,8 @@ void Render::RenderObject(
                 shader->UniformFloat(fmt::format("lights[{}].constant", index), light->light->constant);
                 shader->UniformFloat(fmt::format("lights[{}].linear", index), light->light->linear);
                 shader->UniformFloat(fmt::format("lights[{}].quadratic", index), light->light->quadratic);
-                shader->UniformFloat(fmt::format("lights[{}].cutOff", index), glm::cos(glm::radians(light->light->cutOff)));
-                shader->UniformFloat(fmt::format("lights[{}].outerCutOff", index), glm::cos(glm::radians(light->light->outerCutOff)));
+                shader->UniformFloat(fmt::format("lights[{}].cutOff", index), light->light->cutOff);
+                shader->UniformFloat(fmt::format("lights[{}].outerCutOff", index), light->light->outerCutOff);
             }
         }
 

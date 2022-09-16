@@ -87,8 +87,8 @@ namespace Engine {
                 float quadratic = 0.44f;
 
                 // Only for spot lighting
-                float cutOff = 12.5f;
-                float outerCutOff = 17.5f;
+                float cutOff = glm::cos(glm::radians(12.5f));
+                float outerCutOff = glm::cos(glm::radians(17.5f));
 
                 Light(Graphics::Lighting::Type type) : lightType(type) {};
             };

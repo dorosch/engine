@@ -167,6 +167,7 @@ namespace Engine {
                                     ImGui::SliderFloat("quadratic", &selectedEntity->light->quadratic, 0, 1.0);
                                     break;
                                 case Engine::Graphics::Lighting::Type::SPOT:
+                                    // TODO: Pass cutOff and outerCutOff as a cos calculated
                                     ImGui::SliderFloat("cutOff", &selectedEntity->light->cutOff, 0, 90.0);
                                     ImGui::SliderFloat("outerCutOff", &selectedEntity->light->outerCutOff, 0, 90.0);
                                     ImGui::SliderFloat("constant", &selectedEntity->light->constant, 0, 1.0);

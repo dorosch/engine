@@ -23,8 +23,8 @@ namespace Engine {
             void Build(std::filesystem::path, std::filesystem::path);
             void UniformInt(const std::string &, int);
             void UniformFloat(const std::string &, float);
-            void UniformVector(const std::string &, glm::vec3);
-            void UniformMatrix(const std::string &, glm::mat4);
+            void UniformVector(const std::string &, glm::vec3 &);
+            void UniformMatrix(const std::string &, glm::mat4 &);
         };
     }
 }

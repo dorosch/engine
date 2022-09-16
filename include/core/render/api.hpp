@@ -40,7 +40,7 @@ namespace Engine {
             void Startup();
             void Shutdown();
             void RenderScene(Engine::Scene::Scene *, glm::mat4, glm::mat4, glm::vec3);
-            void RenderObject(Engine::Object *, glm::mat4, glm::mat4, glm::vec3, std::vector<std::shared_ptr<Graphics::Lighting::Light>>);
+            void RenderObject(Engine::Object *, glm::mat4, glm::mat4, glm::vec3, std::vector<std::shared_ptr<Graphics::Lighting::Light>> &);
         };
     }
 }

@@ -1,7 +1,8 @@
-#include <memory>
-
 #define GLEW_STATIC
 #define GLM_FORCE_RADIANS
+
+#include <memory>
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -212,7 +213,6 @@ public:
             std::make_shared<Engine::Graphics::Lighting::PointLight>();
         std::shared_ptr<Engine::Graphics::Lighting::PointLight> point2 = 
             std::make_shared<Engine::Graphics::Lighting::PointLight>();
-
 
         sun->name = "Sun";
         sun->light->intensity = 2.0f;
