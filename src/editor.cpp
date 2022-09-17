@@ -206,8 +206,12 @@ namespace Engine {
 
                             // TODO: Add viewport settings - https://docs.unity3d.com/Manual/class-Camera.html
 
-                            ImGui::SliderFloat("yaw", &selectedEntity->camera->yaw, 0, 90.0);
-                            ImGui::SliderFloat("pitch", &selectedEntity->camera->pitch, 0, 90.0);
+                            if (ImGui::SliderFloat("yaw", &selectedEntity->camera->yaw, -180, 180)) {
+                                static_cast<Engine::Graphics::Camera::Camera*>(selectedEntity.get())->updateVectors();
+                            }
+                            if (ImGui::SliderFloat("pitch", &selectedEntity->camera->pitch, -180, 180)) {
+                                static_cast<Engine::Graphics::Camera::Camera*>(selectedEntity.get())->updateVectors();
+                            }
                             ImGui::SliderFloat("zoom", &selectedEntity->camera->zoom, 0, 90.0);
                             ImGui::SliderFloat("speed", &selectedEntity->camera->speed, 0, 90.0);
                             ImGui::SliderFloat("sensitivity", &selectedEntity->camera->sensitivity, 0, 90.0);

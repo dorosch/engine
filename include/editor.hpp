@@ -19,6 +19,7 @@
 #include "core/render/api.hpp"
 #include "core/scene/scene.hpp"
 #include "core/object/object.hpp"
+#include "core/graphics/cameras/camera.hpp"
 
 using namespace Tool::Logger;
 
