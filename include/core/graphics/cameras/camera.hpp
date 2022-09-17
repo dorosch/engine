@@ -16,6 +16,8 @@ namespace Engine {
         namespace Camera {
             class Camera : public Object {
             public:
+                bool main;
+
                 Camera();
                 void updateVectors();
                 glm::mat4 getViewMatrix();

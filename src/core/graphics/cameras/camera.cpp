@@ -4,6 +4,7 @@ using namespace Engine::Graphics::Camera;
 
 
 Camera::Camera() {
+    main = false;
     name = "Camera";
     camera = std::make_unique<Ecs::Component::Camera>();
 

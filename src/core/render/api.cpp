@@ -58,8 +58,14 @@ void Render::Shutdown() {
 void Render::RenderScene(const Engine::Scene::Scene *scene) {
     // TODO: Only for opengl backend
 
-    // TODO: There is can be a more that one camera or can not be a cameras
-    const std::shared_ptr<Graphics::Camera::Camera> &camera = scene->cameras.front();
+    std::shared_ptr<Graphics::Camera::Camera> camera;
+
+    assert(!scene->cameras.empty());
+    for (auto camera_item : scene->cameras) {
+        if (camera_item->main) {
+            camera = camera_item;
+        }
+    }
 
     glm::mat4 view = camera->getViewMatrix();
     glm::mat4 projection = camera->getProjectionMatrix();

@@ -37,6 +37,10 @@ public:
         object = targetCamera;
     }
 
+    void changeActiveCamera(Engine::Graphics::Camera::Camera *targetCamera) {
+        object = targetCamera;
+    }
+
     void update(float delta) {
         float velocity = object->camera->speed * delta;
 
@@ -160,7 +164,8 @@ public:
     // Tool::Debug::DebugAxes *debugAxes = nullptr;
     // Tool::Debug::DebugFloorGrid *debugFloorGrid = nullptr;
 
-    std::shared_ptr<Engine::Graphics::Camera::Camera> camera;
+    std::shared_ptr<Engine::Graphics::Camera::Camera> local_camera;
+    std::shared_ptr<Engine::Graphics::Camera::Camera> global_camera;
     std::unique_ptr<CameraController> cameraController;
 
     void Startup() {
@@ -178,10 +183,26 @@ public:
         glfwSetWindowSizeCallback(window, window_size_callback);
 
         // Camera and controller setup
-        camera = std::make_shared<Engine::Graphics::Camera::Camera>();
-        cameraController = std::make_unique<CameraController>(camera.get());
+        local_camera = std::make_shared<Engine::Graphics::Camera::Camera>();
+        global_camera = std::make_shared<Engine::Graphics::Camera::Camera>();
+        cameraController = std::make_unique<CameraController>(local_camera.get());
 
-        scene->cameras.push_back(camera);
+        local_camera->name = "local camera";
+        local_camera->main = true;
+
+        global_camera->name = "global camera";
+        global_camera->camera->yaw = 0.0f;
+        global_camera->camera->pitch = -35.0f;
+        global_camera->camera->up = glm::vec3(0.0f, 1.0f, 0.0f);
+        global_camera->camera->front = glm::vec3(0.0f, 0.0f, -1.0f);
+        global_camera->camera->right = glm::vec3(0.0f, 0.0f, 1.0f);
+        global_camera->transform->position = glm::vec3(-15.0f, 10.0f, -1.0f);
+
+        local_camera->updateVectors();
+        global_camera->updateVectors();
+
+        scene->cameras.push_back(global_camera);
+        scene->cameras.push_back(local_camera);
 
         // Add geometry primitives to the scene
         std::shared_ptr<Engine::Geometry::Plane> plane = std::make_shared<Engine::Geometry::Plane>();
@@ -240,6 +261,12 @@ public:
     }
 
     void Update(float delta) {
+        for (auto camera_item : scene->cameras) {
+            if (camera_item->main) {
+                cameraController->changeActiveCamera(camera_item.get());
+                break;
+            }
+        }
         cameraController->update(delta);
 
         if (mouseCamera) {

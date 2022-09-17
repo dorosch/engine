@@ -106,10 +106,30 @@ namespace Engine {
 
                 if (ImGui::TreeNode("Cameras")) {
                     for (std::shared_ptr<Graphics::Camera::Camera> camera : app->scene->cameras) {
-                        ImGui::TreeNodeEx(camera->name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+                        ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth;
+
+                        if (camera->main) {
+                            flag |= ImGuiTreeNodeFlags_Selected;
+                        }
+
+                        ImGui::TreeNodeEx(camera->name.c_str(), flag);
 
                         if (ImGui::IsItemClicked()) {
                             SelectEntity(camera);
+                        }
+
+                        if (ImGui::BeginPopupContextItem()) {
+                            if (ImGui::MenuItem("make main")) {
+                                for (auto camera_item : app->scene->cameras) {
+                                    if (camera_item->main) {
+                                        camera_item->main = false;
+                                        break;
+                                    }
+                                }
+
+                                camera->main = true;
+                            }
+                            ImGui::EndPopup();
                         }
                     }
 
@@ -179,9 +199,14 @@ namespace Engine {
                                     ImGui::SliderFloat("quadratic", &selectedEntity->light->quadratic, 0, 1.0);
                                     break;
                                 case Engine::Graphics::Lighting::Type::SPOT:
-                                    // TODO: Pass cutOff and outerCutOff as a cos calculated
-                                    ImGui::SliderFloat("cutOff", &selectedEntity->light->cutOff, 0, 90.0);
-                                    ImGui::SliderFloat("outerCutOff", &selectedEntity->light->outerCutOff, 0, 90.0);
+                                    static float cutOff, outerCutOff;
+
+                                    if (ImGui::SliderFloat("cutOff", &cutOff, 0, 90.0)) {
+                                        selectedEntity->light->cutOff = glm::cos(glm::radians(cutOff));
+                                    }
+                                    if (ImGui::SliderFloat("outerCutOff", &outerCutOff, 0, 90.0)) {
+                                        selectedEntity->light->outerCutOff = glm::cos(glm::radians(outerCutOff));
+                                    }
                                     ImGui::SliderFloat("constant", &selectedEntity->light->constant, 0, 1.0);
                                     ImGui::SliderFloat("linear", &selectedEntity->light->linear, 0, 1.0);
                                     ImGui::SliderFloat("quadratic", &selectedEntity->light->quadratic, 0, 1.0);
