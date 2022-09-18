@@ -11,17 +11,16 @@ namespace Engine {
     namespace Geometry {
         class Primitive : public Object {
         public:
-            Primitive() : Object() {
-                mesh = std::make_unique<Ecs::Component::Mesh>();
-            }
+            Primitive() : Object() {};
         };
 
 
         class Plane : public Primitive {
         public:
             Plane() : Primitive() {
-                name = std::string("Plane");
+                std::unique_ptr<Ecs::Component::Mesh> mesh = std::make_unique<Ecs::Component::Mesh>();
 
+                name = std::string("Plane");
                 mesh->vertices = {
                    -0.5f,  0.5f,  0.0f,  0.0f,  0.0f, 1.0f,
                     0.5f,  0.5f,  0.0f,  0.0f,  0.0f, 1.0f,
@@ -31,6 +30,7 @@ namespace Engine {
                    -0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 1.0f
                 };
                 mesh->Initialize();
+                meshes.push_back(std::move(mesh));
             }
         };
 
@@ -38,8 +38,9 @@ namespace Engine {
         class Cube : public Primitive {
         public:
             Cube() : Primitive() {
-                name = std::string("Cube");
+                std::unique_ptr<Ecs::Component::Mesh> mesh = std::make_unique<Ecs::Component::Mesh>();
 
+                name = std::string("Cube");
                 mesh->vertices = {
                    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
                     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -84,6 +85,7 @@ namespace Engine {
                    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
                 };
                 mesh->Initialize();
+                meshes.push_back(std::move(mesh));
             }
         };
     }

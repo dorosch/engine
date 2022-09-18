@@ -162,7 +162,7 @@ namespace Engine {
 
                     if (selectedEntity->HasComponent(Ecs::Component::Type::MESH)) {
                         if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_None)) {
-                            ImGui::Text("vertices: %ld", selectedEntity->mesh->vertices.size());
+                            ImGui::Text("meshes: %ld", selectedEntity->meshes.size());
                         }
                     }
 

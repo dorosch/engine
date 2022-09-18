@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "core/ecs/component.hpp"
 
@@ -14,7 +15,7 @@ namespace Engine {
             std::string name;
             std::unique_ptr<Component::Transform> transform = std::make_unique<Component::Transform>();
             std::unique_ptr<Component::Material> material;
-            std::unique_ptr<Component::Mesh> mesh;
+            std::vector<std::unique_ptr<Component::Mesh>> meshes;
             std::unique_ptr<Component::Light> light;
             std::unique_ptr<Component::Camera> camera;
 
@@ -28,7 +29,7 @@ namespace Engine {
                     case Component::Type::MATERIAL:
                         return material != nullptr;
                     case Component::Type::MESH:
-                        return mesh != nullptr;
+                        return meshes.size() > 0;
                     case Component::Type::LIGHT:
                         return light != nullptr;
                     case Component::Type::CAMERA:

@@ -135,10 +135,12 @@ void Render::RenderScene(const Engine::Scene::Scene *scene) {
                 shader->UniformFloat("material.shininess", object->material->shininess);
             }
 
-            object->mesh->VAO->bind();
-            // TODO: Add calculation of the number of lines to the mesh method
-            glDrawArrays(GL_TRIANGLES, 0, object->mesh->vertices.size() / 6);
-            object->mesh->VAO->unbind();
+            for (auto const &mesh : object->meshes) {
+                mesh->VAO->bind();
+                // TODO: Add calculation of the number of lines to the mesh method
+                glDrawArrays(GL_TRIANGLES, 0, mesh->vertices.size() / 6);
+                mesh->VAO->unbind();
+            }
         }
     }
 
@@ -154,9 +156,11 @@ void Render::RenderScene(const Engine::Scene::Scene *scene) {
         lightingShader->UniformMatrix("projection", projection);
 
         // If the editor is enabled, then draw where the light source is
-        light->mesh->VAO->bind();
-        glDrawArrays(GL_TRIANGLES, 0, light->mesh->vertices.size() / 6);
-        light->mesh->VAO->unbind();
+        for (auto const &mesh : light->meshes) {
+            mesh->VAO->bind();
+            glDrawArrays(GL_TRIANGLES, 0, mesh->vertices.size() / 6);
+            mesh->VAO->unbind();
+        }
     }
 
     scene->environment->skybox->update(projection * view);
