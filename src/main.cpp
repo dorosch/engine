@@ -85,8 +85,8 @@ public:
             object->camera->zoom = 1.0f;
         }
 
-        if (object->camera->zoom > 45.0f) {
-            object->camera->zoom = 45.0f;
+        if (object->camera->zoom > 60.0f) {
+            object->camera->zoom = 60.0f;
         }
     }
 };
