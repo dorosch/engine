@@ -21,7 +21,7 @@ namespace Engine {
             uint32_t object = 0;
 
             static Cubemap *GetInstance();
-            void Build(std::filesystem::path) {};
+            void Build(std::filesystem::path) {}
             virtual void Build(std::vector<std::filesystem::path>) = 0;
             virtual void Bind() = 0;
         };

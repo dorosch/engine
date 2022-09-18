@@ -19,8 +19,8 @@ namespace Engine {
             std::unique_ptr<Component::Light> light;
             std::unique_ptr<Component::Camera> camera;
 
-            Entity() {};
-            virtual ~Entity() {};
+            Entity() {}
+            virtual ~Entity() {}
 
             inline bool HasComponent(const Component::Type type) {
                 switch (type) {

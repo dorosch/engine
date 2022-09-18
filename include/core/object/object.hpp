@@ -7,8 +7,8 @@
 namespace Engine {
     class Object : public Ecs::Entity {
     public:
-        Object() : Ecs::Entity() {};
-        virtual ~Object() {};
+        Object() : Ecs::Entity() {}
+        virtual ~Object() {}
     };
 }
 

@@ -93,7 +93,7 @@ namespace Engine {
                 float cutOff = glm::cos(glm::radians(12.5f));
                 float outerCutOff = glm::cos(glm::radians(17.5f));
 
-                Light(Graphics::Lighting::Type type) : lightType(type) {};
+                Light(Graphics::Lighting::Type type) : lightType(type) {}
             };
 
 

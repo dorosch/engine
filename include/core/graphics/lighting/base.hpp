@@ -12,8 +12,8 @@ namespace Engine {
         namespace Lighting {
             class Light : public Geometry::Cube {
             public:
-                Light() : Cube() {};
-                virtual ~Light() {};
+                Light() : Cube() {}
+                virtual ~Light() {}
             };
 
 

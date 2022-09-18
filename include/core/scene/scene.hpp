@@ -32,7 +32,7 @@ namespace Engine {
             std::unique_ptr<Environment> environment;
 
             Scene();
-            virtual ~Scene() {};
+            virtual ~Scene() {}
             void startup();
         };
     }

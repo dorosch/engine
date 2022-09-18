@@ -34,7 +34,7 @@ namespace Engine {
 
             // TODO: Pass to the GetInstance the application instance for define window backend
             static WindowProvider *GetInstance();
-            virtual ~WindowProvider() {};
+            virtual ~WindowProvider() {}
             virtual void Startup() = 0;
             virtual void Create() = 0;
             virtual void Update() = 0;

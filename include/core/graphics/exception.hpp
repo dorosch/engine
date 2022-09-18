@@ -7,7 +7,7 @@ namespace Engine {
     namespace Graphics {
         class GraphicsException : public std::exception {
         public:
-            virtual ~GraphicsException() {};
+            virtual ~GraphicsException() {}
             virtual const char* what() const noexcept = 0;
         };
     }

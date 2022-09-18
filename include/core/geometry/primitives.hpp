@@ -11,7 +11,7 @@ namespace Engine {
     namespace Geometry {
         class Primitive : public Object {
         public:
-            Primitive() : Object() {};
+            Primitive() : Object() {}
         };
 
 

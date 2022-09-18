@@ -29,7 +29,7 @@ namespace Tool {
 
     class ObjModel : public Model {
     public:
-        ObjModel(std::filesystem::path path) : Model(path) {};
+        ObjModel(std::filesystem::path path) : Model(path) {}
         void Load();
         std::vector<float> Data();
     };
