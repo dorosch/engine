@@ -2,11 +2,22 @@
 #define __RADIAN__
 
 #include <memory>
+#include <exception>
 
+#include "tools/logger.hpp"
 
 namespace Radian {
+    class Exception : public std::exception {
+    public:
+        virtual ~Exception() {}
+        virtual const char* what() const noexcept = 0;
+    };
+
+
     class Application {
     public:
+        std::unique_ptr<Tool::Logger> logger;
+
         Application();
         virtual ~Application();
         virtual void startup() = 0;

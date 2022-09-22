@@ -1,21 +1,21 @@
 #include <memory>
-#include <iostream>
 
 #include "radian.hpp"
+#include "tools/logger.hpp"
 
 
 class Application : public Radian::Application {
 public:
     void startup() override {
-        std::cout << "startup" << std::endl;
+        logger->info("Application startup");
     }
 
     void run() override {
-        std::cout << "run" << std::endl;
+        logger->info("Application run");
     }
 
     void shutdown() override {
-        std::cout << "shutdown" << std::endl;
+        logger->info("Application shutdown");
     }
 };
 
