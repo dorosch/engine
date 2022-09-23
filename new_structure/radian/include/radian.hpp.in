@@ -1,6 +1,9 @@
 #ifndef __RADIAN__
 #define __RADIAN__
 
+#define VERSION_MAJOR @radian_VERSION_MAJOR@
+#define VERSION_MINOR @radian_VERSION_MINOR@
+
 #include <memory>
 #include <exception>
 

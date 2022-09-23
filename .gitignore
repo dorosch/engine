@@ -3,3 +3,7 @@ imgui*
 target/*
 resources/*
 .vscode
+
+*/build/*
+
+
