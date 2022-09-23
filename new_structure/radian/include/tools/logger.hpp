@@ -3,6 +3,9 @@
 
 #include <map>
 #include <memory>
+#include <string>
+
+#include <iostream>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -33,6 +36,22 @@ namespace Radian {
             void error(const std::string &);
             void critical(const std::string &);
         };
+
+
+        static std::map<std::string, std::shared_ptr<Logger>> loggers;
+
+
+        inline std::shared_ptr<Logger> &getLogger(const std::string &name) {
+            auto logger = loggers.find(name);
+
+            if (logger == loggers.end()) {
+                loggers.emplace(name, std::make_shared<Logger>(name));
+
+                return loggers[name];
+            }
+
+            return logger->second;
+        }
     }
 }
 

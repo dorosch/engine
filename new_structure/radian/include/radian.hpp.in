@@ -19,7 +19,7 @@ namespace Radian {
 
     class Application {
     public:
-        std::unique_ptr<Tool::Logger> logger;
+        std::shared_ptr<Tool::Logger> logger;
 
         Application();
         virtual ~Application();

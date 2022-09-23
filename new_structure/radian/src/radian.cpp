@@ -4,7 +4,7 @@ using namespace Radian;
 
 
 Application::Application() {
-    logger = std::make_unique<Tool::Logger>("app");
+    logger = Tool::getLogger("app");
 }
 
 
