@@ -4,6 +4,4 @@ target/*
 resources/*
 .vscode
 
-*/build/*
-
-
+**/build/**
