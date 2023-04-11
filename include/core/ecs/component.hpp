@@ -99,7 +99,7 @@ namespace Engine {
 
             class Camera : public Component {
             public:
-                const Type type = Type::LIGHT;
+                const Type type = Type::CAMERA;
 
                 // TODO: Need to add roll support
                 // float roll;
